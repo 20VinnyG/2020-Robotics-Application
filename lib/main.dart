@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:barcode_scan/barcode_scan.dart';
+import 'package:flutter/services.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 void main() => runApp(MyApp());
-
 
 class MyApp extends StatelessWidget {
   @override
@@ -12,7 +14,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/scoutMode': (_) => ScoutMode(),
         '/scanMode': (_) => ScanMode(),
-        'about': (_) => About(),
+        '/about': (_) => About(),
       },
     );
   }
@@ -57,71 +59,106 @@ class Homepage extends StatelessWidget {
 
 class ScoutMode extends StatelessWidget {
 
-  List<DropdownMenuItem<int>> listDrop = [];
+  String _initials, _matchNumber, _teamNumber;
 
-  void loadData() {
-    listDrop = [];
-    listDrop.add(new DropdownMenuItem(
-      child: new Text('Blue 1'),
-      value: 1,
-    ));
-    listDrop.add(new DropdownMenuItem(
-      child: new Text('Blue 2'),
-      value: 2,
-    ));
-    listDrop.add(new DropdownMenuItem(
-      child: new Text('Blue 3'),
-      value: 3,
-    ));
-        listDrop.add(new DropdownMenuItem(
-      child: new Text('Red 1'),
-      value: 4,
-    ));
-    listDrop.add(new DropdownMenuItem(
-      child: new Text('Red 2'),
-      value: 5,
-    ));
-    listDrop.add(new DropdownMenuItem(
-      child: new Text('Red 3'),
-      value: 6,
-    ));
+  createQR(BuildContext context){
+    return showDialog(context: context,builder: (context) {
+      return AlertDialog(
+        title: Text("Generated QR"),
+        content: QrImage(
+          data: "sts",
+        ),
+      );
+    } );
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: new AppBar(
-            title: new Text("Scout Mode"), backgroundColor: Colors.blue[900]),
-        body: new Container(
-            child: ListView(
+      appBar: new AppBar(
+          title: new Text("Scout Mode"), backgroundColor: Colors.blue[900]),
+      body: new Container(
+        child: ListView(
           children: <Widget>[
             TextFormField(
-                decoration: const InputDecoration(
-              hintText: 'Enter your initials',
-            )),
+              decoration: const InputDecoration(
+                hintText: 'Enter your initials',
+              ),
+              onSaved: (input) => _initials = input,
+            ),
             TextFormField(
-                decoration: const InputDecoration(
-              hintText: 'Enter the match number',
-            )),
+              decoration: const InputDecoration(
+                hintText: 'Enter the match number',
+              ),
+              onSaved: (input) => _matchNumber = input,
+            ),
             TextFormField(
-                decoration: const InputDecoration(
-              hintText: 'Enter the team number',
-            )),
-            DropdownButton(
-              items: listDrop,
-              onChanged: null, 
-            )
+              decoration: const InputDecoration(
+                hintText: 'Enter the team number',
+              ),
+              onSaved: (input) => _teamNumber = input,
+            ),
           ],
-        )));
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+          label: Text("Generate QR"),
+          onPressed: () {
+            createQR(context);
+          }),
+    );
   }
 }
 
-class ScanMode extends StatelessWidget {
+class ScanMode extends StatefulWidget {
+  @override
+  _ScanModeState createState() => _ScanModeState();
+}
+
+class _ScanModeState extends State<ScanMode> {
+  String result = "Hey there !";
+
+  Future _scanQR() async {
+    try {
+      String qrResult = await BarcodeScanner.scan();
+      setState(() {
+        result = qrResult;
+      });
+    } on PlatformException catch (ex) {
+      if (ex.code == BarcodeScanner.CameraAccessDenied) {
+        setState(() {
+          result = "Camera permission was denied";
+        });
+      } else {
+        setState(() {
+          result = "Unkown Error $ex";
+        });
+      }
+    } on FormatException {
+      setState(() {
+        result = "You pressed the back button before scanning anything";
+      });
+    } catch (ex) {
+      setState(() {
+        result = "Unknown Error $ex";
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
           title: new Text("Scan Mode"), backgroundColor: Colors.blue[900]),
+      body: Center(
+          child: Text(
+        result,
+      )),
+      floatingActionButton: FloatingActionButton.extended(
+        icon: Icon(Icons.camera_alt),
+        label: Text("Scan"),
+        onPressed: _scanQR,
+      ),
     );
   }
 }
