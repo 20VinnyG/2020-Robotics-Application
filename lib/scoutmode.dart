@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'match.dart';
+import 'dart:convert';
 
 class ScoutMode extends StatefulWidget {
 
@@ -12,7 +13,6 @@ class _ScoutModeState extends State<ScoutMode> {
 
   final _match = Match();
   final _formKey = GlobalKey<FormState>();
-
 
   createQR(BuildContext context){
     return showDialog(context: context,builder: (context) {
@@ -80,7 +80,10 @@ class _ScoutModeState extends State<ScoutMode> {
                 final form = _formKey.currentState;
                 if (form.validate()) {
                   form.save();
-                  createQR(context);
+                  var data = json.encode({
+                    'data': _formKey.currentState.toString()
+                  }
+                  );
                 }
               },)
             )
