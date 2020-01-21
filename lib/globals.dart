@@ -1,0 +1,3 @@
+class Globals{
+  List schedule;
+}

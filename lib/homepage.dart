@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frc1640scoutingframework/about.dart';
 import 'package:frc1640scoutingframework/scan.dart';
+import 'bluealliance.dart';
 import 'scoutmode.dart';
 
 class Homepage extends StatefulWidget {
@@ -47,6 +48,16 @@ class _HomepageState extends State<Homepage> {
                           new MaterialPageRoute(
                               builder: (context) => About()));
                     }),
+                RaisedButton(
+                    child: Text('TBA Code'),
+                    color: Colors.yellow,
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          new MaterialPageRoute(
+                              builder: (context) => Bluealliance()));
+                    }),
+                
               ],
             ),
           ),

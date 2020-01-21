@@ -8,14 +8,41 @@ class ScanMode extends StatefulWidget {
 }
 
 class _ScanModeState extends State<ScanMode> {
+
+  String blue1;
+  String blue2;
+  String blue3;
+  String red1;
+  String red2;
+  String red3;
+  String packagedpayload;
   String result = "Hey there !";
 
   Future _scanQR() async {
     try {
-      String qrResult = await BarcodeScanner.scan();
-      setState(() {
-        result = qrResult;
-      });
+      for(int i = 0; i <= 6; i++) {
+        String qrResult = await BarcodeScanner.scan();
+        if(qrResult.contains("Blue1")) {
+          blue1 = qrResult;
+        }
+        if(qrResult.contains("Blue2")) {
+          blue2 = qrResult;
+        }
+        if(qrResult.contains("Blue3")) {
+          blue3 = qrResult;
+        }
+        if(qrResult.contains("Red1")) {
+          red1 = qrResult;
+        }
+        if(qrResult.contains("Red2")) {
+          red2 = qrResult;
+        }
+        if(qrResult.contains("Red3")) {
+          red3 = qrResult;
+        }
+      }
+
+
     } on PlatformException catch (ex) {
       if (ex.code == BarcodeScanner.CameraAccessDenied) {
         setState(() {
@@ -45,7 +72,8 @@ class _ScanModeState extends State<ScanMode> {
       body: Center(
           child: Text(
         result,
-      )),
+      ),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         icon: Icon(Icons.camera_alt),
         label: Text("Scan"),
