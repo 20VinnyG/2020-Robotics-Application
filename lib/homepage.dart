@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frc1640scoutingframework/about.dart';
 import 'package:frc1640scoutingframework/scan.dart';
+import 'package:frc1640scoutingframework/teleop.dart';
 import 'bluealliance.dart';
 import 'scoutmode.dart';
 
@@ -57,7 +58,15 @@ class _HomepageState extends State<Homepage> {
                           new MaterialPageRoute(
                               builder: (context) => Bluealliance()));
                     }),
-                
+                RaisedButton(
+                    child: Text('Test'),
+                    color: Colors.yellow,
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          new MaterialPageRoute(
+                              builder: (context) => Teleop()));
+                    }),
               ],
             ),
           ),

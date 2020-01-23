@@ -35,6 +35,8 @@ class _ScoutModeState extends State<ScoutMode> {
                           validator: (input) =>
                               input.isEmpty ? 'Not a valid input' : null,
                           onSaved: (input) => newMatch.initials = input,
+                          onFieldSubmitted: (input) => newMatch.initials = input,
+                          onChanged: (input) => newMatch.initials = input,
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
@@ -45,6 +47,8 @@ class _ScoutModeState extends State<ScoutMode> {
                               input.isEmpty ? 'Not a valid input' : null,
                           onSaved: (input) =>
                               newMatch.matchNumber = int.parse(input),
+                              onChanged: (input) => newMatch.matchNumber = int.parse(input),
+                              onFieldSubmitted: (input) => newMatch.matchNumber = int.parse(input)
                         ),
                         DropdownButton(
                           items: [
@@ -64,6 +68,7 @@ class _ScoutModeState extends State<ScoutMode> {
                           onChanged: (value) {
                             setState(() {
                               newMatch.position = value;
+                              onFieldSubmitted: (input) => newMatch.position = value;
                             });
                           },
                           hint: Text("Robot Position"),
@@ -78,6 +83,8 @@ class _ScoutModeState extends State<ScoutMode> {
                               input.isEmpty ? 'Not a valid input' : null,
                           onSaved: (input) =>
                               newMatch.teamNumber = int.parse(input),
+                              onChanged: (input) => newMatch.teamNumber = int.parse(input),
+                              onFieldSubmitted: (input) => newMatch.teamNumber = int.parse(input),
                         ),
                         Slider(
                           value: newMatch.initiationlinepos,
@@ -227,7 +234,7 @@ class _ScoutModeState extends State<ScoutMode> {
                                 }*/
   }
 
-  void _getTeam() {
+   void _getTeam() {
     var scheduledTeam;
     String alphaPos;
     int betaPos;
@@ -239,6 +246,8 @@ class _ScoutModeState extends State<ScoutMode> {
     betaPos = newMatch.position % 3;
     scheduledTeam = newGlobals.schedule[newMatch.matchNumber]["alliances"]
         [alphaPos]["team_keys"][betaPos];
+    scheduledTeam = int.parse(scheduledTeam.substring(3));
     print(scheduledTeam);
+    //return scheduledTeam;
   }
 }
