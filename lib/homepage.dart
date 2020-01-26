@@ -59,7 +59,7 @@ class _HomepageState extends State<Homepage> {
                               builder: (context) => Bluealliance()));
                     }),
                 RaisedButton(
-                    child: Text('Test'),
+                    child: Text('Test - Teleop'),
                     color: Colors.yellow,
                     onPressed: () {
                       Navigator.push(

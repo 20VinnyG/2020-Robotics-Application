@@ -4,6 +4,8 @@ import 'package:frc1640scoutingframework/bluealliance.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'match.dart';
+import 'package:flutter/src/rendering/shifted_box.dart';
+import 'package:flutter/src/rendering/box.dart';
 import 'globals.dart';
 
 class ScoutMode extends StatefulWidget {
