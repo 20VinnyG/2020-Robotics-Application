@@ -3,17 +3,20 @@ import "shot.dart";
 
 double screenx = 811;
 double screeny;
+Paint paint = new Paint();
+Canvas canvas;
+Size size = new Size(screenx, screeny);
+
 class Teleop extends StatefulWidget {
   @override
   _TeleopState createState() => _TeleopState();
 }
+
 bool val = true;
-List<Shot> shots = new List(); 
+List<Shot> shots = new List();
 
 class _TeleopState extends State<Teleop> {
-
   void onTapDown(BuildContext context, TapDownDetails details) {
-    
     print('${details.globalPosition}');
     final RenderBox box = context.findRenderObject();
     final Offset localOffset = box.globalToLocal(details.globalPosition);
@@ -23,7 +26,7 @@ class _TeleopState extends State<Teleop> {
     });
   }
 
-  onSwitchValueChanged (bool newVal) {
+  onSwitchValueChanged(bool newVal) {
     setState(() {
       val = newVal;
     });
@@ -45,6 +48,7 @@ class _TeleopState extends State<Teleop> {
       ),
       onTapDown: (TapDownDetails details) => onTapDown(context, details),
       onTap: () {
+        canvas.drawCircle(Offset(screenx, screeny), 25.0, paint);
         Shot newShot = new Shot();
         newShot.posx = screenx;
         newShot.posy = screeny;
@@ -100,5 +104,17 @@ class _TeleopState extends State<Teleop> {
             });
       },
     ));
+  }
+}
+
+class MyPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawCircle(Offset(screenx, screeny), 25.0, Paint());
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return null;
   }
 }

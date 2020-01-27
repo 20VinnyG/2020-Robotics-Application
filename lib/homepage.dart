@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frc1640scoutingframework/about.dart';
+import 'package:frc1640scoutingframework/autonpath.dart';
 import 'package:frc1640scoutingframework/scan.dart';
 import 'package:frc1640scoutingframework/teleop.dart';
 import 'bluealliance.dart';
@@ -57,6 +58,15 @@ class _HomepageState extends State<Homepage> {
                           context,
                           new MaterialPageRoute(
                               builder: (context) => Bluealliance()));
+                    }),
+                RaisedButton(
+                    child: Text('Test - Autonpath'),
+                    color: Colors.yellow,
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          new MaterialPageRoute(
+                              builder: (context) => AutonPath()));
                     }),
                 RaisedButton(
                     child: Text('Test - Teleop'),
