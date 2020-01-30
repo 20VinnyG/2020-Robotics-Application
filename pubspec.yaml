@@ -28,7 +28,7 @@ dependencies:
   qr_flutter: ^3.0.1
   http: ^0.12.0+4
   smooth_star_rating: 1.0.4+2
-
+  flutter_speed_dial: ^1.2.1
 
 dev_dependencies:
   flutter_test:

@@ -50,33 +50,6 @@ class _HomepageState extends State<Homepage> {
                           new MaterialPageRoute(
                               builder: (context) => About()));
                     }),
-                RaisedButton(
-                    child: Text('TBA Code'),
-                    color: Colors.yellow,
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          new MaterialPageRoute(
-                              builder: (context) => Bluealliance()));
-                    }),
-                RaisedButton(
-                    child: Text('Test - Autonpath'),
-                    color: Colors.yellow,
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          new MaterialPageRoute(
-                              builder: (context) => AutonPath()));
-                    }),
-                RaisedButton(
-                    child: Text('Test - Teleop'),
-                    color: Colors.yellow,
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          new MaterialPageRoute(
-                              builder: (context) => Teleop()));
-                    }),
               ],
             ),
           ),

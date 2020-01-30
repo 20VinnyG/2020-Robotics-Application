@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frc1640scoutingframework/autonpath.dart';
 import 'package:frc1640scoutingframework/bluealliance.dart';
+import 'package:frc1640scoutingframework/teleop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'match.dart';
-import 'package:flutter/src/rendering/shifted_box.dart';
-import 'package:flutter/src/rendering/box.dart';
-import 'globals.dart';
 
 class ScoutMode extends StatefulWidget {
+  final List autonpath;
+  ScoutMode({Key key, this.autonpath}) : super (key: key);
   @override
   _ScoutModeState createState() => _ScoutModeState();
 }
 
 class _ScoutModeState extends State<ScoutMode> {
-  Match newMatch = new Match();
   final formKey = GlobalKey<FormState>();
-
+  Match newMatch = new Match();
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -30,6 +30,23 @@ class _ScoutModeState extends State<ScoutMode> {
                     key: formKey,
                     child: ListView(
                       children: [
+                        Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16.0, horizontal: 16.0),
+                            child: RaisedButton(
+                              child: Text("Import Schedule"),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    new MaterialPageRoute(
+                                        builder: (context) => Bluealliance()));
+                              },
+                            )),
+                        Divider(
+                          height: 30.0,
+                          indent: 5.0,
+                          color: Colors.black,
+                        ),
                         TextFormField(
                           decoration: const InputDecoration(
                             hintText: 'Enter your initials',
@@ -37,21 +54,23 @@ class _ScoutModeState extends State<ScoutMode> {
                           validator: (input) =>
                               input.isEmpty ? 'Not a valid input' : null,
                           onSaved: (input) => newMatch.initials = input,
-                          onFieldSubmitted: (input) => newMatch.initials = input,
+                          onFieldSubmitted: (input) =>
+                              newMatch.initials = input,
                           onChanged: (input) => newMatch.initials = input,
                         ),
                         TextFormField(
-                          decoration: const InputDecoration(
-                            hintText: 'Enter the match number',
-                          ),
-                          keyboardType: TextInputType.number,
-                          validator: (input) =>
-                              input.isEmpty ? 'Not a valid input' : null,
-                          onSaved: (input) =>
-                              newMatch.matchNumber = int.parse(input),
-                              onChanged: (input) => newMatch.matchNumber = int.parse(input),
-                              onFieldSubmitted: (input) => newMatch.matchNumber = int.parse(input)
-                        ),
+                            decoration: const InputDecoration(
+                              hintText: 'Enter the match number',
+                            ),
+                            keyboardType: TextInputType.number,
+                            validator: (input) =>
+                                input.isEmpty ? 'Not a valid input' : null,
+                            onSaved: (input) =>
+                                newMatch.matchNumber = int.parse(input),
+                            onChanged: (input) =>
+                                newMatch.matchNumber = int.parse(input),
+                            onFieldSubmitted: (input) =>
+                                newMatch.matchNumber = int.parse(input)),
                         DropdownButton(
                           items: [
                             DropdownMenuItem(
@@ -70,7 +89,6 @@ class _ScoutModeState extends State<ScoutMode> {
                           onChanged: (value) {
                             setState(() {
                               newMatch.position = value;
-                              onFieldSubmitted: (input) => newMatch.position = value;
                             });
                           },
                           hint: Text("Robot Position"),
@@ -85,8 +103,10 @@ class _ScoutModeState extends State<ScoutMode> {
                               input.isEmpty ? 'Not a valid input' : null,
                           onSaved: (input) =>
                               newMatch.teamNumber = int.parse(input),
-                              onChanged: (input) => newMatch.teamNumber = int.parse(input),
-                              onFieldSubmitted: (input) => newMatch.teamNumber = int.parse(input),
+                          onChanged: (input) =>
+                              newMatch.teamNumber = int.parse(input),
+                          onFieldSubmitted: (input) =>
+                              newMatch.teamNumber = int.parse(input),
                         ),
                         Slider(
                           value: newMatch.initiationlinepos,
@@ -121,12 +141,50 @@ class _ScoutModeState extends State<ScoutMode> {
                           value: newMatch.preloadedfuelcells,
                         ),
                         Divider(
-                          height: 20.0,
+                          height: 30.0,
                           indent: 5.0,
                           color: Colors.black,
                         ),
+                        Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16.0, horizontal: 16.0),
+                            child: RaisedButton(
+                              child: Text("Auton"),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    new MaterialPageRoute(
+                                        builder: (context) => AutonPath()));
+                              },
+                            )),
+                        Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16.0, horizontal: 16.0),
+                            child: RaisedButton(
+                              child: Text("Test Pipeline"),
+                              onPressed: () {
+                                print("${widget.autonpath}");
+                              },
+                            )),
                         Divider(
-                          height: 20.0,
+                          height: 30.0,
+                          indent: 5.0,
+                          color: Colors.black,
+                        ),
+                        Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16.0, horizontal: 16.0),
+                            child: RaisedButton(
+                              child: Text("Teleop"),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    new MaterialPageRoute(
+                                        builder: (context) => Teleop()));
+                              },
+                            )),
+                        Divider(
+                          height: 30.0,
                           indent: 5.0,
                           color: Colors.black,
                         ),
@@ -179,13 +237,6 @@ class _ScoutModeState extends State<ScoutMode> {
                               child: Text("Generate QR"),
                               onPressed: _submit,
                             )),
-                        Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 16.0, horizontal: 16.0),
-                            child: RaisedButton(
-                              child: Text("Get Team"),
-                              onPressed: _getTeam,
-                            ))
                       ],
                       scrollDirection: Axis.vertical,
                     )))));
@@ -207,6 +258,7 @@ class _ScoutModeState extends State<ScoutMode> {
         'generalsuccess': newMatch.generalSuccess,
         'defensivesuccess': newMatch.defensiveSuccess,
         'accuracy': newMatch.accuracy,
+        'path': newMatch.path
       };
       print(payload);
       showDialog(
@@ -218,25 +270,11 @@ class _ScoutModeState extends State<ScoutMode> {
                   data: payload.toString(),
                 ));
           });
+      print(payload.toString());
     }
-    /*_getTeam(){
-                                  int scheduledTeam;
-                                  String alphaPos;
-                                  int betaPos;
-                                  if (newMatch.position <= 3) {
-                                    alphaPos="blue";
-                                  } 
-                                  else{
-                                    alphaPos="red";
-                                  }
-                                  betaPos = newMatch.position % 3;
-                                  scheduledTeam = newGlobals.schedule[newMatch.matchNumber]["alliances"][alphaPos]["team_keys"][betaPos];
-                                  print(scheduledTeam);
-                                  return scheduledTeam;
-                                }*/
   }
 
-   void _getTeam() {
+  void _getTeam() {
     var scheduledTeam;
     String alphaPos;
     int betaPos;
@@ -253,3 +291,5 @@ class _ScoutModeState extends State<ScoutMode> {
     //return scheduledTeam;
   }
 }
+//incoming object pipeline
+
