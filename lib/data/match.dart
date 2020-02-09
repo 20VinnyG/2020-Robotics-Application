@@ -4,25 +4,25 @@ class Match {
   int position;
   int matchNumber;
   int teamNumber;
-  double initiationlinepos =0;
-  int preloadedfuelcells;
+  double initiationLinePosition =0;
+  int preloadedFuelCells;
   int id;
   //Auton
   var path;
-  var autoshots;
+  var autonShots;
   //Telop
-  var teleopshots;
+  var teleopShots;
   //Endgame
-  double climbtime=0;
+  double climbTime=0;
   int park;
   bool levelability = false;
   bool assist = false;
-  bool typeassist = false;
+  bool typeAssist = false;
   //Postgame
   double generalSuccess =0;
   double defensiveSuccess=0;
   double accuracy=0;
-  bool floorpickup = false;
+  bool floorPickup = false;
   bool fouls = false;
   bool problems = false;
 }

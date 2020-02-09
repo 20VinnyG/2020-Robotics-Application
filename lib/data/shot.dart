@@ -1,6 +1,6 @@
 class Shot {
-  double posx;
-  double posy;
+  double posX;
+  double posY;
   bool shotType = false;
   int shotsMade;
 }

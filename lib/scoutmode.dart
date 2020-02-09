@@ -119,9 +119,9 @@ class _ScoutModeState extends State<ScoutMode> {
                               newMatch.teamNumber = int.parse(input),
                         ),
                         Slider(
-                          value: newMatch.initiationlinepos,
+                          value: newMatch.initiationLinePosition,
                           onChanged: (double delta) {
-                            setState(() => newMatch.initiationlinepos = delta);
+                            setState(() => newMatch.initiationLinePosition = delta);
                           },
                           min: 0.0,
                           max: 10.0,
@@ -144,11 +144,11 @@ class _ScoutModeState extends State<ScoutMode> {
                           ],
                           onChanged: (value) {
                             setState(() {
-                              newMatch.preloadedfuelcells = value;
+                              newMatch.preloadedFuelCells = value;
                             });
                           },
                           hint: Text("Number of Preloaded Fuel Cells"),
-                          value: newMatch.preloadedfuelcells,
+                          value: newMatch.preloadedFuelCells,
                         ),
                         Divider(
                           height: 30.0,
@@ -208,7 +208,7 @@ class _ScoutModeState extends State<ScoutMode> {
                               child: Text("Stop Climb Timer"),
                               onPressed: () {
                                 stopwatch..stop();
-                                newMatch.climbtime = stopwatch.elapsedMilliseconds/1000;
+                                newMatch.climbTime = stopwatch.elapsedMilliseconds/1000;
                               },
                             )),
                         Container(
@@ -257,10 +257,10 @@ class _ScoutModeState extends State<ScoutMode> {
                         ),
                         Text("Active or Passive Assist?"),
                         Switch(
-                          value: newMatch.typeassist,
+                          value: newMatch.typeAssist,
                           onChanged: (bool s) {
                             setState(() {
-                              newMatch.typeassist = s;
+                              newMatch.typeAssist = s;
                             });
                           },
                         ),
@@ -317,10 +317,10 @@ class _ScoutModeState extends State<ScoutMode> {
                             spacing: 0.0),
                         Text("Floor Pickup?"),
                         Switch(
-                          value: newMatch.floorpickup,
+                          value: newMatch.floorPickup,
                           onChanged: (bool s) {
                             setState(() {
-                              newMatch.floorpickup = s;
+                              newMatch.floorPickup = s;
                             });
                           },
                         ),
@@ -370,8 +370,8 @@ class _ScoutModeState extends State<ScoutMode> {
         'teamnumber': newMatch.teamNumber,
         'position': newMatch.position,
         'matchnumber': newMatch.matchNumber,
-        'initiationposition': newMatch.initiationlinepos,
-        'preloadedfuelcells': newMatch.preloadedfuelcells,
+        'initiationposition': newMatch.initiationLinePosition,
+        'preloadedFuelCells': newMatch.preloadedFuelCells,
         'generalsuccess': newMatch.generalSuccess,
         'defensivesuccess': newMatch.defensiveSuccess,
         'accuracy': newMatch.accuracy,

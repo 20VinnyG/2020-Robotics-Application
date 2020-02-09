@@ -49,8 +49,8 @@ class _TeleopState extends State<Teleop> {
 
   input() {
     Shot newShot = new Shot();
-    newShot.posx = screenx;
-    newShot.posy = screeny;
+    newShot.posX = screenx;
+    newShot.posY = screeny;
     return showDialog(
         context: context,
         builder: (context) {
