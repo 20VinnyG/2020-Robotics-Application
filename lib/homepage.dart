@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frc1640scoutingframework/about.dart';
-import 'package:frc1640scoutingframework/autonpath.dart';
 import 'package:frc1640scoutingframework/scan.dart';
-import 'package:frc1640scoutingframework/teleop.dart';
-import 'bluealliance.dart';
 import 'scoutmode.dart';
 
 class Homepage extends StatefulWidget {

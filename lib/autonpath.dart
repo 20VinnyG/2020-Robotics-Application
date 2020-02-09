@@ -47,7 +47,6 @@ class AutonPathState extends State<AutonPath> {
                 child: Icon(Icons.check),
                 label: "Completed Path",
                 onTap: () {
-                  
                   Navigator.push(context,
                       new MaterialPageRoute(builder: (context) => ScoutMode(autonpath: _points,)));
                 })

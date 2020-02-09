@@ -1,15 +1,19 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frc1640scoutingframework/autonpath.dart';
 import 'package:frc1640scoutingframework/bluealliance.dart';
 import 'package:frc1640scoutingframework/teleop.dart';
+//import 'package:frc1640scoutingframework/teleop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'match.dart';
 
 class ScoutMode extends StatefulWidget {
   final List autonpath;
-  ScoutMode({Key key, this.autonpath}) : super (key: key);
+  final List teleopshots;
+  ScoutMode({Key key, this.autonpath, this.teleopshots}) : super(key: key);
   @override
   _ScoutModeState createState() => _ScoutModeState();
 }
@@ -245,9 +249,6 @@ class _ScoutModeState extends State<ScoutMode> {
   void _submit() {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      print(newMatch.initials);
-      print(newMatch.teamNumber);
-      print(newMatch.matchNumber);
       var payload = {
         'initials': newMatch.initials,
         'teamnumber': newMatch.teamNumber,
@@ -260,7 +261,6 @@ class _ScoutModeState extends State<ScoutMode> {
         'accuracy': newMatch.accuracy,
         'path': newMatch.path
       };
-      print(payload);
       showDialog(
           context: context,
           builder: (context) {
@@ -270,7 +270,6 @@ class _ScoutModeState extends State<ScoutMode> {
                   data: payload.toString(),
                 ));
           });
-      print(payload.toString());
     }
   }
 
@@ -288,8 +287,5 @@ class _ScoutModeState extends State<ScoutMode> {
         [alphaPos]["team_keys"][betaPos];
     scheduledTeam = int.parse(scheduledTeam.substring(3));
     print(scheduledTeam);
-    //return scheduledTeam;
   }
 }
-//incoming object pipeline
-
