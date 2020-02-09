@@ -1,4 +1,4 @@
-class Match {
+class MatchData {
   //Pregame
   String initials = '';
   int position;

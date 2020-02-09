@@ -25,7 +25,7 @@ class _ScoutModeState extends State<ScoutMode> {
   bool state = true;
 
   final formKey = GlobalKey<FormState>();
-  Match newMatch = new Match();
+  MatchData newMatch = new MatchData();
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
