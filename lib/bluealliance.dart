@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'globals.dart';
+import 'data/globals.dart';
 
 Globals newGlobals = new Globals();
 

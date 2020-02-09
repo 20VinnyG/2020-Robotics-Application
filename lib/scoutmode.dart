@@ -8,7 +8,7 @@ import 'package:frc1640scoutingframework/teleop.dart';
 //import 'package:frc1640scoutingframework/teleop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
-import 'match.dart';
+import 'data/match.dart';
 
 class ScoutMode extends StatefulWidget {
   final List autonpath;

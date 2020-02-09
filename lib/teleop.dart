@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import "shot.dart";
+import "data/shot.dart";
 
 double screenx;
 double screeny;
