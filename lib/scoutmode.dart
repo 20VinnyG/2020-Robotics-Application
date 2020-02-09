@@ -377,15 +377,16 @@ class _ScoutModeState extends State<ScoutMode> {
         'accuracy': newMatch.accuracy,
         'path': newMatch.path
       };
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-                title: Text("Generated QR"),
-                content: QrImage(
-                  data: payload.toString(),
-                ));
-          });
+      print(payload);
+      // showDialog(
+      //     context: context,
+      //     builder: (context) {
+      //       return AlertDialog(
+      //           title: Text("Generated QR"),
+      //           content: QrImage(
+      //             data: payload.toString(),
+      //           ));
+      //     });
     }
   }
 
