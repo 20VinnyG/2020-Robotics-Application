@@ -6,6 +6,7 @@ class Match {
   int teamNumber;
   double initiationlinepos =0;
   int preloadedfuelcells;
+  int id;
   //Auton
   var path;
   var autoshots;
@@ -14,14 +15,14 @@ class Match {
   //Endgame
   double climbtime=0;
   int park;
-  int levelability;
-  int assist;
-  int typeassist;
+  bool levelability = false;
+  bool assist = false;
+  bool typeassist = false;
   //Postgame
   double generalSuccess =0;
   double defensiveSuccess=0;
   double accuracy=0;
-  int floorpickup;
-  int fouls;
-  int problems;
+  bool floorpickup = false;
+  bool fouls = false;
+  bool problems = false;
 }

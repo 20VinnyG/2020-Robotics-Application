@@ -19,6 +19,11 @@ class ScoutMode extends StatefulWidget {
 }
 
 class _ScoutModeState extends State<ScoutMode> {
+
+  var stopwatch = new Stopwatch();
+  double showntime;
+  bool state = true;
+
   final formKey = GlobalKey<FormState>();
   Match newMatch = new Match();
   @override
@@ -51,6 +56,7 @@ class _ScoutModeState extends State<ScoutMode> {
                           indent: 5.0,
                           color: Colors.black,
                         ),
+                        Text("Prematch"),
                         TextFormField(
                           decoration: const InputDecoration(
                             hintText: 'Enter your initials',
@@ -149,6 +155,7 @@ class _ScoutModeState extends State<ScoutMode> {
                           indent: 5.0,
                           color: Colors.black,
                         ),
+                        Text("Auton"),
                         Container(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 16.0, horizontal: 16.0),
@@ -175,6 +182,7 @@ class _ScoutModeState extends State<ScoutMode> {
                           indent: 5.0,
                           color: Colors.black,
                         ),
+                        Text("Teleop"),
                         Container(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 16.0, horizontal: 16.0),
@@ -192,6 +200,77 @@ class _ScoutModeState extends State<ScoutMode> {
                           indent: 5.0,
                           color: Colors.black,
                         ),
+                        Text("Endgame"),
+                        Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16.0, horizontal: 16.0),
+                            child: RaisedButton(
+                              child: Text("Stop Climb Timer"),
+                              onPressed: () {
+                                stopwatch..stop();
+                                newMatch.climbtime = stopwatch.elapsedMilliseconds/1000;
+                              },
+                            )),
+                        Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16.0, horizontal: 16.0),
+                            child: RaisedButton(
+                              child: Text("Reset Climb Timer"),
+                              onPressed: () {
+                                stopwatch..reset();
+                              },
+                            )),
+                        DropdownButton(
+                          items: [
+                            DropdownMenuItem(
+                                value: int.parse("1"), child: Text("Park")),
+                            DropdownMenuItem(
+                                value: int.parse("2"), child: Text("Climb")),
+                            DropdownMenuItem(
+                                value: int.parse("3"), child: Text("Neither")),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              newMatch.park = value;
+                            });
+                          },
+                          hint: Text("End Game State?"),
+                          value: newMatch.park,
+                        ),
+                        Text("Level Ability?"),
+                        Switch(
+                          value: newMatch.levelability,
+                          onChanged: (bool s) {
+                            setState(() {
+                              newMatch.levelability = s;
+                            });
+                          },
+                        ),
+                        Text("Assist?"),
+                        Switch(
+                          value: newMatch.assist,
+                          onChanged: (bool s) {
+                            setState(() {
+                              newMatch.assist = s;
+                            });
+                          },
+                        ),
+                        Text("Active or Passive Assist?"),
+                        Switch(
+                          value: newMatch.typeassist,
+                          onChanged: (bool s) {
+                            setState(() {
+                              newMatch.typeassist = s;
+                            });
+                          },
+                        ),
+                        Divider(
+                          height: 30.0,
+                          indent: 5.0,
+                          color: Colors.black,
+                        ),
+                        Text("Post-Match"),
+                        Text("General Success"),
                         SmoothStarRating(
                             allowHalfRating: true,
                             onRatingChanged: (v) {
@@ -203,9 +282,10 @@ class _ScoutModeState extends State<ScoutMode> {
                             size: 40.0,
                             filledIconData: Icons.blur_off,
                             halfFilledIconData: Icons.blur_on,
-                            color: Colors.green,
-                            borderColor: Colors.green,
+                            color: Colors.blue,
+                            borderColor: Colors.blue,
                             spacing: 0.0),
+                        Text("Defensive Success"),
                         SmoothStarRating(
                             allowHalfRating: true,
                             onRatingChanged: (v) {
@@ -217,9 +297,10 @@ class _ScoutModeState extends State<ScoutMode> {
                             size: 40.0,
                             filledIconData: Icons.blur_off,
                             halfFilledIconData: Icons.blur_on,
-                            color: Colors.green,
-                            borderColor: Colors.green,
+                            color: Colors.blue,
+                            borderColor: Colors.blue,
                             spacing: 0.0),
+                        Text("Accuracy Rating"),
                         SmoothStarRating(
                             allowHalfRating: true,
                             onRatingChanged: (v) {
@@ -231,9 +312,36 @@ class _ScoutModeState extends State<ScoutMode> {
                             size: 40.0,
                             filledIconData: Icons.blur_off,
                             halfFilledIconData: Icons.blur_on,
-                            color: Colors.green,
-                            borderColor: Colors.green,
+                            color: Colors.blue,
+                            borderColor: Colors.blue,
                             spacing: 0.0),
+                        Text("Floor Pickup?"),
+                        Switch(
+                          value: newMatch.floorpickup,
+                          onChanged: (bool s) {
+                            setState(() {
+                              newMatch.floorpickup = s;
+                            });
+                          },
+                        ),
+                        Text("Eggregious Fouls?"),
+                        Switch(
+                          value: newMatch.fouls,
+                          onChanged: (bool s) {
+                            setState(() {
+                              newMatch.fouls = s;
+                            });
+                          },
+                        ),
+                        Text("Had Problems?"),
+                        Switch(
+                          value: newMatch.problems,
+                          onChanged: (bool s) {
+                            setState(() {
+                              newMatch.problems = s;
+                            });
+                          },
+                        ),
                         Container(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 16.0, horizontal: 16.0),
@@ -243,7 +351,15 @@ class _ScoutModeState extends State<ScoutMode> {
                             )),
                       ],
                       scrollDirection: Axis.vertical,
-                    )))));
+                    )))),
+                    floatingActionButton: FloatingActionButton.extended(
+                      icon: Icon(Icons.timer),
+                      label: Text("Start Climb Timer"),
+                      onPressed: () {
+                        stopwatch..start();
+                      },
+                    ),
+                    );
   }
 
   void _submit() {
@@ -288,4 +404,11 @@ class _ScoutModeState extends State<ScoutMode> {
     scheduledTeam = int.parse(scheduledTeam.substring(3));
     print(scheduledTeam);
   }
+
+  _generateId(int preid) {
+    int id = preid+00+newMatch.matchNumber;
+    print(id);
+    newMatch.id = id;
+  }
+
 }
