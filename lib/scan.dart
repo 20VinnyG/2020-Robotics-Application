@@ -7,19 +7,68 @@ import 'package:gsheets/gsheets.dart';
 
 String sheetName;
 String blue1 = '''
+
 {
   "initials": "vg",
   "position": "1",
   "matchNumber": "10"
 }
-''';
 
-String blue2;
-String blue3;
-String red1;
-String red2;
-String red3;
-String packagedpayload;
+''';
+String blue2 = '''
+
+{
+  "initials": "vg",
+  "position": "1",
+  "matchNumber": "10"
+}
+
+''';
+String blue3= '''
+
+{
+  "initials": "vg",
+  "position": "1",
+  "matchNumber": "10"
+}
+
+''';
+String red1= '''
+
+{
+  "initials": "vg",
+  "position": "1",
+  "matchNumber": "10"
+}
+
+''';
+String red2= '''
+
+{
+  "initials": "vg",
+  "position": "1",
+  "matchNumber": "10"
+}
+
+''';
+String red3= '''
+
+{
+  "initials": "vg",
+  "position": "1",
+  "matchNumber": "10"
+}
+
+''';
+String packagedpayload= '''
+
+{
+  "initials": "vg",
+  "position": "1",
+  "matchNumber": "10"
+}
+
+''';
 String result = "Hey there !";
 
 const _credentials = r'''{
@@ -61,11 +110,30 @@ void _appendValues() async {
   var sheet = ss.worksheetByTitle("Flutter Demo");
   sheet ??= await ss.addWorksheet(sheetName);
   print(jsonDecode(blue1));
-  Map<String, String> preappender = jsonDecode(blue1);
-  print(preappender.values);
-  List<String> appender = preappender.values;
-  print(appender);
-  await sheet.values.insertRow(1, appender);
+  Map<String, dynamic> preb1 = jsonDecode(blue1);
+  Map<String, dynamic> preb2 = jsonDecode(blue2);
+  Map<String, dynamic> preb3 = jsonDecode(blue3);
+  Map<String, dynamic> prer1 = jsonDecode(red1);
+  Map<String, dynamic> prer2 = jsonDecode(red2);
+  Map<String, dynamic> prer3 = jsonDecode(red3);
+  List<dynamic> b1 = preb1.values.toList();
+  List<dynamic> b2 = preb2.values.toList();
+  List<dynamic> b3 = preb3.values.toList();
+  List<dynamic> r1 = prer1.values.toList();
+  List<dynamic> r2 = prer2.values.toList();
+  List<dynamic> r3 = prer3.values.toList();
+  var payloadb1 = new List<String>.from(b1);
+  var payloadb2 = new List<String>.from(b2);
+  var payloadb3 = new List<String>.from(b3);
+  var payloadr1 = new List<String>.from(r1);
+  var payloadr2 = new List<String>.from(r2);
+  var payloadr3 = new List<String>.from(r3);
+  await sheet.values.insertRow(1, payloadb1);
+  await sheet.values.insertRow(2, payloadb2);
+  await sheet.values.insertRow(3, payloadb3);
+  await sheet.values.insertRow(4, payloadr1);
+  await sheet.values.insertRow(5, payloadr2);
+  await sheet.values.insertRow(6, payloadr3);
 }
  
 class ScanMode extends StatefulWidget {
