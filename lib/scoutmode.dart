@@ -388,7 +388,7 @@ class _ScoutModeState extends State<ScoutMode> {
             return AlertDialog(
                 title: Text("Generated QR"),
                 content: QrImage(
-                  data: payload.toString(),
+                  data: jsonEncode(payload),
                 ));
           });
     }
