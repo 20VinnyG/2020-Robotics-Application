@@ -385,14 +385,16 @@ class _ScoutModeState extends State<ScoutMode> {
       showDialog(
           context: context,
           builder: (context) {
-            return SimpleDialog(
-                children: <Widget>[
-                  Text("Generated QR"),
-                  QrImage(
+            return Expanded(
+              child: SizedBox(
+                height: 200.0,
+                child: AlertDialog(
+                title: Text("Generated QR"),
+                content: QrImage(
                   data: jsonEncode(payload),
-                )
-                ],
-                );
+                ))
+              )
+            );
           });
     }
   }
@@ -414,7 +416,7 @@ class _ScoutModeState extends State<ScoutMode> {
   }
 
   _generateId() {
-    int id = newMatch.teamNumber*1000+newMatch.matchNumber;
+    int id = newMatch.teamNumber+00+newMatch.matchNumber;
     print(id);
     newMatch.id = id;
   }
