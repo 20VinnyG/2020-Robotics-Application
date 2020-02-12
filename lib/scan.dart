@@ -6,69 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:gsheets/gsheets.dart';
 
 String sheetName;
-String blue1 = '''
-
-{
-  "initials": "vg",
-  "position": "1",
-  "matchNumber": "10"
-}
-
-''';
-String blue2 = '''
-
-{
-  "initials": "vg",
-  "position": "1",
-  "matchNumber": "10"
-}
-
-''';
-String blue3= '''
-
-{
-  "initials": "vg",
-  "position": "1",
-  "matchNumber": "10"
-}
-
-''';
-String red1= '''
-
-{
-  "initials": "vg",
-  "position": "1",
-  "matchNumber": "10"
-}
-
-''';
-String red2= '''
-
-{
-  "initials": "vg",
-  "position": "1",
-  "matchNumber": "10"
-}
-
-''';
-String red3= '''
-
-{
-  "initials": "vg",
-  "position": "1",
-  "matchNumber": "10"
-}
-
-''';
-String packagedpayload= '''
-
-{
-  "initials": "vg",
-  "position": "1",
-  "matchNumber": "10"
-}
-
-''';
+String blue1;
+String blue2;
+String blue3;
+String red1;
+String red2;
+String red3;
 String result = "Hey there !";
 
 const _credentials = r'''{
@@ -87,19 +30,11 @@ const _credentials = r'''{
 
 String _spreadsheetId = '1K3AQE7kr5u0Z-_c-_YGsHVGHImtGfy47bBikxvjjdUQ';
 
+
 void _createSpreadSheet() async {
   final gsheets = GSheets(_credentials);
   final ss = await gsheets.spreadsheet(_spreadsheetId);
-  var sheet = ss.worksheetByTitle("xyz");
-  sheet ??= await ss.addWorksheet(sheetName);
-  //await sheet.values.insertValue(sheetName, column: 1, row: 1);
-}
-
-void _formatSheet() async {
-  final gsheets = GSheets(_credentials);
-  final ss = await gsheets.spreadsheet(_spreadsheetId);
-  var sheet = ss.worksheetByTitle("Flutter Demo");
-  sheet ??= await ss.addWorksheet(sheetName);
+  var sheet = ss.worksheetByTitle("Sheet1");
   final sheetinitializer = ['Initials', 'Position', 'Match Number', 'Team Number', 'Initiation Line Position', 'Preloaded Fuel Cells', 'ClimbTime', 'Park', 'General Success', 'Defensive Success', 'Accuracy', 'Floorpickup', 'Fouls', 'Problems'];
   await sheet.values.insertRow(1, sheetinitializer);
 }
@@ -107,33 +42,36 @@ void _formatSheet() async {
 void _appendValues() async {
   final gsheets = GSheets(_credentials);
   final ss = await gsheets.spreadsheet(_spreadsheetId);
-  var sheet = ss.worksheetByTitle("Flutter Demo");
-  sheet ??= await ss.addWorksheet(sheetName);
-  print(jsonDecode(blue1));
+  var sheet = ss.worksheetByTitle("Sheet1");
+
   Map<String, dynamic> preb1 = jsonDecode(blue1);
   Map<String, dynamic> preb2 = jsonDecode(blue2);
   Map<String, dynamic> preb3 = jsonDecode(blue3);
   Map<String, dynamic> prer1 = jsonDecode(red1);
   Map<String, dynamic> prer2 = jsonDecode(red2);
   Map<String, dynamic> prer3 = jsonDecode(red3);
+
   List<dynamic> b1 = preb1.values.toList();
   List<dynamic> b2 = preb2.values.toList();
   List<dynamic> b3 = preb3.values.toList();
   List<dynamic> r1 = prer1.values.toList();
   List<dynamic> r2 = prer2.values.toList();
   List<dynamic> r3 = prer3.values.toList();
+
   var payloadb1 = new List<String>.from(b1);
   var payloadb2 = new List<String>.from(b2);
   var payloadb3 = new List<String>.from(b3);
   var payloadr1 = new List<String>.from(r1);
   var payloadr2 = new List<String>.from(r2);
   var payloadr3 = new List<String>.from(r3);
+
   await sheet.values.insertRow(1, payloadb1);
   await sheet.values.insertRow(2, payloadb2);
   await sheet.values.insertRow(3, payloadb3);
   await sheet.values.insertRow(4, payloadr1);
   await sheet.values.insertRow(5, payloadr2);
   await sheet.values.insertRow(6, payloadr3);
+
 }
  
 class ScanMode extends StatefulWidget {
@@ -172,8 +110,6 @@ class _ScanModeState extends State<ScanMode> {
           print("red3 scanned");
         }
       }
-      //packagedpayload=blue1+blue2+blue3+red1+red2+red3;
-      //print(packagedpayload);
 
     } on PlatformException catch (ex) {
       if (ex.code == BarcodeScanner.CameraAccessDenied) {
@@ -224,6 +160,12 @@ class _ScanModeState extends State<ScanMode> {
             onFieldSubmitted: (input) =>
               sheetName = input,
             onChanged: (input) => sheetName = input,
+          ),
+          RaisedButton(
+            child: Text("Create Sheet"),
+            onPressed: () {
+              _createSpreadSheet();
+            },
           ),
           RaisedButton(
             child: Text("Create Sheet"),

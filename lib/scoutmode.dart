@@ -106,7 +106,7 @@ class _ScoutModeState extends State<ScoutMode> {
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
-                            hintText: 'Enter the team number',
+                            hintText: "jkl",
                           ),
                           keyboardType: TextInputType.number,
                           validator: (input) =>
@@ -363,10 +363,12 @@ class _ScoutModeState extends State<ScoutMode> {
   }
 
   void _submit() {
+    _generateId();
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       var payload = {
         'initials': newMatch.initials,
+        'id': newMatch.id,
         'teamnumber': newMatch.teamNumber,
         'position': newMatch.position,
         'matchnumber': newMatch.matchNumber,
@@ -375,7 +377,10 @@ class _ScoutModeState extends State<ScoutMode> {
         'generalsuccess': newMatch.generalSuccess,
         'defensivesuccess': newMatch.defensiveSuccess,
         'accuracy': newMatch.accuracy,
-        'path': newMatch.path
+        'path': newMatch.path,
+        'floorpickup': newMatch.floorpickup,
+        'fouls': newMatch.fouls,
+        'problems': newMatch.problems
       };
       showDialog(
           context: context,
@@ -389,8 +394,8 @@ class _ScoutModeState extends State<ScoutMode> {
     }
   }
 
-  void _getTeam() {
-    var scheduledTeam;
+  _getTeam() {
+    String scheduledTeam;
     String alphaPos;
     int betaPos;
     if (newMatch.position <= 3) {
@@ -401,12 +406,12 @@ class _ScoutModeState extends State<ScoutMode> {
     betaPos = newMatch.position % 3;
     scheduledTeam = newGlobals.schedule[newMatch.matchNumber]["alliances"]
         [alphaPos]["team_keys"][betaPos];
-    scheduledTeam = int.parse(scheduledTeam.substring(3));
-    print(scheduledTeam);
+    scheduledTeam = scheduledTeam.substring(3);
+    return scheduledTeam;
   }
 
-  _generateId(int preid) {
-    int id = preid+00+newMatch.matchNumber;
+  _generateId() {
+    int id = newMatch.teamNumber+00+newMatch.matchNumber;
     print(id);
     newMatch.id = id;
   }
