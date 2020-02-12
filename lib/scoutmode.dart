@@ -385,11 +385,14 @@ class _ScoutModeState extends State<ScoutMode> {
       showDialog(
           context: context,
           builder: (context) {
-            return AlertDialog(
-                title: Text("Generated QR"),
-                content: QrImage(
+            return SimpleDialog(
+                children: <Widget>[
+                  Text("Generated QR"),
+                  QrImage(
                   data: jsonEncode(payload),
-                ));
+                )
+                ],
+                );
           });
     }
   }
