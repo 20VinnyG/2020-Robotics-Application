@@ -5,13 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gsheets/gsheets.dart';
 
+List<String> data = [];
+
 String sheetName;
-String blue1;
-String blue2;
-String blue3;
-String red1;
-String red2;
-String red3;
 String result = "Hey there !";
 
 const _credentials = r'''{
@@ -30,12 +26,26 @@ const _credentials = r'''{
 
 String _spreadsheetId = '1K3AQE7kr5u0Z-_c-_YGsHVGHImtGfy47bBikxvjjdUQ';
 
-
 void _createSpreadSheet() async {
   final gsheets = GSheets(_credentials);
   final ss = await gsheets.spreadsheet(_spreadsheetId);
   var sheet = ss.worksheetByTitle("Sheet1");
-  final sheetinitializer = ['Initials', 'Position', 'Match Number', 'Team Number', 'Initiation Line Position', 'Preloaded Fuel Cells', 'ClimbTime', 'Park', 'General Success', 'Defensive Success', 'Accuracy', 'Floorpickup', 'Fouls', 'Problems'];
+  final sheetinitializer = [
+    'Initials',
+    'Position',
+    'Match Number',
+    'Team Number',
+    'Initiation Line Position',
+    'Preloaded Fuel Cells',
+    'ClimbTime',
+    'Park',
+    'General Success',
+    'Defensive Success',
+    'Accuracy',
+    'Floorpickup',
+    'Fouls',
+    'Problems'
+  ];
   await sheet.values.insertRow(1, sheetinitializer);
 }
 
@@ -44,73 +54,26 @@ void _appendValues() async {
   final ss = await gsheets.spreadsheet(_spreadsheetId);
   var sheet = ss.worksheetByTitle("Sheet1");
 
-  Map<String, dynamic> preb1 = jsonDecode(blue1);
-  Map<String, dynamic> preb2 = jsonDecode(blue2);
-  Map<String, dynamic> preb3 = jsonDecode(blue3);
-  Map<String, dynamic> prer1 = jsonDecode(red1);
-  Map<String, dynamic> prer2 = jsonDecode(red2);
-  Map<String, dynamic> prer3 = jsonDecode(red3);
-
-  List<dynamic> b1 = preb1.values.toList();
-  List<dynamic> b2 = preb2.values.toList();
-  List<dynamic> b3 = preb3.values.toList();
-  List<dynamic> r1 = prer1.values.toList();
-  List<dynamic> r2 = prer2.values.toList();
-  List<dynamic> r3 = prer3.values.toList();
-
-  var payloadb1 = new List<String>.from(b1);
-  var payloadb2 = new List<String>.from(b2);
-  var payloadb3 = new List<String>.from(b3);
-  var payloadr1 = new List<String>.from(r1);
-  var payloadr2 = new List<String>.from(r2);
-  var payloadr3 = new List<String>.from(r3);
-
-  await sheet.values.insertRow(1, payloadb1);
-  await sheet.values.insertRow(2, payloadb2);
-  await sheet.values.insertRow(3, payloadb3);
-  await sheet.values.insertRow(4, payloadr1);
-  await sheet.values.insertRow(5, payloadr2);
-  await sheet.values.insertRow(6, payloadr3);
-
+  for (int i = 0; i < data.length; i++) {
+    List<String> payload =
+        jsonDecode(data[i]).values.toList().Cast<String>().toList();
+    await sheet.values.insertRow(i + 1, payload);
+  }
 }
- 
+
 class ScanMode extends StatefulWidget {
   @override
   _ScanModeState createState() => _ScanModeState();
 }
 
 class _ScanModeState extends State<ScanMode> {
-
   Future _scanQR() async {
     try {
-      for(int i = 0; i < 5; i++) {
+      data.clear();
+      for (int i = 0; i < 6; i++) {
         String qrResult = await BarcodeScanner.scan();
-        if(qrResult.contains("Blue1")) {
-          blue1 = qrResult;
-          print("blue1 scanned");
-        }
-        if(qrResult.contains("Blue2")) {
-          blue2 = qrResult;
-          print("blue2 scanned");
-        }
-        if(qrResult.contains("Blue3")) {
-          blue3 = qrResult;
-          print("blue3 scanned");
-        }
-        if(qrResult.contains("Red1")) {
-          red1 = qrResult;
-          print("red1 scanned");
-        }
-        if(qrResult.contains("Red2")) {
-          red2 = qrResult;
-          print("red2 scanned");
-        }
-        if(qrResult.contains("Red3")) {
-          red3 = qrResult;
-          print("red3 scanned");
-        }
+        data.add(qrResult);
       }
-
     } on PlatformException catch (ex) {
       if (ex.code == BarcodeScanner.CameraAccessDenied) {
         setState(() {
@@ -142,23 +105,19 @@ class _ScanModeState extends State<ScanMode> {
           TextFormField(
             decoration: const InputDecoration(
               hintText: 'Enter sheet ID',
-            ), 
-            validator: (input) =>
-              input.isEmpty ? 'Not a valid input' : null,
+            ),
+            validator: (input) => input.isEmpty ? 'Not a valid input' : null,
             onSaved: (input) => _spreadsheetId = input,
-            onFieldSubmitted: (input) =>
-              _spreadsheetId = input,
+            onFieldSubmitted: (input) => _spreadsheetId = input,
             onChanged: (input) => _spreadsheetId = input,
           ),
           TextFormField(
             decoration: const InputDecoration(
               hintText: 'Enter ',
-            ), 
-            validator: (input) =>
-              input.isEmpty ? 'Not a valid input' : null,
+            ),
+            validator: (input) => input.isEmpty ? 'Not a valid input' : null,
             onSaved: (input) => sheetName = input,
-            onFieldSubmitted: (input) =>
-              sheetName = input,
+            onFieldSubmitted: (input) => sheetName = input,
             onChanged: (input) => sheetName = input,
           ),
           RaisedButton(
@@ -172,7 +131,7 @@ class _ScanModeState extends State<ScanMode> {
             onPressed: () {
               _appendValues();
             },
-          )
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
