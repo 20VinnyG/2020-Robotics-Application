@@ -57,7 +57,7 @@ void _appendValues() async {
   for (int i = 0; i < data.length; i++) {
     List<String> payload =
         new List<String>.from(jsonDecode(data[i]).values.toList());
-    await sheet.values.insertRow(i + 1, payload);
+    await sheet.values.appendRow(payload);
   }
 }
 

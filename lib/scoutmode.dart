@@ -367,20 +367,20 @@ class _ScoutModeState extends State<ScoutMode> {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       var payload = {
-        'initials': newMatch.initials,
-        'id': newMatch.id,
-        'teamnumber': newMatch.teamNumber,
-        'position': newMatch.position,
-        'matchnumber': newMatch.matchNumber,
-        'initiationposition': newMatch.initiationlinepos,
-        'preloadedfuelcells': newMatch.preloadedfuelcells,
-        'generalsuccess': newMatch.generalSuccess,
-        'defensivesuccess': newMatch.defensiveSuccess,
-        'accuracy': newMatch.accuracy,
-        'path': newMatch.path,
-        'floorpickup': newMatch.floorpickup,
-        'fouls': newMatch.fouls,
-        'problems': newMatch.problems
+        'initials': newMatch.initials.toString(),
+        'id': newMatch.id.toString(),
+        'teamnumber': newMatch.teamNumber.toString(),
+        'position': newMatch.position.toString(),
+        'matchnumber': newMatch.matchNumber.toString(),
+        'initiationposition': newMatch.initiationlinepos.toString(),
+        'preloadedfuelcells': newMatch.preloadedfuelcells.toString(),
+        'generalsuccess': newMatch.generalSuccess.toString(),
+        'defensivesuccess': newMatch.defensiveSuccess.toString(),
+        'accuracy': newMatch.accuracy.toString(),
+        'path': newMatch.path.toString(),
+        'floorpickup': newMatch.floorpickup.toString(),
+        'fouls': newMatch.fouls.toString(),
+        'problems': newMatch.problems.toString()
       };
       showDialog(
           context: context,
@@ -411,7 +411,7 @@ class _ScoutModeState extends State<ScoutMode> {
   }
 
   _generateId() {
-    int id = newMatch.teamNumber+00+newMatch.matchNumber;
+    int id = newMatch.teamNumber*1000+newMatch.matchNumber;
     print(id);
     newMatch.id = id;
   }
