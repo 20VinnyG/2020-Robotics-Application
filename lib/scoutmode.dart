@@ -192,7 +192,7 @@ class _ScoutModeState extends State<ScoutMode> {
                               Navigator.push(
                                   context,
                                   new MaterialPageRoute(
-                                      builder: (context) => Teleop(shotsList: newMatch.teleopShots)));
+                                      builder: (context) => Teleop(shotsList: widget.teleopshots)));
                             },
                           )),
                       Divider(
