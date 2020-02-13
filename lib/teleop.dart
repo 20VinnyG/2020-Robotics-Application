@@ -8,14 +8,20 @@ Canvas canvas;
 Size size = new Size(screenx, screeny);
 
 class Teleop extends StatefulWidget {
+  final List<Shot> shotsList;
+
   @override
   _TeleopState createState() => _TeleopState();
+
+  Teleop({
+    this.shotsList
+  });
 }
 
 bool val = true;
-List<Shot> shots = new List();
 
 class _TeleopState extends State<Teleop> {
+
   void onTapDown(BuildContext context, TapDownDetails details) {
     print('${details.globalPosition}');
     final RenderBox box = context.findRenderObject();
@@ -97,8 +103,7 @@ class _TeleopState extends State<Teleop> {
                           print(newShot.shotsMade);
                           print(newShot.shotType);
                           print(newShot.toString());
-                          shots.add(newShot);
-                          print(shots);
+                          widget.shotsList.add(newShot);
                         },
                       )
                     ],

@@ -8,10 +8,10 @@ class Match {
   int preloadedfuelcells;
   int id;
   //Auton
-  var path;
-  var autoshots;
+  List<Offset> path;
+  List<Shot> autoshots;
   //Telop
-  var teleopshots;
+  List<Shot> teleopshots;
   //Endgame
   double climbtime=0;
   int park;

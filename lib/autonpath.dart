@@ -3,12 +3,19 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:frc1640scoutingframework/scoutmode.dart';
 
 class AutonPath extends StatefulWidget {
+  final List<Offset> condensedPath;
+  final List<Offset> points;
+
   @override
   AutonPathState createState() => AutonPathState();
+
+  AutonPath({
+    this.condensedPath,
+    this.points
+  });
 }
 
 class AutonPathState extends State<AutonPath> {
-  List<Offset> _points = <Offset>[];
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -25,12 +32,12 @@ class AutonPathState extends State<AutonPath> {
                   RenderBox object = context.findRenderObject();
                   Offset _localPosition =
                       object.globalToLocal(details.globalPosition);
-                  _points = new List.from(_points)..add(_localPosition);
+                  widget.points = new List.from(widget.points)..add(_localPosition);
                 });
               },
-              onPanEnd: (DragEndDetails details) => _points.add(null),
+              onPanEnd: (DragEndDetails details) => widget.points.add(null),
               child: new CustomPaint(
-                painter: new AutoPath(points: _points),
+                painter: new AutoPath(points: widget.points),
                 size: Size.infinite,
               )),
         ]),
@@ -41,19 +48,30 @@ class AutonPathState extends State<AutonPath> {
                 backgroundColor: Colors.red,
                 child: Icon(Icons.clear),
                 label: "Clear Path",
-                onTap: () => _points.clear()),
+                onTap: () => widget.points.clear()),
             SpeedDialChild(
                 backgroundColor: Colors.green,
                 child: Icon(Icons.check),
                 label: "Completed Path",
                 onTap: () {
-                  Navigator.push(context,
-                      new MaterialPageRoute(builder: (context) => ScoutMode(autonpath: _points,)));
-                })
+                  print(widget.points.length);
+                  //Navigator.pop(context);
+                  }
+                  )
           ],
         ));
   }
+  condensePoints() {
+    for(int i=0; i<widget.points.length; i+=5) {
+      widget.condensedPath.add(widget.points[i]);
+    }
+    if(widget.points.length % 5 != 4) { // != mod value - 1
+      widget.condensedPath.add(widget.points.last);
+    }
 }
+}
+
+
 class AutoPath extends CustomPainter {
   List<Offset> points;
   AutoPath({this.points});
