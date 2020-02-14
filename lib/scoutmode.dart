@@ -11,9 +11,6 @@ import 'match.dart';
 import 'shot.dart';
 
 class ScoutMode extends StatefulWidget {
-  final List<Offset> autonpath;
-  final List teleopshots;
-  ScoutMode({Key key, this.autonpath, this.teleopshots}) : super(key: key);
   @override
   _ScoutModeState createState() => _ScoutModeState();
 }
@@ -22,9 +19,6 @@ class _ScoutModeState extends State<ScoutMode> {
   var stopwatch = new Stopwatch();
   double showntime;
   bool state = true;
-
-  List<Shot> shotsList = [];
-  List<Offset> autonPath = [];
 
   final formKey = GlobalKey<FormState>();
   Match newMatch = new Match();
@@ -106,7 +100,7 @@ class _ScoutModeState extends State<ScoutMode> {
                       ),
                       TextFormField(
                         decoration: const InputDecoration(
-                          hintText: "jkl",
+                          hintText: "Enter Team Number",
                         ),
                         keyboardType: TextInputType.number,
                         validator: (input) =>
@@ -165,16 +159,7 @@ class _ScoutModeState extends State<ScoutMode> {
                               Navigator.push(
                                   context,
                                   new MaterialPageRoute(
-                                      builder: (context) => AutonPath(condensedPath: newMatch.path, points: autonPath)));
-                            },
-                          )),
-                      Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 16.0, horizontal: 16.0),
-                          child: RaisedButton(
-                            child: Text("Test Pipeline"),
-                            onPressed: () {
-                              print("${widget.autonpath}");
+                                      builder: (context) => AutonPath(condensedPath: newMatch.path, autonshotsList: newMatch.autoshots,)));
                             },
                           )),
                       Divider(
@@ -192,7 +177,7 @@ class _ScoutModeState extends State<ScoutMode> {
                               Navigator.push(
                                   context,
                                   new MaterialPageRoute(
-                                      builder: (context) => Teleop(shotsList: widget.teleopshots)));
+                                      builder: (context) => Teleop(teleopshotsList: newMatch.teleopshots)));
                             },
                           )),
                       Divider(

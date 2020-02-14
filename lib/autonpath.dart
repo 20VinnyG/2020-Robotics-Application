@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:frc1640scoutingframework/scoutmode.dart';
+import 'package:frc1640scoutingframework/shot.dart';
+
+List<Offset> points = <Offset>[];
 
 class AutonPath extends StatefulWidget {
   final List<Offset> condensedPath;
-  final List<Offset> points;
+  final List<Shot> autonshotsList;
 
   @override
   AutonPathState createState() => AutonPathState();
 
-  AutonPath({
-    this.condensedPath,
-    this.points
-  });
+  AutonPath({this.condensedPath, this.autonshotsList});
 }
 
 class AutonPathState extends State<AutonPath> {
@@ -32,12 +31,71 @@ class AutonPathState extends State<AutonPath> {
                   RenderBox object = context.findRenderObject();
                   Offset _localPosition =
                       object.globalToLocal(details.globalPosition);
-                  widget.points = new List.from(widget.points)..add(_localPosition);
+                  points = new List.from(points)..add(_localPosition);
                 });
               },
-              onPanEnd: (DragEndDetails details) => widget.points.add(null),
+              onPanEnd: (DragEndDetails details) {
+                points.add(null);
+                Shot newShot = new Shot();
+                newShot.posx = points[points.length-2].dx;
+                newShot.posy = points[points.length-2].dy;                
+                print(newShot.posx);
+                print(newShot.posy);
+                return showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                          title: Text("Enter Number of Balls Made"),
+                          content: ListView(
+                            children: <Widget>[
+                              DropdownButton(
+                                items: [
+                                  DropdownMenuItem(
+                                      value: int.parse("0"), child: Text("0")),
+                                  DropdownMenuItem(
+                                      value: int.parse("1"), child: Text("1")),
+                                  DropdownMenuItem(
+                                      value: int.parse("2"), child: Text("2")),
+                                  DropdownMenuItem(
+                                      value: int.parse("3"), child: Text("3")),
+                                  DropdownMenuItem(
+                                      value: int.parse("4"), child: Text("4")),
+                                  DropdownMenuItem(
+                                      value: int.parse("5"), child: Text("5")),
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    newShot.shotsMade = value;
+                                  });
+                                },
+                                hint: Text("Balls Made"),
+                                value: newShot.shotsMade,
+                              ),
+                              Switch(
+                                value: newShot.shotType,
+                                onChanged: (bool s) {
+                                  setState(() {
+                                    newShot.shotType = s;
+                                  });
+                                },
+                              ),
+                              RaisedButton(
+                                child: Text("Done"),
+                                onPressed: () {
+                                  extractPoints();
+                                  //print(newShot.shotsMade);
+                                  //print(newShot.shotType);
+                                  //print(newShot.toString());
+                                  //widget.autonshotsList.add(newShot);
+                                  //Navigator.pop(context);
+                                },
+                              )
+                            ],
+                          ));
+                    });
+              },
               child: new CustomPaint(
-                painter: new AutoPath(points: widget.points),
+                painter: new AutoPath(points: points),
                 size: Size.infinite,
               )),
         ]),
@@ -48,29 +106,41 @@ class AutonPathState extends State<AutonPath> {
                 backgroundColor: Colors.red,
                 child: Icon(Icons.clear),
                 label: "Clear Path",
-                onTap: () => widget.points.clear()),
+                onTap: () => points.clear()),
             SpeedDialChild(
                 backgroundColor: Colors.green,
                 child: Icon(Icons.check),
                 label: "Completed Path",
                 onTap: () {
-                  print(widget.points.length);
+                  print(MediaQuery.of(context).size.width);
+                  print(MediaQuery.of(context).size.height);
                   //Navigator.pop(context);
-                  }
-                  )
+                })
           ],
         ));
   }
-  condensePoints() {
-    for(int i=0; i<widget.points.length; i+=5) {
-      widget.condensedPath.add(widget.points[i]);
-    }
-    if(widget.points.length % 5 != 4) { // != mod value - 1
-      widget.condensedPath.add(widget.points.last);
-    }
-}
-}
 
+  condensePoints() {
+    for (int i = 0; i < points.length; i += 5) {
+      widget.condensedPath.add(points[i]);
+    }
+    if (points.length % 5 != 4) {
+      // != mod value - 1
+      widget.condensedPath.add(points.last);
+    }
+  }
+
+  extractPoints() {
+    List<double> pointsx = <double>[];
+    List<double> pointsy = <double>[];
+    for(int i = 1; i<points.length-1; i++) {
+      pointsx.add(points[i].dx);
+      pointsy.add(points[i].dy);
+    }
+    print(pointsx);
+    print(pointsy);
+  }
+}
 
 class AutoPath extends CustomPainter {
   List<Offset> points;

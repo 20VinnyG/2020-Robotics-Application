@@ -8,13 +8,13 @@ Canvas canvas;
 Size size = new Size(screenx, screeny);
 
 class Teleop extends StatefulWidget {
-  final List<Shot> shotsList;
+  final List<Shot> teleopshotsList;
 
   @override
   _TeleopState createState() => _TeleopState();
 
   Teleop({
-    this.shotsList
+    this.teleopshotsList
   });
 }
 
@@ -103,7 +103,8 @@ class _TeleopState extends State<Teleop> {
                           print(newShot.shotsMade);
                           print(newShot.shotType);
                           print(newShot.toString());
-                          widget.shotsList.add(newShot);
+                          widget.teleopshotsList.add(newShot);
+                          Navigator.pop(context);
                         },
                       )
                     ],
