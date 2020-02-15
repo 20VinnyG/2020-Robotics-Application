@@ -77,14 +77,15 @@ void _appendPath() async {
     List<String> xStringList = _toStringList(data2['autopathx']);
     List<String> yStringList = _toStringList(data2['autopathy']);
     List<String> appender = <String>[];
-    for(int i = 0; i <= xStringList.length; i++) {
+    for(int j = 0; j < xStringList.length; j++) {
       appender.add(data2['matchnumber'].toString());
       appender.add(data2['teamnumber'].toString());
       appender.add(data2['id'].toString());
-      appender.add(data2[i].toString());
-      appender.add(xStringList[i].toString());
-      appender.add(yStringList[i].toString());
+      appender.add(j.toString());
+      appender.add(xStringList[j].toString());
+      appender.add(yStringList[j].toString());
       await sheet.values.appendRow(appender);
+      appender.clear();
     }
   }
 }
@@ -94,43 +95,28 @@ void _appendShots() async {
   final gsheets = GSheets(_credentials);
   final ss = await gsheets.spreadsheet(_spreadsheetId);
   var sheet = ss.worksheetByTitle("Sheet3");
-  for (int i = 0; i < data.length; i++) {
+  for(int i = 0; i <= data.length; i++) {
     dynamic data2 = jsonDecode(data[i]);
-    List<String> xshotsautoStringList = _toStringList(data2['autoshotsx']);
-    List<String> yshotsautoStringList = _toStringList(data2['autoshotsy']);
-    List<String> shotsautomadeStringList = _toStringList(data2['autoshotsmade']);
-    List<String> shotsautotypeStringList = _toStringList(data2['autoshotstype']);
-    List<String> xshotsteleopStringList = _toStringList(data2['teleopshotsx']);
-    List<String> yshotsteleopStringList = _toStringList(data2['teleopshotsy']);
-    List<String> shotsteleopmadeStringList = _toStringList(data2['teleopshotsmade']);
-    List<String> shotsteleoptypeStringList = _toStringList(data2['teleopshotstype']);
-    List<String> sequenceauto = <String>[];
-    List<String> sequenceteleop = <String>[];
-    List<String> teamnumber = <String>[];
-    List<String> id = <String>[];
-    List<String> match = <String>[];
-    for(int i = 0; i <= xshotsautoStringList.length; i++) {
-      sequenceauto.add(i.toString());
-      teamnumber.add(data2['teamnumber'].toString());
-      id.add(data2['id'].toString());
-      match.add(data2['matchnumber'].toString());
+    List<int> autoshotsx = <int>[];
+    List<int> autoshotsy = <int>[];
+    List<int> autoshotsmade = <int>[];
+    List<int> autoshotstype = <int>[];
+    autoshotsx = data2['autoshotsx'];
+    autoshotsy = data2['autoshotsy'];
+    autoshotsx = data2['autoshotsmade'];
+    autoshotsy = data2['autoshotstype'];
+    List<String> appender = <String>[];
+    for(int k = 0; k <= autoshotsx.length; k++) {
+      appender.add(data2['matchnumber'].toString());
+      appender.add(data2['teamnumber'].toString());
+      appender.add(data2['id'].toString());
+      appender.add(autoshotsx[k].toString());
+      appender.add(autoshotsy[k].toString());
+      appender.add(autoshotsmade[k].toString());
+      appender.add(autoshotstype[k].toString());
+      await sheet.values.appendRow(appender);
+      appender.clear();
     }
-     for(int i = 0; i <= xshotsteleopStringList.length; i++) {
-      sequenceteleop.add(i.toString());
-    }
-    await sheet.values.insertColumnByKey('autoshotsx', xshotsautoStringList);
-    await sheet.values.insertColumnByKey('autoshotsy', yshotsautoStringList);
-    await sheet.values.insertColumnByKey('autoshotsmade', shotsautomadeStringList);
-    await sheet.values.insertColumnByKey('autoshotstype', shotsautotypeStringList);
-    await sheet.values.insertColumnByKey('teleopshotsx', xshotsteleopStringList);
-    await sheet.values.insertColumnByKey('teleopshotsy', yshotsteleopStringList);
-    await sheet.values.insertColumnByKey('teleopshotsmade', shotsteleopmadeStringList);
-    await sheet.values.insertColumnByKey('teleopshotsmade', shotsteleoptypeStringList);
-    await sheet.values.insertColumnByKey('sequence-auto', sequenceauto);
-    await sheet.values.insertColumnByKey('sequence-teleop', sequenceteleop);
-    await sheet.values.insertColumnByKey('id', id);
-    await sheet.values.insertColumnByKey('match', match);
-    await sheet.values.insertColumnByKey('teamnumber', teamnumber);
   }
 }
 class ScanMode extends StatefulWidget {

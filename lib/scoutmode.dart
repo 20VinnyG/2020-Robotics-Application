@@ -347,6 +347,16 @@ class _ScoutModeState extends State<ScoutMode> {
                               _submit();
                             },
                           )),
+                      Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16.0, horizontal: 16.0),
+                          child: RaisedButton(
+                            child: Text("Clear"),
+                            onPressed:() {
+                              AutoPath().points = <Offset>[];
+                              Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => ScoutMode()));
+                            },
+                          )),
                     ],
                     scrollDirection: Axis.vertical,
                   )))),
@@ -361,7 +371,7 @@ class _ScoutModeState extends State<ScoutMode> {
   }
 
   void _submit() {
-    //_generateId();
+    _generateId();
     _extractshootingshootingpoints();
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
@@ -393,7 +403,7 @@ class _ScoutModeState extends State<ScoutMode> {
       List<int> stringBytes = utf8.encode(json.encode(payload));
       List<int> gzipBytes = new GZipEncoder().encode(stringBytes);
       String compressedString = base64.encode(gzipBytes);
-      showDialog(
+      showDialog (
           context: context,
           builder: (context) {
             return Dialog(

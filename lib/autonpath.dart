@@ -36,7 +36,6 @@ class AutonPathState extends State<AutonPath> {
                 });
               },
               onPanEnd: (DragEndDetails details) {
-                points.add(null);
                 Shot newShot = new Shot();
                 newShot.posx = points[points.length-2].dx;
                 newShot.posy = points[points.length-2].dy;                
