@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frc1640scoutingframework/autonpath.dart';
@@ -9,6 +10,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'match.dart';
 import 'shot.dart';
+import 'package:archive/archive.dart';
 
 class ScoutMode extends StatefulWidget {
   @override
@@ -364,13 +366,13 @@ class _ScoutModeState extends State<ScoutMode> {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       var payload = {
-        'initials': newMatch.initials.toString(),
-        'id': newMatch.id,
-        'teamnumber': newMatch.teamNumber,
-        'position': newMatch.position,
-        'matchnumber': newMatch.matchNumber,
-        'initiationposition': newMatch.initiationlinepos,
-        'preloadedfuelcells': newMatch.preloadedfuelcells,
+        // 'initials': newMatch.initials.toString(),
+        // 'id': newMatch.id,
+        // 'teamnumber': newMatch.teamNumber,
+        // 'position': newMatch.position,
+        // 'matchnumber': newMatch.matchNumber,
+        // 'initiationposition': newMatch.initiationlinepos,
+        // 'preloadedfuelcells': newMatch.preloadedfuelcells,
         'autopathx': newMatch.autopathx,
         'autopathy': newMatch.autopathy,
         'autoshotsx': autoshotsx,
@@ -381,19 +383,22 @@ class _ScoutModeState extends State<ScoutMode> {
         'teleopshotsy': teleopshotsy,
         'teleopshotsmade': teleopshotsmade,
         'teleopshotstype': teleopshotstype,
-        'generalsuccess': newMatch.generalSuccess,
-        'defensivesuccess': newMatch.defensiveSuccess,
-        'accuracy': newMatch.accuracy,
-        'floorpickup': newMatch.floorpickup ? 1 : 0,
-        'fouls': newMatch.fouls ? 1 : 0,
-        'problems': newMatch.problems ? 1 : 0
+        // 'generalsuccess': newMatch.generalSuccess,
+        // 'defensivesuccess': newMatch.defensiveSuccess,
+        // 'accuracy': newMatch.accuracy,
+        // 'floorpickup': newMatch.floorpickup ? 1 : 0,
+        // 'fouls': newMatch.fouls ? 1 : 0,
+        // 'problems': newMatch.problems ? 1 : 0
       };
+      List<int> stringBytes = utf8.encode(payload.toString());
+      List<int> gzipBytes = new GZipEncoder().encode(stringBytes);
+      String compressedString = base64.encode(gzipBytes);
       showDialog(
           context: context,
           builder: (context) {
             return Dialog(
                 child: QrImage(
-              data: jsonEncode(payload),
+              data: jsonEncode(compressedString),
             ));
           });
     }

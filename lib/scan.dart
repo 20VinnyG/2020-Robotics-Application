@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:archive/archive.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -144,7 +144,11 @@ class _ScanModeState extends State<ScanMode> {
       data.clear();
       for (int i = 0; i < 6; i++) {
         String qrResult = await BarcodeScanner.scan();
-        data.add(qrResult);
+        List<int> stringBytesDecoded = base64.decode(qrResult);
+        List<int> gzipBytesDecoded = new GZipDecoder().decodeBytes(stringBytesDecoded);
+        String decodedqr = new Utf8Codec().decode(gzipBytesDecoded);
+        data.add(decodedqr);
+        print(decodedqr);
       }
     } on PlatformException catch (ex) {
       if (ex.code == BarcodeScanner.CameraAccessDenied) {
