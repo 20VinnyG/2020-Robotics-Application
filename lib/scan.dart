@@ -76,22 +76,16 @@ void _appendPath() async {
     dynamic data2 = jsonDecode(data[i]);
     List<String> xStringList = _toStringList(data2['autopathx']);
     List<String> yStringList = _toStringList(data2['autopathy']);
-    List<String> sequence = <String>[];
-    List<String> teamnumber = <String>[];
-    List<String> id = <String>[];
-    List<String> match = <String>[];
+    List<String> appender = <String>[];
     for(int i = 0; i <= xStringList.length; i++) {
-      sequence.add(i.toString());
-      teamnumber.add(data2['teamnumber'].toString());
-      id.add(data2['id'].toString());
-      match.add(data2['matchnumber'].toString());
+      appender.add(data2['matchnumber'].toString());
+      appender.add(data2['teamnumber'].toString());
+      appender.add(data2['id'].toString());
+      appender.add(data2[i].toString());
+      appender.add(xStringList[i].toString());
+      appender.add(yStringList[i].toString());
+      await sheet.values.appendColumn(appender);
     }
-    await sheet.values.insertColumnByKey('autopathx', xStringList);
-    await sheet.values.insertColumnByKey('autopathy', yStringList);
-    await sheet.values.insertColumnByKey('sequence', sequence);
-    await sheet.values.insertColumnByKey('id', id);
-    await sheet.values.insertColumnByKey('match', match);
-    await sheet.values.insertColumnByKey('teamnumber', teamnumber);
   }
 }
 
