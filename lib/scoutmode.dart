@@ -366,13 +366,13 @@ class _ScoutModeState extends State<ScoutMode> {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       var payload = {
-        // 'initials': newMatch.initials.toString(),
-        // 'id': newMatch.id,
-        // 'teamnumber': newMatch.teamNumber,
-        // 'position': newMatch.position,
-        // 'matchnumber': newMatch.matchNumber,
-        // 'initiationposition': newMatch.initiationlinepos,
-        // 'preloadedfuelcells': newMatch.preloadedfuelcells,
+        'initials': newMatch.initials.toString(),
+        'id': newMatch.id,
+        'teamnumber': newMatch.teamNumber,
+        'position': newMatch.position,
+        'matchnumber': newMatch.matchNumber,
+        'initiationposition': newMatch.initiationlinepos,
+        'preloadedfuelcells': newMatch.preloadedfuelcells,
         'autopathx': newMatch.autopathx,
         'autopathy': newMatch.autopathy,
         'autoshotsx': autoshotsx,
@@ -383,14 +383,14 @@ class _ScoutModeState extends State<ScoutMode> {
         'teleopshotsy': teleopshotsy,
         'teleopshotsmade': teleopshotsmade,
         'teleopshotstype': teleopshotstype,
-        // 'generalsuccess': newMatch.generalSuccess,
-        // 'defensivesuccess': newMatch.defensiveSuccess,
-        // 'accuracy': newMatch.accuracy,
-        // 'floorpickup': newMatch.floorpickup ? 1 : 0,
-        // 'fouls': newMatch.fouls ? 1 : 0,
-        // 'problems': newMatch.problems ? 1 : 0
+        'generalsuccess': newMatch.generalSuccess,
+        'defensivesuccess': newMatch.defensiveSuccess,
+        'accuracy': newMatch.accuracy,
+        'floorpickup': newMatch.floorpickup ? 1 : 0,
+        'fouls': newMatch.fouls ? 1 : 0,
+        'problems': newMatch.problems ? 1 : 0
       };
-      List<int> stringBytes = utf8.encode(payload.toString());
+      List<int> stringBytes = utf8.encode(json.encode(payload));
       List<int> gzipBytes = new GZipEncoder().encode(stringBytes);
       String compressedString = base64.encode(gzipBytes);
       showDialog(
@@ -398,7 +398,7 @@ class _ScoutModeState extends State<ScoutMode> {
           builder: (context) {
             return Dialog(
                 child: QrImage(
-              data: jsonEncode(compressedString),
+              data: compressedString,
             ));
           });
     }

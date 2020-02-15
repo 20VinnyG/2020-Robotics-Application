@@ -84,7 +84,7 @@ void _appendPath() async {
       appender.add(data2[i].toString());
       appender.add(xStringList[i].toString());
       appender.add(yStringList[i].toString());
-      await sheet.values.appendColumn(appender);
+      await sheet.values.appendRow(appender);
     }
   }
 }
