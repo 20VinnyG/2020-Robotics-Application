@@ -57,6 +57,14 @@ List<String> _toStringList (List list) {
   return list2;
 }
 
+List<int> _toIntList (List list) {
+  List<int> list2 = [];
+  for (int i = 0; i < list.length; i++) {
+    list2.add(list[i]);
+  }
+  return list2;
+}
+
 void _appendValues() async {
   final gsheets = GSheets(_credentials);
   final ss = await gsheets.spreadsheet(_spreadsheetId);
@@ -95,18 +103,14 @@ void _appendShots() async {
   final gsheets = GSheets(_credentials);
   final ss = await gsheets.spreadsheet(_spreadsheetId);
   var sheet = ss.worksheetByTitle("Sheet3");
-  for(int i = 0; i <= data.length; i++) {
+  for(int i = 0; i < data.length; i++) {
     dynamic data2 = jsonDecode(data[i]);
-    List<int> autoshotsx = <int>[];
-    List<int> autoshotsy = <int>[];
-    List<int> autoshotsmade = <int>[];
-    List<int> autoshotstype = <int>[];
-    autoshotsx = data2['autoshotsx'];
-    autoshotsy = data2['autoshotsy'];
-    autoshotsx = data2['autoshotsmade'];
-    autoshotsy = data2['autoshotstype'];
+    List<int> autoshotsx = _toIntList(data2['autoshotsx']);
+    List<int> autoshotsy = _toIntList(data2['autoshotsy']);
+    List<int> autoshotsmade = _toIntList(data2['autoshotsmade']);
+    List<int> autoshotstype = _toIntList(data2['autoshotstype']);
     List<String> appender = <String>[];
-    for(int k = 0; k <= autoshotsx.length; k++) {
+    for(int k = 0; k < autoshotsx.length; k++) {
       appender.add(data2['matchnumber'].toString());
       appender.add(data2['teamnumber'].toString());
       appender.add(data2['id'].toString());
@@ -135,6 +139,7 @@ class _ScanModeState extends State<ScanMode> {
         String decodedqr = new Utf8Codec().decode(gzipBytesDecoded);
         data.add(decodedqr);
         print(decodedqr);
+        print("transmitted: " + qrResult.length.toString() + " -- decoded: " + decodedqr.length.toString());
       }
     } on PlatformException catch (ex) {
       if (ex.code == BarcodeScanner.CameraAccessDenied) {
@@ -197,7 +202,7 @@ class _ScanModeState extends State<ScanMode> {
           RaisedButton(
             child: Text("Test"),
             onPressed: () {
-              _appendPath();
+              _appendShots();
             },
           ),
         ],
