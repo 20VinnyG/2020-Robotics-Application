@@ -95,6 +95,50 @@ void _appendPath() async {
   }
 }
 
+
+void _appendShots() async {
+  final gsheets = GSheets(_credentials);
+  final ss = await gsheets.spreadsheet(_spreadsheetId);
+  var sheet = ss.worksheetByTitle("Sheet3");
+  for (int i = 0; i < data.length; i++) {
+    dynamic data2 = jsonDecode(data[i]);
+    List<String> xshotsautoStringList = _toStringList(data2['autoshotsx']);
+    List<String> yshotsautoStringList = _toStringList(data2['autoshotsy']);
+    List<String> shotsautomadeStringList = _toStringList(data2['autoshotsmade']);
+    List<String> shotsautotypeStringList = _toStringList(data2['autoshotstype']);
+    List<String> xshotsteleopStringList = _toStringList(data2['teleopshotsx']);
+    List<String> yshotsteleopStringList = _toStringList(data2['teleopshotsy']);
+    List<String> shotsteleopmadeStringList = _toStringList(data2['teleopshotsmade']);
+    List<String> shotsteleoptypeStringList = _toStringList(data2['teleopshotstype']);
+    List<String> sequenceauto = <String>[];
+    List<String> sequenceteleop = <String>[];
+    List<String> teamnumber = <String>[];
+    List<String> id = <String>[];
+    List<String> match = <String>[];
+    for(int i = 0; i <= xshotsautoStringList.length; i++) {
+      sequenceauto.add(i.toString());
+      teamnumber.add(data2['teamnumber'].toString());
+      id.add(data2['id'].toString());
+      match.add(data2['matchnumber'].toString());
+    }
+     for(int i = 0; i <= xshotsteleopStringList.length; i++) {
+      sequenceteleop.add(i.toString());
+    }
+    await sheet.values.insertColumnByKey('autoshotsx', xshotsautoStringList);
+    await sheet.values.insertColumnByKey('autoshotsy', yshotsautoStringList);
+    await sheet.values.insertColumnByKey('autoshotsmade', shotsautomadeStringList);
+    await sheet.values.insertColumnByKey('autoshotstype', shotsautotypeStringList);
+    await sheet.values.insertColumnByKey('teleopshotsx', xshotsteleopStringList);
+    await sheet.values.insertColumnByKey('teleopshotsy', yshotsteleopStringList);
+    await sheet.values.insertColumnByKey('teleopshotsmade', shotsteleopmadeStringList);
+    await sheet.values.insertColumnByKey('teleopshotsmade', shotsteleoptypeStringList);
+    await sheet.values.insertColumnByKey('sequence-auto', sequenceauto);
+    await sheet.values.insertColumnByKey('sequence-teleop', sequenceteleop);
+    await sheet.values.insertColumnByKey('id', id);
+    await sheet.values.insertColumnByKey('match', match);
+    await sheet.values.insertColumnByKey('teamnumber', teamnumber);
+  }
+}
 class ScanMode extends StatefulWidget {
   @override
   _ScanModeState createState() => _ScanModeState();
