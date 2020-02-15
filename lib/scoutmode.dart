@@ -30,8 +30,8 @@ class _ScoutModeState extends State<ScoutMode> {
   List<int> autoshotsy = <int>[];
   List<int> autoshotsmade = <int>[];
   List<int> teleopshotsmade = <int>[];
-  List<bool> autoshotstype = <bool>[];
-  List<bool> teleopshotstype = <bool>[];
+  List<int> autoshotstype = <int>[];
+  List<int> teleopshotstype = <int>[];
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -441,13 +441,13 @@ class _ScoutModeState extends State<ScoutMode> {
       autoshotsx.add(newMatch.autoshots[i].posx.round());
       autoshotsy.add(newMatch.autoshots[i].posy.round());
       autoshotsmade.add(newMatch.autoshots[i].shotsMade);
-      autoshotstype.add(newMatch.autoshots[i].shotType);
+      autoshotstype.add(newMatch.autoshots[i].shotType ? 1 : 0);
     }
     for(int i=0; i< newMatch.autoshots.length; i++) {
       teleopshotsx.add(newMatch.teleopshots[i].posx.round());
       teleopshotsy.add(newMatch.teleopshots[i].posy.round());
       teleopshotsmade.add(newMatch.teleopshots[i].shotsMade);
-      teleopshotstype.add(newMatch.teleopshots[i].shotType);
+      teleopshotstype.add(newMatch.teleopshots[i].shotType ? 1 : 0);
     }
     
   }
