@@ -49,7 +49,13 @@ void _initializeSpreadSheet() async {
   await sheet.values.insertRow(1, sheetinitializer);
 }
 
-
+List<String> _toStringList (List list) {
+  List<String> list2 = [];
+  for (int i = 0; i < list.length; i++) {
+    list2.add(list[i].toString());
+  }
+  return list2;
+}
 
 void _appendValues() async {
   final gsheets = GSheets(_credentials);
@@ -67,16 +73,25 @@ void _appendPath() async {
   final ss = await gsheets.spreadsheet(_spreadsheetId);
   var sheet = ss.worksheetByTitle("Sheet2");
   for (int i = 0; i < data.length; i++) {
-    List<String> payload =
-        new List<String>.from(jsonDecode(data[i]).values.toList());
-    String pathx = payload[7];
-    String pathy = payload[8];
-    List<String> pathpayloadx = 
-        new List<String>.from(jsonDecode("{'list': " + pathx +"}").values.toList());
-    List<String> pathpayloady = 
-        new List<String>.from(jsonDecode("{'list': " + pathy +"}").values.toList());
-    print(pathpayloadx);
-    print(pathpayloady);
+    dynamic data2 = jsonDecode(data[i]);
+    List<String> xStringList = _toStringList(data2['autopathx']);
+    List<String> yStringList = _toStringList(data2['autopathy']);
+    List<String> sequence = <String>[];
+    List<String> teamnumber = <String>[];
+    List<String> id = <String>[];
+    List<String> match = <String>[];
+    for(int i = 0; i <= xStringList.length; i++) {
+      sequence.add(i.toString());
+      teamnumber.add(data2['teamnumber'].toString());
+      id.add(data2['id'].toString());
+      match.add(data2['matchnumber'].toString());
+    }
+    await sheet.values.insertColumnByKey('autopathx', xStringList);
+    await sheet.values.insertColumnByKey('autopathy', yStringList);
+    await sheet.values.insertColumnByKey('sequence', sequence);
+    await sheet.values.insertColumnByKey('id', id);
+    await sheet.values.insertColumnByKey('match', match);
+    await sheet.values.insertColumnByKey('teamnumber', teamnumber);
   }
 }
 
@@ -154,7 +169,7 @@ class _ScanModeState extends State<ScanMode> {
           RaisedButton(
             child: Text("Test"),
             onPressed: () {
-              
+              _appendPath();
             },
           ),
         ],

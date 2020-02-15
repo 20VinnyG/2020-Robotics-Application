@@ -365,26 +365,26 @@ class _ScoutModeState extends State<ScoutMode> {
       formKey.currentState.save();
       var payload = {
         'initials': newMatch.initials.toString(),
-        'id': newMatch.id.toString(),
-        'teamnumber': newMatch.teamNumber.toString(),
-        'position': newMatch.position.toString(),
-        'matchnumber': newMatch.matchNumber.toString(),
-        'initiationposition': newMatch.initiationlinepos.toString(),
-        'preloadedfuelcells': newMatch.preloadedfuelcells.toString(),
-        'autonpathx': newMatch.autopathx.toString(),
-        'autopathy': newMatch.autopathy.toString(),
-        'autoshotsx': autoshotsx.toString(),
-        'autoshotsy': autoshotsy.toString(),
-        'autoshotsmade': autoshotsmade.toString(),
-        'teleopshotsx': teleopshotsx.toString(),
-        'teleopshotsx': teleopshotsy.toString(),
-        'teleopshotsmade': teleopshotsmade.toString(),
-        'generalsuccess': newMatch.generalSuccess.toString(),
-        'defensivesuccess': newMatch.defensiveSuccess.toString(),
-        'accuracy': newMatch.accuracy.toString(),
-        'floorpickup': newMatch.floorpickup.toString(),
-        'fouls': newMatch.fouls.toString(),
-        'problems': newMatch.problems.toString()
+        'id': newMatch.id,
+        'teamnumber': newMatch.teamNumber,
+        'position': newMatch.position,
+        'matchnumber': newMatch.matchNumber,
+        'initiationposition': newMatch.initiationlinepos,
+        'preloadedfuelcells': newMatch.preloadedfuelcells,
+        'autopathx': newMatch.autopathx,
+        'autopathy': newMatch.autopathy,
+        'autoshotsx': autoshotsx,
+        'autoshotsy': autoshotsy,
+        'autoshotsmade': autoshotsmade,
+        'teleopshotsx': teleopshotsx,
+        'teleopshotsy': teleopshotsy,
+        'teleopshotsmade': teleopshotsmade,
+        'generalsuccess': newMatch.generalSuccess,
+        'defensivesuccess': newMatch.defensiveSuccess,
+        'accuracy': newMatch.accuracy,
+        'floorpickup': newMatch.floorpickup ? 1 : 0,
+        'fouls': newMatch.fouls ? 1 : 0,
+        'problems': newMatch.problems ? 1 : 0
       };
       showDialog(
           context: context,
@@ -397,7 +397,7 @@ class _ScoutModeState extends State<ScoutMode> {
     }
   }
 
-  _getTeam() {
+  int _getTeam() {
     String scheduledTeam;
     String alphaPos;
     int betaPos;
@@ -410,7 +410,7 @@ class _ScoutModeState extends State<ScoutMode> {
     scheduledTeam = newGlobals.schedule[newMatch.matchNumber]["alliances"]
         [alphaPos]["team_keys"][betaPos];
     scheduledTeam = scheduledTeam.substring(3);
-    return scheduledTeam;
+    return int.parse(scheduledTeam);
   }
 
   _generateId() {
@@ -420,15 +420,15 @@ class _ScoutModeState extends State<ScoutMode> {
   }
 
   _extractshootingshootingpoints() {
-    for(int i; i< newMatch.teleopshots.length; i++) {
-      autoshotsx.add(newMatch.teleopshots[i].posx.round());
-      autoshotsy.add(newMatch.teleopshots[i].posy.round());
-      autoshotsmade.add(newMatch.teleopshots[i].shotsMade);
-      autoshotstype.add(newMatch.teleopshots[i].shotType);
+    for(int i=0; i < newMatch.autoshots.length; i++) {
+      autoshotsx.add(newMatch.autoshots[i].posx.round());
+      autoshotsy.add(newMatch.autoshots[i].posy.round());
+      autoshotsmade.add(newMatch.autoshots[i].shotsMade);
+      autoshotstype.add(newMatch.autoshots[i].shotType);
     }
-    for(int i; i< newMatch.autoshots.length; i++) {
-      teleopshotsx.add(newMatch.autoshots[i].posx.round());
-      teleopshotsy.add(newMatch.autoshots[i].posy.round());
+    for(int i=0; i< newMatch.autoshots.length; i++) {
+      teleopshotsx.add(newMatch.teleopshots[i].posx.round());
+      teleopshotsy.add(newMatch.teleopshots[i].posy.round());
       teleopshotsmade.add(newMatch.teleopshots[i].shotsMade);
       teleopshotstype.add(newMatch.teleopshots[i].shotType);
     }

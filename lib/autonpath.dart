@@ -124,12 +124,12 @@ class AutonPathState extends State<AutonPath> {
       widget.condensedPathx.add(points[i].dx.round());
       widget.condensedPathy.add(points[i].dy.round());
     }
-    if (points.last = null) {
+    /*if (points.last = null) {
       // != mod value - 1
       widget.condensedPathx.add(points.last.dx.round());
       widget.condensedPathy.add(points.last.dy.round());
     }
-    
+    */
   }
 }
 
