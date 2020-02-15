@@ -22,6 +22,14 @@ class _ScoutModeState extends State<ScoutMode> {
 
   final formKey = GlobalKey<FormState>();
   Match newMatch = new Match();
+  List<int> teleopshotsx = <int>[];
+  List<int> teleopshotsy = <int>[];
+  List<int> autoshotsx = <int>[];
+  List<int> autoshotsy = <int>[];
+  List<int> autoshotsmade = <int>[];
+  List<int> teleopshotsmade = <int>[];
+  List<bool> autoshotstype = <bool>[];
+  List<bool> teleopshotstype = <bool>[];
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -159,7 +167,7 @@ class _ScoutModeState extends State<ScoutMode> {
                               Navigator.push(
                                   context,
                                   new MaterialPageRoute(
-                                      builder: (context) => AutonPath(condensedPath: newMatch.path, autonshotsList: newMatch.autoshots,)));
+                                      builder: (context) => AutonPath(condensedPathx: newMatch.autopathx, condensedPathy: newMatch.autopathy, autonshotsList: newMatch.autoshots,)));
                             },
                           )),
                       Divider(
@@ -333,7 +341,9 @@ class _ScoutModeState extends State<ScoutMode> {
                               vertical: 16.0, horizontal: 16.0),
                           child: RaisedButton(
                             child: Text("Generate QR"),
-                            onPressed: _submit,
+                            onPressed:() {
+                              _submit();
+                            },
                           )),
                     ],
                     scrollDirection: Axis.vertical,
@@ -349,7 +359,8 @@ class _ScoutModeState extends State<ScoutMode> {
   }
 
   void _submit() {
-    _generateId();
+    //_generateId();
+    _extractshootingshootingpoints();
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       var payload = {
@@ -360,10 +371,17 @@ class _ScoutModeState extends State<ScoutMode> {
         'matchnumber': newMatch.matchNumber.toString(),
         'initiationposition': newMatch.initiationlinepos.toString(),
         'preloadedfuelcells': newMatch.preloadedfuelcells.toString(),
+        'autonpathx': newMatch.autopathx.toString(),
+        'autopathy': newMatch.autopathy.toString(),
+        'autoshotsx': autoshotsx.toString(),
+        'autoshotsy': autoshotsy.toString(),
+        'autoshotsmade': autoshotsmade.toString(),
+        'teleopshotsx': teleopshotsx.toString(),
+        'teleopshotsx': teleopshotsy.toString(),
+        'teleopshotsmade': teleopshotsmade.toString(),
         'generalsuccess': newMatch.generalSuccess.toString(),
         'defensivesuccess': newMatch.defensiveSuccess.toString(),
         'accuracy': newMatch.accuracy.toString(),
-        'path': newMatch.path.toString(),
         'floorpickup': newMatch.floorpickup.toString(),
         'fouls': newMatch.fouls.toString(),
         'problems': newMatch.problems.toString()
@@ -399,5 +417,21 @@ class _ScoutModeState extends State<ScoutMode> {
     int id = newMatch.teamNumber + 00 + newMatch.matchNumber;
     print(id);
     newMatch.id = id;
+  }
+
+  _extractshootingshootingpoints() {
+    for(int i; i< newMatch.teleopshots.length; i++) {
+      autoshotsx.add(newMatch.teleopshots[i].posx.round());
+      autoshotsy.add(newMatch.teleopshots[i].posy.round());
+      autoshotsmade.add(newMatch.teleopshots[i].shotsMade);
+      autoshotstype.add(newMatch.teleopshots[i].shotType);
+    }
+    for(int i; i< newMatch.autoshots.length; i++) {
+      teleopshotsx.add(newMatch.autoshots[i].posx.round());
+      teleopshotsy.add(newMatch.autoshots[i].posy.round());
+      teleopshotsmade.add(newMatch.teleopshots[i].shotsMade);
+      teleopshotstype.add(newMatch.teleopshots[i].shotType);
+    }
+    
   }
 }

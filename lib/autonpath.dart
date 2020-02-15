@@ -5,13 +5,14 @@ import 'package:frc1640scoutingframework/shot.dart';
 List<Offset> points = <Offset>[];
 
 class AutonPath extends StatefulWidget {
-  final List<Offset> condensedPath;
+  final List<int> condensedPathx;
+  final List<int> condensedPathy;
   final List<Shot> autonshotsList;
 
   @override
   AutonPathState createState() => AutonPathState();
 
-  AutonPath({this.condensedPath, this.autonshotsList});
+  AutonPath({this.condensedPathx, this.condensedPathy, this.autonshotsList});
 }
 
 class AutonPathState extends State<AutonPath> {
@@ -82,12 +83,11 @@ class AutonPathState extends State<AutonPath> {
                               RaisedButton(
                                 child: Text("Done"),
                                 onPressed: () {
-                                  extractPoints();
-                                  //print(newShot.shotsMade);
-                                  //print(newShot.shotType);
-                                  //print(newShot.toString());
-                                  //widget.autonshotsList.add(newShot);
-                                  //Navigator.pop(context);
+                                  print(newShot.shotsMade);
+                                  print(newShot.shotType);
+                                  print(newShot.toString());
+                                  widget.autonshotsList.add(newShot);
+                                  Navigator.pop(context);
                                 },
                               )
                             ],
@@ -112,33 +112,24 @@ class AutonPathState extends State<AutonPath> {
                 child: Icon(Icons.check),
                 label: "Completed Path",
                 onTap: () {
-                  print(MediaQuery.of(context).size.width);
-                  print(MediaQuery.of(context).size.height);
-                  //Navigator.pop(context);
+                  condensePoints();
+                  Navigator.pop(context);
                 })
           ],
         ));
   }
 
   condensePoints() {
-    for (int i = 0; i < points.length; i += 5) {
-      widget.condensedPath.add(points[i]);
+    for (int i = 0; i < points.length; i+=5) {
+      widget.condensedPathx.add(points[i].dx.round());
+      widget.condensedPathy.add(points[i].dy.round());
     }
-    if (points.length % 5 != 4) {
+    if (points.last = null) {
       // != mod value - 1
-      widget.condensedPath.add(points.last);
+      widget.condensedPathx.add(points.last.dx.round());
+      widget.condensedPathy.add(points.last.dy.round());
     }
-  }
-
-  extractPoints() {
-    List<double> pointsx = <double>[];
-    List<double> pointsy = <double>[];
-    for(int i = 1; i<points.length-1; i++) {
-      pointsx.add(points[i].dx);
-      pointsy.add(points[i].dy);
-    }
-    print(pointsx);
-    print(pointsy);
+    
   }
 }
 

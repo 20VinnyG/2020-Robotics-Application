@@ -26,7 +26,7 @@ const _credentials = r'''{
 
 String _spreadsheetId = '1K3AQE7kr5u0Z-_c-_YGsHVGHImtGfy47bBikxvjjdUQ';
 
-void _createSpreadSheet() async {
+void _initializeSpreadSheet() async {
   final gsheets = GSheets(_credentials);
   final ss = await gsheets.spreadsheet(_spreadsheetId);
   var sheet = ss.worksheetByTitle("Sheet1");
@@ -49,15 +49,34 @@ void _createSpreadSheet() async {
   await sheet.values.insertRow(1, sheetinitializer);
 }
 
+
+
 void _appendValues() async {
   final gsheets = GSheets(_credentials);
   final ss = await gsheets.spreadsheet(_spreadsheetId);
   var sheet = ss.worksheetByTitle("Sheet1");
+  for (int i = 0; i < data.length; i++) {
+     List<String> payload =
+        new List<String>.from(jsonDecode(data[i]).values.toList());
+    await sheet.values.appendRow(payload);
+  }
+}
 
+void _appendPath() async {
+  final gsheets = GSheets(_credentials);
+  final ss = await gsheets.spreadsheet(_spreadsheetId);
+  var sheet = ss.worksheetByTitle("Sheet2");
   for (int i = 0; i < data.length; i++) {
     List<String> payload =
         new List<String>.from(jsonDecode(data[i]).values.toList());
-    await sheet.values.appendRow(payload);
+    String pathx = payload[7];
+    String pathy = payload[8];
+    List<String> pathpayloadx = 
+        new List<String>.from(jsonDecode("{'list': " + pathx +"}").values.toList());
+    List<String> pathpayloady = 
+        new List<String>.from(jsonDecode("{'list': " + pathy +"}").values.toList());
+    print(pathpayloadx);
+    print(pathpayloady);
   }
 }
 
@@ -123,13 +142,19 @@ class _ScanModeState extends State<ScanMode> {
           RaisedButton(
             child: Text("Create Sheet"),
             onPressed: () {
-              _createSpreadSheet();
+              _initializeSpreadSheet();
             },
           ),
           RaisedButton(
-            child: Text("Create Sheet"),
+            child: Text("Append Values"),
             onPressed: () {
               _appendValues();
+            },
+          ),
+          RaisedButton(
+            child: Text("Test"),
+            onPressed: () {
+              
             },
           ),
         ],

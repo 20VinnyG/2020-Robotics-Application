@@ -11,7 +11,8 @@ class Match {
   int preloadedfuelcells;
   int id;
   //Auton
-  List<Offset> path = <Offset>[];
+  List<int> autopathx = <int>[];
+  List<int> autopathy = <int>[];
   List<Shot> autoshots = <Shot>[];
   //Telop
   List<Shot> teleopshots = <Shot>[];
