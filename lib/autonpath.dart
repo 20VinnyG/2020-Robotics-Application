@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:frc1640scoutingframework/match.dart';
 import 'package:frc1640scoutingframework/shot.dart';
@@ -41,13 +42,10 @@ class AutonPathState extends State<AutonPath> {
 								return showDialog(
 										context: context,
 										builder: (context) {
-											return Column(
-												mainAxisSize: MainAxisSize.min,
-												children: <Widget>[
-													Container(
-														child: AlertDialog(
+											return AlertDialog(
 														title: Text("Enter Number of Balls Made"),
-														content: ListView(
+														content: Column(
+                              mainAxisSize: MainAxisSize.min,
 															children: <Widget>[
 																DropdownButton(
 																	items: [
@@ -91,10 +89,7 @@ class AutonPathState extends State<AutonPath> {
 																	},
 																)
 															],
-														))
-													)
-												],
-											);
+														));
 										});
 							},
 							child: new CustomPaint(

@@ -85,7 +85,8 @@ class _TeleopState extends State<Teleop> {
 						builder: (context) {
 							return AlertDialog(
 									title: Text("Enter Number of Balls Made"),
-									content: ListView(
+									content: Column(
+                    mainAxisSize: MainAxisSize.min,
 										children: <Widget>[
 											DropdownButton(
 												items: [
