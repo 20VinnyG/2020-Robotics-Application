@@ -49,7 +49,7 @@ void _initializeSpreadSheet() async {
   await sheet.values.insertRow(1, sheetinitializer);
 }
 
-List<String> _toStringList (List list) {
+List<String> _toStringList(List list) {
   List<String> list2 = [];
   for (int i = 0; i < list.length; i++) {
     list2.add(list[i].toString());
@@ -57,7 +57,7 @@ List<String> _toStringList (List list) {
   return list2;
 }
 
-List<int> _toIntList (List list) {
+List<int> _toIntList(List list) {
   List<int> list2 = [];
   for (int i = 0; i < list.length; i++) {
     list2.add(list[i]);
@@ -66,11 +66,17 @@ List<int> _toIntList (List list) {
 }
 
 void _appendValues() async {
+  _appendGeneralMetrics();
+  _appendPath();
+  _appendShots();
+}
+
+void _appendGeneralMetrics() async {
   final gsheets = GSheets(_credentials);
   final ss = await gsheets.spreadsheet(_spreadsheetId);
   var sheet = ss.worksheetByTitle("Sheet1");
   for (int i = 0; i < data.length; i++) {
-     List<String> payload =
+    List<String> payload =
         new List<String>.from(jsonDecode(data[i]).values.toList());
     await sheet.values.appendRow(payload);
   }
@@ -85,7 +91,7 @@ void _appendPath() async {
     List<String> xStringList = _toStringList(data2['autopathx']);
     List<String> yStringList = _toStringList(data2['autopathy']);
     List<String> appender = <String>[];
-    for(int j = 0; j < xStringList.length; j++) {
+    for (int j = 0; j < xStringList.length; j++) {
       appender.add(data2['matchnumber'].toString());
       appender.add(data2['teamnumber'].toString());
       appender.add(data2['id'].toString());
@@ -98,19 +104,18 @@ void _appendPath() async {
   }
 }
 
-
 void _appendShots() async {
   final gsheets = GSheets(_credentials);
   final ss = await gsheets.spreadsheet(_spreadsheetId);
   var sheet = ss.worksheetByTitle("Sheet3");
-  for(int i = 0; i < data.length; i++) {
+  for (int i = 0; i < data.length; i++) {
     dynamic data2 = jsonDecode(data[i]);
     List<int> autoshotsx = _toIntList(data2['autoshotsx']);
     List<int> autoshotsy = _toIntList(data2['autoshotsy']);
     List<int> autoshotsmade = _toIntList(data2['autoshotsmade']);
     List<int> autoshotstype = _toIntList(data2['autoshotstype']);
     List<String> appender = <String>[];
-    for(int k = 0; k < autoshotsx.length; k++) {
+    for (int k = 0; k < autoshotsx.length; k++) {
       appender.add(data2['matchnumber'].toString());
       appender.add(data2['teamnumber'].toString());
       appender.add(data2['id'].toString());
@@ -123,6 +128,7 @@ void _appendShots() async {
     }
   }
 }
+
 class ScanMode extends StatefulWidget {
   @override
   _ScanModeState createState() => _ScanModeState();
@@ -135,11 +141,10 @@ class _ScanModeState extends State<ScanMode> {
       for (int i = 0; i < 6; i++) {
         String qrResult = await BarcodeScanner.scan();
         List<int> stringBytesDecoded = base64.decode(qrResult);
-        List<int> gzipBytesDecoded = new GZipDecoder().decodeBytes(stringBytesDecoded);
+        List<int> gzipBytesDecoded =
+            new GZipDecoder().decodeBytes(stringBytesDecoded);
         String decodedqr = new Utf8Codec().decode(gzipBytesDecoded);
         data.add(decodedqr);
-        print(decodedqr);
-        print("transmitted: " + qrResult.length.toString() + " -- decoded: " + decodedqr.length.toString());
       }
     } on PlatformException catch (ex) {
       if (ex.code == BarcodeScanner.CameraAccessDenied) {

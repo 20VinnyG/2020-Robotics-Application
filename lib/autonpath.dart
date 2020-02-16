@@ -37,60 +37,55 @@ class AutonPathState extends State<AutonPath> {
               },
               onPanEnd: (DragEndDetails details) {
                 Shot newShot = new Shot();
-                newShot.posx = points[points.length-2].dx;
-                newShot.posy = points[points.length-2].dy;                
-                print(newShot.posx);
-                print(newShot.posy);
-                return showDialog(
+                newShot.posx = points[points.length - 2].dx;
+                newShot.posy = points[points.length - 2].dy;
+                showDialog(
                     context: context,
                     builder: (context) {
-                      return AlertDialog(
-                          title: Text("Enter Number of Balls Made"),
-                          content: ListView(
-                            children: <Widget>[
-                              DropdownButton(
-                                items: [
-                                  DropdownMenuItem(
-                                      value: int.parse("0"), child: Text("0")),
-                                  DropdownMenuItem(
-                                      value: int.parse("1"), child: Text("1")),
-                                  DropdownMenuItem(
-                                      value: int.parse("2"), child: Text("2")),
-                                  DropdownMenuItem(
-                                      value: int.parse("3"), child: Text("3")),
-                                  DropdownMenuItem(
-                                      value: int.parse("4"), child: Text("4")),
-                                  DropdownMenuItem(
-                                      value: int.parse("5"), child: Text("5")),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    newShot.shotsMade = value;
-                                  });
-                                },
-                                hint: Text("Balls Made"),
-                                value: newShot.shotsMade,
-                              ),
-                              Switch(
-                                value: newShot.shotType,
-                                onChanged: (bool s) {
-                                  setState(() {
-                                    newShot.shotType = s;
-                                  });
-                                },
-                              ),
-                              RaisedButton(
-                                child: Text("Done"),
-                                onPressed: () {
-                                  print(newShot.shotsMade);
-                                  print(newShot.shotType);
-                                  print(newShot.toString());
-                                  widget.autonshotsList.add(newShot);
-                                  Navigator.pop(context);
-                                },
-                              )
+                      return Dialog(
+                          child: ListView(
+                        children: <Widget>[
+                          DropdownButton(
+                            items: [
+                              DropdownMenuItem(
+                                  value: int.parse("0"), child: Text("0")),
+                              DropdownMenuItem(
+                                  value: int.parse("1"), child: Text("1")),
+                              DropdownMenuItem(
+                                  value: int.parse("2"), child: Text("2")),
+                              DropdownMenuItem(
+                                  value: int.parse("3"), child: Text("3")),
+                              DropdownMenuItem(
+                                  value: int.parse("4"), child: Text("4")),
+                              DropdownMenuItem(
+                                  value: int.parse("5"), child: Text("5")),
                             ],
-                          ));
+                            onChanged: (value) {
+                              setState(() {
+                                newShot.shotsMade = value;
+                              });
+                            },
+                            hint: Text("Balls Made"),
+                            value: newShot.shotsMade,
+                          ),
+                          Text("Enter the Shot Type"),
+                          Switch(
+                            value: newShot.shotType,
+                            onChanged: (bool s) {
+                              setState(() {
+                                newShot.shotType = s;
+                              });
+                            },
+                          ),
+                          RaisedButton(
+                            child: Text("Done"),
+                            onPressed: () {
+                              widget.autonshotsList.add(newShot);
+                              Navigator.pop(context);
+                            },
+                          )
+                        ],
+                      ));
                     });
               },
               child: new CustomPaint(
@@ -119,7 +114,7 @@ class AutonPathState extends State<AutonPath> {
   }
 
   condensePoints() {
-    for (int i = 0; i < points.length; i+=5) {
+    for (int i = 0; i < points.length; i += 5) {
       widget.condensedPathx.add(points[i].dx.round());
       widget.condensedPathy.add(points[i].dy.round());
     }

@@ -169,7 +169,11 @@ class _ScoutModeState extends State<ScoutMode> {
                               Navigator.push(
                                   context,
                                   new MaterialPageRoute(
-                                      builder: (context) => AutonPath(condensedPathx: newMatch.autopathx, condensedPathy: newMatch.autopathy, autonshotsList: newMatch.autoshots,)));
+                                      builder: (context) => AutonPath(
+                                            condensedPathx: newMatch.autopathx,
+                                            condensedPathy: newMatch.autopathy,
+                                            autonshotsList: newMatch.autoshots,
+                                          )));
                             },
                           )),
                       Divider(
@@ -187,7 +191,9 @@ class _ScoutModeState extends State<ScoutMode> {
                               Navigator.push(
                                   context,
                                   new MaterialPageRoute(
-                                      builder: (context) => Teleop(teleopshotsList: newMatch.teleopshots)));
+                                      builder: (context) => Teleop(
+                                          teleopshotsList:
+                                              newMatch.teleopshots)));
                             },
                           )),
                       Divider(
@@ -343,7 +349,7 @@ class _ScoutModeState extends State<ScoutMode> {
                               vertical: 16.0, horizontal: 16.0),
                           child: RaisedButton(
                             child: Text("Generate QR"),
-                            onPressed:() {
+                            onPressed: () {
                               _submit();
                             },
                           )),
@@ -352,9 +358,12 @@ class _ScoutModeState extends State<ScoutMode> {
                               vertical: 16.0, horizontal: 16.0),
                           child: RaisedButton(
                             child: Text("Clear"),
-                            onPressed:() {
+                            onPressed: () {
                               AutoPath().points = <Offset>[];
-                              Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => ScoutMode()));
+                              Navigator.pushReplacement(
+                                  context,
+                                  new MaterialPageRoute(
+                                      builder: (context) => ScoutMode()));
                             },
                           )),
                     ],
@@ -403,7 +412,7 @@ class _ScoutModeState extends State<ScoutMode> {
       List<int> stringBytes = utf8.encode(json.encode(payload));
       List<int> gzipBytes = new GZipEncoder().encode(stringBytes);
       String compressedString = base64.encode(gzipBytes);
-      showDialog (
+      showDialog(
           context: context,
           builder: (context) {
             return Dialog(
@@ -431,24 +440,22 @@ class _ScoutModeState extends State<ScoutMode> {
   }
 
   _generateId() {
-    int id = newMatch.teamNumber + 00 + newMatch.matchNumber;
-    print(id);
+    int id = newMatch.teamNumber * 1000 + newMatch.matchNumber;
     newMatch.id = id;
   }
 
   _extractshootingshootingpoints() {
-    for(int i=0; i < newMatch.autoshots.length; i++) {
+    for (int i = 0; i < newMatch.autoshots.length; i++) {
       autoshotsx.add(newMatch.autoshots[i].posx.round());
       autoshotsy.add(newMatch.autoshots[i].posy.round());
       autoshotsmade.add(newMatch.autoshots[i].shotsMade);
       autoshotstype.add(newMatch.autoshots[i].shotType ? 1 : 0);
     }
-    for(int i=0; i< newMatch.autoshots.length; i++) {
+    for (int i = 0; i < newMatch.autoshots.length; i++) {
       teleopshotsx.add(newMatch.teleopshots[i].posx.round());
       teleopshotsy.add(newMatch.teleopshots[i].posy.round());
       teleopshotsmade.add(newMatch.teleopshots[i].shotsMade);
       teleopshotstype.add(newMatch.teleopshots[i].shotType ? 1 : 0);
     }
-    
   }
 }
