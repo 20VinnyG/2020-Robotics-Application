@@ -434,14 +434,14 @@ class _ScoutModeState extends State<ScoutMode> {
 
 	_extractshootingshootingpoints() {
 		for(int i=0; i < newMatch.autoshots.length; i++) {
-			autoshotsx.add(newMatch.autoshots[i].posx.round());
-			autoshotsy.add(newMatch.autoshots[i].posy.round());
+			autoshotsx.add(newMatch.autoshots[i].pos.dx.round());
+			autoshotsy.add(newMatch.autoshots[i].pos.dy.round());
 			autoshotsmade.add(newMatch.autoshots[i].shotsMade);
 			autoshotstype.add(newMatch.autoshots[i].shotType ? 1 : 0);
 		}
 		for(int i=0; i< newMatch.autoshots.length; i++) {
-			teleopshotsx.add(newMatch.teleopshots[i].posx.round());
-			teleopshotsy.add(newMatch.teleopshots[i].posy.round());
+			teleopshotsx.add(newMatch.teleopshots[i].pos.dx.round());
+			teleopshotsy.add(newMatch.teleopshots[i].pos.dy.round());
 			teleopshotsmade.add(newMatch.teleopshots[i].shotsMade);
 			teleopshotstype.add(newMatch.teleopshots[i].shotType ? 1 : 0);
 		}

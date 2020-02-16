@@ -3,12 +3,6 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:frc1640scoutingframework/match.dart';
 import "shot.dart";
 
-double screenx = 811;
-double screeny;
-Paint paint = new Paint();
-Canvas canvas;
-Size size = new Size(screenx, screeny);
-
 class Teleop extends StatefulWidget {
 	// final List<Shot> teleopshotsList;
 	final MatchData matchData;
@@ -25,13 +19,12 @@ bool val = true;
 
 class _TeleopState extends State<Teleop> {
 
+  Offset screenPos;
+
 	void onTapDown(BuildContext context, TapDownDetails details) {
 		final RenderBox box = context.findRenderObject();
 		final Offset localOffset = box.globalToLocal(details.globalPosition);
-		setState(() {
-			screenx = localOffset.dx;
-			screeny = localOffset.dy;
-		});
+    screenPos = localOffset;
 	}
 
 	onSwitchValueChanged(bool newVal) {
@@ -45,15 +38,19 @@ class _TeleopState extends State<Teleop> {
 		return Scaffold(
 				body: new GestureDetector(
 					child: new Stack(
-				children: <Widget>[
-					new Container(
-						decoration: new BoxDecoration(
-								image: new DecorationImage(
-										image: new AssetImage('assets/images/field.png'),
-										fit: BoxFit.cover)),
-					)
-				],
-			),
+            children: <Widget>[
+              new Container(
+                decoration: new BoxDecoration(
+                    image: new DecorationImage(
+                        image: new AssetImage('assets/images/field.png'),
+                        fit: BoxFit.cover)),
+              ),
+              new CustomPaint(
+								painter: new MyPainter(shotList: widget.matchData.teleopshots),
+								size: Size.infinite,
+							)
+            ],
+		    	),
 			// floatingActionButton: SpeedDial(
 			//		 animatedIcon: AnimatedIcons.menu_close,
 			//		 children: [
@@ -75,8 +72,6 @@ class _TeleopState extends State<Teleop> {
 			onTapDown: (TapDownDetails details) => onTapDown(context, details),
 			onTap: () {
 				Shot newShot = new Shot();
-				newShot.posx = screenx;
-				newShot.posy = screeny;
 				return showDialog(
 						context: context,
 						builder: (context) {
@@ -119,7 +114,9 @@ class _TeleopState extends State<Teleop> {
 											RaisedButton(
 												child: Text("Done"),
 												onPressed: () {
-													widget.matchData.teleopshots.add(newShot);
+                          setState(() {
+                            widget.matchData.teleopshots.add(newShot);
+                          });
 													Navigator.pop(context);
 												},
 											)
@@ -132,13 +129,18 @@ class _TeleopState extends State<Teleop> {
 }
 
 class MyPainter extends CustomPainter {
-	@override
+
+  List<Shot> shotList;
+
+  MyPainter({this.shotList});
+	
+  @override
 	void paint(Canvas canvas, Size size) {
-		canvas.drawCircle(Offset(screenx, screeny), 25.0, Paint());
+    for (int i = 0; i < shotList.length; i++) {
+      canvas.drawCircle(shotList[i].pos, 20.0, Paint()..color = Colors.yellow);
+    }
 	}
 
 	@override
-	bool shouldRepaint(CustomPainter oldDelegate) {
-		return null;
-	}
+	bool shouldRepaint(CustomPainter oldDelegate) => true;
 }

@@ -1,6 +1,7 @@
+import 'package:flutter/material.dart';
+
 class Shot {
-	double posx;
-	double posy;
+  Offset pos;
 	bool shotType = false;
 	int shotsMade;
 }
