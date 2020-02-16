@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:frc1640scoutingframework/match.dart';
 import 'package:frc1640scoutingframework/shot.dart';
 
-List<Offset> points = <Offset>[];
-
 class AutonPath extends StatefulWidget {
-  final List<int> condensedPathx;
-  final List<int> condensedPathy;
-  final List<Shot> autonshotsList;
+  final MatchData matchData;
 
   @override
   AutonPathState createState() => AutonPathState();
 
-  AutonPath({this.condensedPathx, this.condensedPathy, this.autonshotsList});
+  AutonPath({this.matchData});
 }
 
 class AutonPathState extends State<AutonPath> {
+
   @override
   Widget build(BuildContext context) {
+    List<Offset> points = widget.matchData.autopathpoints;
+
     return new Scaffold(
         body: new Stack(children: <Widget>[
           Container(
@@ -30,71 +30,75 @@ class AutonPathState extends State<AutonPath> {
               onPanUpdate: (DragUpdateDetails details) {
                 setState(() {
                   RenderBox object = context.findRenderObject();
-                  Offset _localPosition =
-                      object.globalToLocal(details.globalPosition);
-                  points = new List.from(points)..add(_localPosition);
+                  Offset _localPosition = object.globalToLocal(details.globalPosition);
+                  points.add(_localPosition);
                 });
               },
               onPanEnd: (DragEndDetails details) {
                 Shot newShot = new Shot();
-                newShot.posx = points[points.length-2].dx;
-                newShot.posy = points[points.length-2].dy;                
-                print(newShot.posx);
-                print(newShot.posy);
+                newShot.posx = points[points.length-1].dx;
+                newShot.posy = points[points.length-1].dy;
                 return showDialog(
                     context: context,
                     builder: (context) {
-                      return AlertDialog(
-                          title: Text("Enter Number of Balls Made"),
-                          content: ListView(
-                            children: <Widget>[
-                              DropdownButton(
-                                items: [
-                                  DropdownMenuItem(
-                                      value: int.parse("0"), child: Text("0")),
-                                  DropdownMenuItem(
-                                      value: int.parse("1"), child: Text("1")),
-                                  DropdownMenuItem(
-                                      value: int.parse("2"), child: Text("2")),
-                                  DropdownMenuItem(
-                                      value: int.parse("3"), child: Text("3")),
-                                  DropdownMenuItem(
-                                      value: int.parse("4"), child: Text("4")),
-                                  DropdownMenuItem(
-                                      value: int.parse("5"), child: Text("5")),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    newShot.shotsMade = value;
-                                  });
-                                },
-                                hint: Text("Balls Made"),
-                                value: newShot.shotsMade,
-                              ),
-                              Switch(
-                                value: newShot.shotType,
-                                onChanged: (bool s) {
-                                  setState(() {
-                                    newShot.shotType = s;
-                                  });
-                                },
-                              ),
-                              RaisedButton(
-                                child: Text("Done"),
-                                onPressed: () {
-                                  print(newShot.shotsMade);
-                                  print(newShot.shotType);
-                                  print(newShot.toString());
-                                  widget.autonshotsList.add(newShot);
-                                  Navigator.pop(context);
-                                },
-                              )
-                            ],
-                          ));
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Container(
+                            child: AlertDialog(
+                            title: Text("Enter Number of Balls Made"),
+                            content: ListView(
+                              children: <Widget>[
+                                DropdownButton(
+                                  items: [
+                                    DropdownMenuItem(
+                                        value: int.parse("0"), child: Text("0")),
+                                    DropdownMenuItem(
+                                        value: int.parse("1"), child: Text("1")),
+                                    DropdownMenuItem(
+                                        value: int.parse("2"), child: Text("2")),
+                                    DropdownMenuItem(
+                                        value: int.parse("3"), child: Text("3")),
+                                    DropdownMenuItem(
+                                        value: int.parse("4"), child: Text("4")),
+                                    DropdownMenuItem(
+                                        value: int.parse("5"), child: Text("5")),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      newShot.shotsMade = value;
+                                    });
+                                  },
+                                  hint: Text("Balls Made"),
+                                  value: newShot.shotsMade,
+                                ),
+                                Switch(
+                                  value: newShot.shotType,
+                                  onChanged: (bool s) {
+                                    setState(() {
+                                      newShot.shotType = s;
+                                    });
+                                  },
+                                ),
+                                RaisedButton(
+                                  child: Text("Done"),
+                                  onPressed: () {
+                                    print(newShot.shotsMade);
+                                    print(newShot.shotType);
+                                    print(newShot.toString());
+                                    widget.matchData.autoshots.add(newShot);
+                                    Navigator.pop(context);
+                                  },
+                                )
+                              ],
+                            ))
+                          )
+                        ],
+                      );
                     });
               },
               child: new CustomPaint(
-                painter: new AutoPath(points: points),
+                painter: new AutoPath(points: widget.matchData.autopathpoints),
                 size: Size.infinite,
               )),
         ]),
@@ -119,9 +123,12 @@ class AutonPathState extends State<AutonPath> {
   }
 
   condensePoints() {
+    List<Offset> points = widget.matchData.autopathpoints;
+    widget.matchData.autopathx = [];
+    widget.matchData.autopathy = [];
     for (int i = 0; i < points.length; i+=5) {
-      widget.condensedPathx.add(points[i].dx.round());
-      widget.condensedPathy.add(points[i].dy.round());
+      widget.matchData.autopathx.add(points[i].dx.round());
+      widget.matchData.autopathy.add(points[i].dy.round());
     }
     /*if (points.last = null) {
       // != mod value - 1
@@ -138,6 +145,8 @@ class AutoPath extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    print(points.toString());
+
     Paint paint = new Paint()
       ..color = Colors.blue
       ..strokeCap = StrokeCap.round
@@ -152,5 +161,5 @@ class AutoPath extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(AutoPath oldDelegate) => oldDelegate.points != points;
+  bool shouldRepaint(AutoPath oldDelegate) => true; // oldDelegate.points.length != points.length;
 }

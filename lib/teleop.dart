@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:frc1640scoutingframework/match.dart';
 import "shot.dart";
 
 double screenx = 811;
@@ -8,13 +10,14 @@ Canvas canvas;
 Size size = new Size(screenx, screeny);
 
 class Teleop extends StatefulWidget {
-  final List<Shot> teleopshotsList;
+  // final List<Shot> teleopshotsList;
+  final MatchData matchData;
 
   @override
   _TeleopState createState() => _TeleopState();
 
   Teleop({
-    this.teleopshotsList
+    this.matchData
   });
 }
 
@@ -42,7 +45,7 @@ class _TeleopState extends State<Teleop> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: new GestureDetector(
-      child: new Stack(
+          child: new Stack(
         children: <Widget>[
           new Container(
             decoration: new BoxDecoration(
@@ -52,6 +55,24 @@ class _TeleopState extends State<Teleop> {
           )
         ],
       ),
+      // floatingActionButton: SpeedDial(
+      //     animatedIcon: AnimatedIcons.menu_close,
+      //     children: [
+      //       SpeedDialChild(
+      //           backgroundColor: Colors.red,
+      //           child: Icon(Icons.clear),
+      //           label: "Clear Path",
+      //           onTap: () => points.clear()),
+      //       SpeedDialChild(
+      //           backgroundColor: Colors.green,
+      //           child: Icon(Icons.check),
+      //           label: "Completed Path",
+      //           onTap: () {
+      //             condensePoints();
+      //             Navigator.pop(context);
+      //           })
+      //     ],
+      //   ));
       onTapDown: (TapDownDetails details) => onTapDown(context, details),
       onTap: () {
         Shot newShot = new Shot();
@@ -103,7 +124,7 @@ class _TeleopState extends State<Teleop> {
                           print(newShot.shotsMade);
                           print(newShot.shotType);
                           print(newShot.toString());
-                          widget.teleopshotsList.add(newShot);
+                          widget.matchData.teleopshots.add(newShot);
                           Navigator.pop(context);
                         },
                       )

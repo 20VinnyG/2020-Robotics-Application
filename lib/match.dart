@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'shot.dart';
 
-class Match {
+class MatchData {
   //Pregame
   String initials = '';
   int position;
   int matchNumber;
   int teamNumber;
-  double initiationlinepos =0;
+  double initiationlinepos = 0;
   int preloadedfuelcells;
   int id;
   //Auton
-  List<int> autopathx = <int>[];
-  List<int> autopathy = <int>[];
-  List<Shot> autoshots = <Shot>[];
+  List<Offset> autopathpoints = [];
+  List<int> autopathx = [];
+  List<int> autopathy = [];
+  List<Shot> autoshots = [];
   //Telop
-  List<Shot> teleopshots = <Shot>[];
+  List<Shot> teleopshots = [];
   //Endgame
   double climbtime=0;
   int park;
@@ -23,9 +24,9 @@ class Match {
   bool assist = false;
   bool typeassist = false;
   //Postgame
-  double generalSuccess =0;
-  double defensiveSuccess=0;
-  double accuracy=0;
+  double generalSuccess =  0;
+  double defensiveSuccess =0;
+  double accuracy = 0;
   bool floorpickup = false;
   bool fouls = false;
   bool problems = false;

@@ -1,15 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frc1640scoutingframework/autonpath.dart';
 import 'package:frc1640scoutingframework/bluealliance.dart';
 import 'package:frc1640scoutingframework/teleop.dart';
-//import 'package:frc1640scoutingframework/teleop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'match.dart';
-import 'shot.dart';
 import 'package:archive/archive.dart';
 
 class ScoutMode extends StatefulWidget {
@@ -23,7 +20,7 @@ class _ScoutModeState extends State<ScoutMode> {
   bool state = true;
 
   final formKey = GlobalKey<FormState>();
-  Match newMatch = new Match();
+  MatchData newMatch = new MatchData();
   List<int> teleopshotsx = <int>[];
   List<int> teleopshotsy = <int>[];
   List<int> autoshotsx = <int>[];
@@ -169,7 +166,7 @@ class _ScoutModeState extends State<ScoutMode> {
                               Navigator.push(
                                   context,
                                   new MaterialPageRoute(
-                                      builder: (context) => AutonPath(condensedPathx: newMatch.autopathx, condensedPathy: newMatch.autopathy, autonshotsList: newMatch.autoshots,)));
+                                      builder: (context) => AutonPath(matchData: newMatch)));
                             },
                           )),
                       Divider(
@@ -187,7 +184,7 @@ class _ScoutModeState extends State<ScoutMode> {
                               Navigator.push(
                                   context,
                                   new MaterialPageRoute(
-                                      builder: (context) => Teleop(teleopshotsList: newMatch.teleopshots)));
+                                      builder: (context) => Teleop(matchData: newMatch)));
                             },
                           )),
                       Divider(
