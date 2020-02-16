@@ -37,8 +37,7 @@ class AutonPathState extends State<AutonPath> {
 							},
 							onPanEnd: (DragEndDetails details) {
 								Shot newShot = new Shot();
-								newShot.posx = points[points.length-1].dx;
-								newShot.posy = points[points.length-1].dy;
+                newShot.pos = points[points.length-1];
 								return showDialog(
 										context: context,
 										builder: (context) {
@@ -81,7 +80,9 @@ class AutonPathState extends State<AutonPath> {
 																RaisedButton(
 																	child: Text("Done"),
 																	onPressed: () {
-																		widget.matchData.autoshots.add(newShot);
+                                    setState(() {
+                                      widget.matchData.autoshots.add(newShot);
+                                    });
 																		Navigator.pop(context);
 																	},
 																)
@@ -90,7 +91,7 @@ class AutonPathState extends State<AutonPath> {
 										});
 							},
 							child: new CustomPaint(
-								painter: new AutoPath(points: widget.matchData.autopathpoints),
+								painter: new AutoPath(points: widget.matchData.autopathpoints, shotList: widget.matchData.autoshots),
 								size: Size.infinite,
 							)),
 				]),
@@ -100,8 +101,11 @@ class AutonPathState extends State<AutonPath> {
 						SpeedDialChild(
 								backgroundColor: Colors.red,
 								child: Icon(Icons.clear),
-								label: "Clear Path",
-								onTap: () => points.clear()),
+								label: "Clear Path and Shots",
+								onTap: () => {
+                  points.clear(),
+                  widget.matchData.autoshots.clear()
+                }),
 						SpeedDialChild(
 								backgroundColor: Colors.green,
 								child: Icon(Icons.check),
@@ -133,7 +137,8 @@ class AutonPathState extends State<AutonPath> {
 
 class AutoPath extends CustomPainter {
 	List<Offset> points;
-	AutoPath({this.points});
+  List<Shot> shotList;
+	AutoPath({this.points, this.shotList});
 
 	@override
 	void paint(Canvas canvas, Size size) {
@@ -147,7 +152,10 @@ class AutoPath extends CustomPainter {
 				canvas.drawLine(points[i], points[i + 1], paint);
 			}
 		}
-		// TODO: implement paint
+
+    for (int i = 0; i < shotList.length; i++) {
+      canvas.drawCircle(shotList[i].pos, 20.0, Paint()..color = Colors.yellow);
+    }
 	}
 
 	@override
