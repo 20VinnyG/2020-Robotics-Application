@@ -428,8 +428,7 @@ class _ScoutModeState extends State<ScoutMode> {
 	}
 
 	_generateId() {
-		int id = newMatch.teamNumber + 00 + newMatch.matchNumber;
-		print(id);
+		int id = newMatch.teamNumber * 10000 + newMatch.matchNumber;
 		newMatch.id = id;
 	}
 

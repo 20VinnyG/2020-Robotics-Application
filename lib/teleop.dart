@@ -26,7 +26,6 @@ bool val = true;
 class _TeleopState extends State<Teleop> {
 
 	void onTapDown(BuildContext context, TapDownDetails details) {
-		print('${details.globalPosition}');
 		final RenderBox box = context.findRenderObject();
 		final Offset localOffset = box.globalToLocal(details.globalPosition);
 		setState(() {
@@ -78,8 +77,6 @@ class _TeleopState extends State<Teleop> {
 				Shot newShot = new Shot();
 				newShot.posx = screenx;
 				newShot.posy = screeny;
-				print(newShot.posx);
-				print(newShot.posy);
 				return showDialog(
 						context: context,
 						builder: (context) {
@@ -122,9 +119,6 @@ class _TeleopState extends State<Teleop> {
 											RaisedButton(
 												child: Text("Done"),
 												onPressed: () {
-													print(newShot.shotsMade);
-													print(newShot.shotType);
-													print(newShot.toString());
 													widget.matchData.teleopshots.add(newShot);
 													Navigator.pop(context);
 												},

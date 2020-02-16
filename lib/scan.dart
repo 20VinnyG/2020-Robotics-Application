@@ -138,7 +138,6 @@ class _ScanModeState extends State<ScanMode> {
 				List<int> gzipBytesDecoded = new GZipDecoder().decodeBytes(stringBytesDecoded);
 				String decodedqr = new Utf8Codec().decode(gzipBytesDecoded);
 				data.add(decodedqr);
-				print(decodedqr);
 				print("transmitted: " + qrResult.length.toString() + " -- decoded: " + decodedqr.length.toString());
 			}
 		} on PlatformException catch (ex) {

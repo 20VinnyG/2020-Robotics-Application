@@ -81,9 +81,6 @@ class AutonPathState extends State<AutonPath> {
 																RaisedButton(
 																	child: Text("Done"),
 																	onPressed: () {
-																		print(newShot.shotsMade);
-																		print(newShot.shotType);
-																		print(newShot.toString());
 																		widget.matchData.autoshots.add(newShot);
 																		Navigator.pop(context);
 																	},
