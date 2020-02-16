@@ -98,7 +98,6 @@ void _appendPath() async {
 	}
 }
 
-
 void _appendShots() async {
 	final gsheets = GSheets(_credentials);
 	final ss = await gsheets.spreadsheet(_spreadsheetId);
@@ -123,6 +122,7 @@ void _appendShots() async {
 		}
 	}
 }
+
 class ScanMode extends StatefulWidget {
 	@override
 	_ScanModeState createState() => _ScanModeState();
