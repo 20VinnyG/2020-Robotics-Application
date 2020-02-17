@@ -5,8 +5,8 @@ class MatchData {
 	//Pregame
 	String initials = '';
 	int position;
-	int matchNumber;
-	int teamNumber;
+	int matchNumber = 0;
+	int teamNumber = 0;
 	double initiationlinepos = 0;
 	int preloadedfuelcells;
 	int id;

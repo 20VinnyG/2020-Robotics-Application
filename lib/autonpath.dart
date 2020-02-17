@@ -84,7 +84,7 @@ class AutonPathState extends State<AutonPath> {
                                       widget.matchData.autoshots.add(newShot);
                                     });
 																		Navigator.pop(context);
-																	},
+																	},  
 																)
 															],
 														));
