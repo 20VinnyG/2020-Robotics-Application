@@ -31,8 +31,7 @@ class AutonPathState extends State<AutonPath> {
 							onPanUpdate: (DragUpdateDetails details) {
 								setState(() {
 									RenderBox object = context.findRenderObject();
-									Offset _localPosition =
-											object.globalToLocal(details.globalPosition);
+									Offset _localPosition = object.globalToLocal(details.globalPosition);
 									points.add(_localPosition);
 								});
 							},
@@ -146,7 +145,8 @@ class AutonPathState extends State<AutonPath> {
 															],
 														));
 										});
-							},
+							});
+            },
 							child: new CustomPaint(
 								painter: new AutoPath(points: widget.matchData.autopathpoints, shotList: widget.matchData.autoshots),
 								size: Size.infinite,
@@ -183,12 +183,6 @@ class AutonPathState extends State<AutonPath> {
 			widget.matchData.autopathx.add(points[i].dx.round());
 			widget.matchData.autopathy.add(points[i].dy.round());
 		}
-		/*if (points.last = null) {
-			// != mod value - 1
-			widget.condensedPathx.add(points.last.dx.round());
-			widget.condensedPathy.add(points.last.dy.round());
-		}
-		*/
 	}
 }
 
@@ -216,6 +210,5 @@ class AutoPath extends CustomPainter {
 	}
 
 	@override
-	bool shouldRepaint(AutoPath oldDelegate) =>
-			true; // oldDelegate.points.length != points.length;
+	bool shouldRepaint(CustomPainter oldDelegate) => true;
 }

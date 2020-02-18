@@ -32,7 +32,7 @@ class _ScoutModeState extends State<ScoutMode> {
 	List<int> autoshotstype = <int>[];
 	List<int> teleopshotstype = <int>[];
 
-	String _clockText = "00:00";
+	String _clockText = "00:000";
 	Timer _clockUpdateTimer;
 	Duration _clockUpdateRate = Duration(milliseconds: 100);
 
@@ -43,7 +43,7 @@ class _ScoutModeState extends State<ScoutMode> {
         Duration elapsedTime = _stopwatch.elapsed;
         int seconds = elapsedTime.inSeconds;
         int millis	= elapsedTime.inMilliseconds - 1000 * seconds;
-        _clockText = sprintf("%d:%d", [seconds, millis]);
+        setState(() { _clockText = sprintf("%02d:%03d", [seconds, millis]); });
 		  }));
     }
 	}
@@ -52,16 +52,19 @@ class _ScoutModeState extends State<ScoutMode> {
     if (_clockUpdateTimer != null) {
       _stopwatch.stop();
       _clockUpdateTimer.cancel();
+      _clockUpdateTimer = null;
 		  newMatch.climbtime = _stopwatch.elapsedMilliseconds / 1000;
     }
 	}
 
 	void _resetClock () {
     if (_clockUpdateTimer != null) {
-      _stopwatch.reset();
       _clockUpdateTimer.cancel();
       _clockUpdateTimer = null;
     }
+    _stopwatch.stop();
+    _stopwatch.reset();
+    setState(() { _clockText = "00:000"; });
 	}
 
 	@override
