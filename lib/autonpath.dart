@@ -14,7 +14,7 @@ class AutonPath extends StatefulWidget {
 }
 
 class AutonPathState extends State<AutonPath> {
-
+	int group;
 	@override
 	Widget build(BuildContext context) {
 		List<Offset> points = widget.matchData.autopathpoints;
@@ -37,37 +37,93 @@ class AutonPathState extends State<AutonPath> {
 							},
 							onPanEnd: (DragEndDetails details) {
 								Shot newShot = new Shot();
-                newShot.pos = points[points.length-1];
+								newShot.pos = points[points.length - 1];
 								return showDialog(
 										context: context,
 										builder: (context) {
-											return AlertDialog(
+											return StatefulBuilder(builder: (context, setState) {
+												return AlertDialog(
 														title: Text("Enter Number of Balls Made"),
 														content: Column(
-                              mainAxisSize: MainAxisSize.min,
+															mainAxisSize: MainAxisSize.min,
 															children: <Widget>[
-																DropdownButton(
-																	items: [
-																		DropdownMenuItem(
-																				value: int.parse("0"), child: Text("0")),
-																		DropdownMenuItem(
-																				value: int.parse("1"), child: Text("1")),
-																		DropdownMenuItem(
-																				value: int.parse("2"), child: Text("2")),
-																		DropdownMenuItem(
-																				value: int.parse("3"), child: Text("3")),
-																		DropdownMenuItem(
-																				value: int.parse("4"), child: Text("4")),
-																		DropdownMenuItem(
-																				value: int.parse("5"), child: Text("5")),
-																	],
-																	onChanged: (value) {
+																RadioListTile(
+																	value: 0,
+																	title: Text("0 Shots Made"),
+																	activeColor: Colors.black,
+																	groupValue: group,
+																	onChanged: (int e) {
 																		setState(() {
-																			newShot.shotsMade = value;
+																			newShot.shotsMade = e;
+																			group = e;
+																			print(newShot.shotsMade);
 																		});
 																	},
-																	hint: Text("Balls Made"),
-																	value: newShot.shotsMade,
+																),
+																RadioListTile(
+																	value: 1,
+																	title: Text("1 Shot Made"),
+																	activeColor: Colors.black,
+																	groupValue: group,
+																	onChanged: (int e) {
+																		setState(() {
+																			newShot.shotsMade = e;
+																			group = e;
+																			print(newShot.shotsMade);
+																		});
+																	},
+																),
+																RadioListTile(
+																	value: 2,
+																	title: Text("2 Shots Made"),
+																	activeColor: Colors.black,
+																	groupValue: group,
+																	onChanged: (int e) {
+																		setState(() {
+																			newShot.shotsMade = e;
+																			group = e;
+																			print(newShot.shotsMade);
+																		});
+																	},
+																),
+																RadioListTile(
+																	value: 3,
+																	title: Text("3 Shots Made"),
+																	activeColor: Colors.black,
+																	groupValue: group,
+																	onChanged: (int e) {
+																		setState(() {
+																			newShot.shotsMade = e;
+																			group = e;
+																			print(newShot.shotsMade);
+																		});
+																	},
+																),
+																RadioListTile(
+																	value: 4,
+																	title: Text("4 Shots Made"),
+																	activeColor: Colors.black,
+																	groupValue: group,
+																	onChanged: (int e) {
+																		setState(() {
+																			newShot.shotsMade = e;
+																			group = e;
+																			print(newShot.shotsMade);
+																		});
+																	},
+																),
+																RadioListTile(
+																	value: 5,
+																	title: Text("5 Shots Made"),
+																	activeColor: Colors.black,
+																	groupValue: group,
+																	onChanged: (int e) {
+																		setState(() {
+																			newShot.shotsMade = e;
+																			group = e;
+																			print(newShot.shotsMade);
+																		});
+																	},
 																),
 																Switch(
 																	value: newShot.shotType,
@@ -80,16 +136,17 @@ class AutonPathState extends State<AutonPath> {
 																RaisedButton(
 																	child: Text("Done"),
 																	onPressed: () {
-                                    setState(() {
-                                      widget.matchData.autoshots.add(newShot);
-                                    });
+																		setState(() {
+																			widget.matchData.autoshots.add(newShot);
+																		});
 																		Navigator.pop(context);
-																	},  
+																	},	
 																)
 															],
 														));
 										});
-							},
+							});
+            },
 							child: new CustomPaint(
 								painter: new AutoPath(points: widget.matchData.autopathpoints, shotList: widget.matchData.autoshots),
 								size: Size.infinite,
@@ -103,9 +160,9 @@ class AutonPathState extends State<AutonPath> {
 								child: Icon(Icons.clear),
 								label: "Clear Path and Shots",
 								onTap: () => {
-                  points.clear(),
-                  widget.matchData.autoshots.clear()
-                }),
+									points.clear(),
+									widget.matchData.autoshots.clear()
+								}),
 						SpeedDialChild(
 								backgroundColor: Colors.green,
 								child: Icon(Icons.check),
@@ -122,22 +179,16 @@ class AutonPathState extends State<AutonPath> {
 		List<Offset> points = widget.matchData.autopathpoints;
 		widget.matchData.autopathx = [];
 		widget.matchData.autopathy = [];
-		for (int i = 0; i < points.length; i+=5) {
+		for (int i = 0; i < points.length; i += 5) {
 			widget.matchData.autopathx.add(points[i].dx.round());
 			widget.matchData.autopathy.add(points[i].dy.round());
 		}
-		/*if (points.last = null) {
-			// != mod value - 1
-			widget.condensedPathx.add(points.last.dx.round());
-			widget.condensedPathy.add(points.last.dy.round());
-		}
-		*/
 	}
 }
 
 class AutoPath extends CustomPainter {
 	List<Offset> points;
-  List<Shot> shotList;
+	List<Shot> shotList;
 	AutoPath({this.points, this.shotList});
 
 	@override
@@ -153,11 +204,11 @@ class AutoPath extends CustomPainter {
 			}
 		}
 
-    for (int i = 0; i < shotList.length; i++) {
-      canvas.drawCircle(shotList[i].pos, 20.0, Paint()..color = Colors.yellow);
-    }
+		for (int i = 0; i < shotList.length; i++) {
+			canvas.drawCircle(shotList[i].pos, 20.0, Paint()..color = Colors.yellow);
+		}
 	}
 
 	@override
-	bool shouldRepaint(AutoPath oldDelegate) => true; // oldDelegate.points.length != points.length;
+	bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
