@@ -72,6 +72,7 @@ class _TeleopState extends State<Teleop> {
 			onTapDown: (TapDownDetails details) => onTapDown(context, details),
 			onTap: () {
 				Shot newShot = new Shot();
+        newShot.pos = screenPos;
 				return showDialog(
 						context: context,
 						builder: (context) {

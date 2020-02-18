@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +7,7 @@ import 'package:frc1640scoutingframework/bluealliance.dart';
 import 'package:frc1640scoutingframework/teleop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
+import 'package:sprintf/sprintf.dart';
 import 'match.dart';
 import 'package:archive/archive.dart';
 
@@ -15,7 +17,7 @@ class ScoutMode extends StatefulWidget {
 }
 
 class _ScoutModeState extends State<ScoutMode> {
-	var stopwatch = new Stopwatch();
+	Stopwatch _stopwatch = new Stopwatch();
 	double showntime;
 	bool state = true;
 
@@ -29,6 +31,39 @@ class _ScoutModeState extends State<ScoutMode> {
 	List<int> teleopshotsmade = <int>[];
 	List<int> autoshotstype = <int>[];
 	List<int> teleopshotstype = <int>[];
+
+	String _clockText = "00:00";
+	Timer _clockUpdateTimer;
+	Duration _clockUpdateRate = Duration(milliseconds: 100);
+
+	void _startClock () {
+		_stopwatch.start();
+    if (_clockUpdateTimer == null) {
+      _clockUpdateTimer = Timer.periodic(_clockUpdateRate, (Timer timer) => setState(() {
+        Duration elapsedTime = _stopwatch.elapsed;
+        int seconds = elapsedTime.inSeconds;
+        int millis	= elapsedTime.inMilliseconds - 1000 * seconds;
+        _clockText = sprintf("%d:%d", [seconds, millis]);
+		  }));
+    }
+	}
+
+	void _stopClock () {
+    if (_clockUpdateTimer != null) {
+      _stopwatch.stop();
+      _clockUpdateTimer.cancel();
+		  newMatch.climbtime = _stopwatch.elapsedMilliseconds / 1000;
+    }
+	}
+
+	void _resetClock () {
+    if (_clockUpdateTimer != null) {
+      _stopwatch.reset();
+      _clockUpdateTimer.cancel();
+      _clockUpdateTimer = null;
+    }
+	}
+
 	@override
 	Widget build(BuildContext context) {
 		return new Scaffold(
@@ -43,15 +78,12 @@ class _ScoutModeState extends State<ScoutMode> {
 										children: [
 											Container(
 													padding: const EdgeInsets.symmetric(
-															vertical: 16.0, horizontal: 16.0),
-													child: RaisedButton(
-														child: Text("Import Schedule"),
-														onPressed: () {
-															Navigator.push(
-																	context,
-																	new MaterialPageRoute(
-																			builder: (context) => Bluealliance()));
-														},
+														vertical: 16.0, horizontal: 16.0),
+														child: RaisedButton(
+															child: Text("Import Schedule"),
+															onPressed: () {
+																Navigator.push(context, new MaterialPageRoute(builder: (context) => Bluealliance()));
+															},
 													)),
 											Divider(
 												height: 30.0,
@@ -60,42 +92,27 @@ class _ScoutModeState extends State<ScoutMode> {
 											),
 											Text("Prematch"),
 											TextFormField(
-												decoration: const InputDecoration(
-													hintText: 'Enter your initials',
-												),
-												validator: (input) =>
-														input.isEmpty ? 'Not a valid input' : null,
+												decoration: const InputDecoration(hintText: 'Enter your initials'),
+												validator: (input) => input.isEmpty ? 'Not a valid input' : null,
 												onSaved: (input) => newMatch.initials = input,
 												onFieldSubmitted: (input) => newMatch.initials = input,
 												onChanged: (input) => newMatch.initials = input,
 											),
 											TextFormField(
-													decoration: const InputDecoration(
-														hintText: 'Enter the match number',
-													),
+													decoration: const InputDecoration(hintText: 'Enter the match number'),
 													keyboardType: TextInputType.number,
-													validator: (input) =>
-															input.isEmpty ? 'Not a valid input' : null,
-													onSaved: (input) =>
-															newMatch.matchNumber = int.parse(input),
-													onChanged: (input) =>
-															newMatch.matchNumber = int.parse(input),
-													onFieldSubmitted: (input) =>
-															newMatch.matchNumber = int.parse(input)),
+													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
+													onSaved: (input) => newMatch.matchNumber = int.parse(input),
+													onChanged: (input) => newMatch.matchNumber = int.parse(input),
+													onFieldSubmitted: (input) => newMatch.matchNumber = int.parse(input)),
 											DropdownButton(
 												items: [
-													DropdownMenuItem(
-															value: int.parse("1"), child: Text("Blue1")),
-													DropdownMenuItem(
-															value: int.parse("2"), child: Text("Blue2")),
-													DropdownMenuItem(
-															value: int.parse("3"), child: Text("Blue3")),
-													DropdownMenuItem(
-															value: int.parse("4"), child: Text("Red1")),
-													DropdownMenuItem(
-															value: int.parse("5"), child: Text("Red2")),
-													DropdownMenuItem(
-															value: int.parse("6"), child: Text("Red3")),
+													DropdownMenuItem(value: 1, child: Text("Blue1")),
+													DropdownMenuItem(value: 2, child: Text("Blue2")),
+													DropdownMenuItem(value: 3, child: Text("Blue3")),
+													DropdownMenuItem(value: 4, child: Text("Red1")),
+													DropdownMenuItem(value: 5, child: Text("Red2")),
+													DropdownMenuItem(value: 6, child: Text("Red3")),
 												],
 												onChanged: (value) {
 													setState(() {
@@ -106,18 +123,12 @@ class _ScoutModeState extends State<ScoutMode> {
 												value: newMatch.position,
 											),
 											TextFormField(
-												decoration: const InputDecoration(
-													hintText: "Enter Team Number",
-												),
+												decoration: const InputDecoration(hintText: "Enter Team Number"),
 												keyboardType: TextInputType.number,
-												validator: (input) =>
-														input.isEmpty ? 'Not a valid input' : null,
-												onSaved: (input) =>
-														newMatch.teamNumber = int.parse(input),
-												onChanged: (input) =>
-														newMatch.teamNumber = int.parse(input),
-												onFieldSubmitted: (input) =>
-														newMatch.teamNumber = int.parse(input),
+												validator: (input) => input.isEmpty ? 'Not a valid input' : null,
+												onSaved: (input) => newMatch.teamNumber = int.parse(input),
+												onChanged: (input) => newMatch.teamNumber = int.parse(input),
+												onFieldSubmitted: (input) => newMatch.teamNumber = int.parse(input),
 											),
 											/*Slider(
 												value: newMatch.initiationlinepos,
@@ -131,14 +142,10 @@ class _ScoutModeState extends State<ScoutMode> {
                       Text("Preloaded Number of Fuel Cells?"),
 											DropdownButton(
 												items: [
-													DropdownMenuItem(
-															value: int.parse("0"), child: Text("0")),
-													DropdownMenuItem(
-															value: int.parse("1"), child: Text("1")),
-													DropdownMenuItem(
-															value: int.parse("2"), child: Text("2")),
-													DropdownMenuItem(
-															value: int.parse("3"), child: Text("3")),
+                          DropdownMenuItem(value: 0, child: Text("0")),
+													DropdownMenuItem(value: 1, child: Text("1")),
+													DropdownMenuItem(value: 2, child: Text("2")),
+													DropdownMenuItem(value: 3, child: Text("3"))
 												],
 												onChanged: (value) {
 													setState(() {
@@ -153,71 +160,56 @@ class _ScoutModeState extends State<ScoutMode> {
 												indent: 5.0,
 												color: Colors.black,
 											),
-											Text("Auton"),
-											Container(
-													padding: const EdgeInsets.symmetric(
-															vertical: 16.0, horizontal: 16.0),
-													child: RaisedButton(
+											Text("Path and Shots"),
+											Row(
+												children: <Widget>[
+													RaisedButton(
 														child: Text("Auton"),
 														onPressed: () {
-															Navigator.push(
-																	context,
-																	new MaterialPageRoute(
-																			builder: (context) => AutonPath(matchData: newMatch)));
+															Navigator.push(context, new MaterialPageRoute(builder: (context) => AutonPath(matchData: newMatch)));
 														},
-													)),
-											Divider(
-												height: 30.0,
-												indent: 5.0,
-												color: Colors.black,
-											),
-											Text("Teleop"),
-											Container(
-													padding: const EdgeInsets.symmetric(
-															vertical: 16.0, horizontal: 16.0),
-													child: RaisedButton(
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
 														child: Text("Teleop"),
 														onPressed: () {
-															Navigator.push(
-																	context,
-																	new MaterialPageRoute(
-																			builder: (context) => Teleop(matchData: newMatch)));
+															Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: newMatch)));
 														},
-													)),
+													)
+												],
+												mainAxisAlignment: MainAxisAlignment.center
+											),
 											Divider(
 												height: 30.0,
 												indent: 5.0,
 												color: Colors.black,
 											),
 											Text("Endgame"),
-											Container(
-													padding: const EdgeInsets.symmetric(
-															vertical: 16.0, horizontal: 16.0),
-													child: RaisedButton(
-														child: Text("Stop Climb Timer"),
-														onPressed: () {
-															stopwatch..stop();
-															newMatch.climbtime =
-																	stopwatch.elapsedMilliseconds / 1000;
-														},
-													)),
-											Container(
-													padding: const EdgeInsets.symmetric(
-															vertical: 16.0, horizontal: 16.0),
-													child: RaisedButton(
-														child: Text("Reset Climb Timer"),
-														onPressed: () {
-															stopwatch..reset();
-														},
-													)),
+											Column(children: <Widget>[
+													Text('$_clockText', style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 3.0)),
+													Row(children: <Widget>[
+														RaisedButton(
+															child: Text("Stop Climb Timer"),
+															onPressed: () {
+																_stopClock();
+															},
+														),
+														VerticalDivider(width: 5.0),
+														RaisedButton(
+															child: Text("Reset Climb Timer"),
+															onPressed: () {
+																_resetClock();
+															},
+														)
+													],
+													mainAxisAlignment: MainAxisAlignment.center
+													)
+											]),
 											DropdownButton(
 												items: [
-													DropdownMenuItem(
-															value: int.parse("1"), child: Text("Park")),
-													DropdownMenuItem(
-															value: int.parse("2"), child: Text("Climb")),
-													DropdownMenuItem(
-															value: int.parse("3"), child: Text("Neither")),
+													DropdownMenuItem(value: int.parse("1"), child: Text("Park")),
+													DropdownMenuItem(value: int.parse("2"), child: Text("Climb")),
+													DropdownMenuItem(value: int.parse("3"), child: Text("Neither")),
 												],
 												onChanged: (value) {
 													setState(() {
@@ -358,7 +350,7 @@ class _ScoutModeState extends State<ScoutMode> {
 				icon: Icon(Icons.timer),
 				label: Text("Start Climb Timer"),
 				onPressed: () {
-					stopwatch..start();
+					_startClock();
 				},
 			),
 		);
