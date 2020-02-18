@@ -65,7 +65,7 @@ List<int> _toIntList (List list) {
 	return list2;
 }
 
-void _appendValues() async {
+void _appendGeneral() async {
 	final gsheets = GSheets(_credentials);
 	final ss = await gsheets.spreadsheet(_spreadsheetId);
 	var sheet = ss.worksheetByTitle("Sheet1");
@@ -121,6 +121,12 @@ void _appendShots() async {
 			appender.clear();
 		}
 	}
+}
+
+void _appendAll() {
+  _appendGeneral();
+  _appendPath();
+  _appendShots();
 }
 
 class ScanMode extends StatefulWidget {
@@ -187,21 +193,15 @@ class _ScanModeState extends State<ScanMode> {
 						onChanged: (input) => sheetName = input,
 					),
 					RaisedButton(
-						child: Text("Create Sheet"),
+						child: Text("Format Sheets"),
 						onPressed: () {
 							_initializeSpreadSheet();
 						},
 					),
 					RaisedButton(
-						child: Text("Append Values"),
+						child: Text("Push to Sheet"),
 						onPressed: () {
-							_appendValues();
-						},
-					),
-					RaisedButton(
-						child: Text("Test"),
-						onPressed: () {
-							_appendShots();
+							_appendAll();
 						},
 					),
 				],

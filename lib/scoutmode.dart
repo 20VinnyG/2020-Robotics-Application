@@ -119,7 +119,7 @@ class _ScoutModeState extends State<ScoutMode> {
 												onFieldSubmitted: (input) =>
 														newMatch.teamNumber = int.parse(input),
 											),
-											Slider(
+											/*Slider(
 												value: newMatch.initiationlinepos,
 												onChanged: (double delta) {
 													setState(() => newMatch.initiationlinepos = delta);
@@ -127,21 +127,18 @@ class _ScoutModeState extends State<ScoutMode> {
 												min: 0.0,
 												max: 10.0,
 												divisions: 10,
-											),
+											),*/
+                      Text("Preloaded Number of Fuel Cells?"),
 											DropdownButton(
 												items: [
+													DropdownMenuItem(
+															value: int.parse("0"), child: Text("0")),
 													DropdownMenuItem(
 															value: int.parse("1"), child: Text("1")),
 													DropdownMenuItem(
 															value: int.parse("2"), child: Text("2")),
 													DropdownMenuItem(
 															value: int.parse("3"), child: Text("3")),
-													DropdownMenuItem(
-															value: int.parse("4"), child: Text("4")),
-													DropdownMenuItem(
-															value: int.parse("5"), child: Text("5")),
-													DropdownMenuItem(
-															value: int.parse("6"), child: Text("6")),
 												],
 												onChanged: (value) {
 													setState(() {
@@ -376,7 +373,6 @@ class _ScoutModeState extends State<ScoutMode> {
 				'initials': newMatch.initials.toString(),
 				'id': newMatch.id,
 				'teamnumber': newMatch.teamNumber,
-				'position': newMatch.position,
 				'matchnumber': newMatch.matchNumber,
 				'initiationposition': newMatch.initiationlinepos,
 				'preloadedfuelcells': newMatch.preloadedfuelcells,
