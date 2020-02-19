@@ -35,10 +35,10 @@ class AutonPathState extends State<AutonPath> {
 									points.add(_localPosition);
 								});
 							},
-							onPanEnd: (DragEndDetails details) {
+							onPanEnd: (DragEndDetails details) async {
 								Shot newShot = new Shot();
 								newShot.pos = points[points.length - 1];
-								return showDialog(
+								await showDialog(
 										context: context,
 										builder: (context) {
 											return StatefulBuilder(builder: (context, setState) {
@@ -136,16 +136,17 @@ class AutonPathState extends State<AutonPath> {
 																RaisedButton(
 																	child: Text("Done"),
 																	onPressed: () {
-																		setState(() {
-																			widget.matchData.autoshots.add(newShot);
-																		});
+                                    widget.matchData.autoshots.add(newShot);
+																		setState(() {});
 																		Navigator.pop(context);
 																	},	
 																)
 															],
 														));
-										});
+									  });
+                    
 							});
+              setState(() {});
             },
 							child: new CustomPaint(
 								painter: new AutoPath(points: widget.matchData.autopathpoints, shotList: widget.matchData.autoshots),
