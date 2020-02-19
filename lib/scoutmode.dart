@@ -38,33 +38,34 @@ class _ScoutModeState extends State<ScoutMode> {
 
 	void _startClock () {
 		_stopwatch.start();
-    if (_clockUpdateTimer == null) {
-      _clockUpdateTimer = Timer.periodic(_clockUpdateRate, (Timer timer) => setState(() {
-        Duration elapsedTime = _stopwatch.elapsed;
-        int seconds = elapsedTime.inSeconds;
-        int millis	= elapsedTime.inMilliseconds - 1000 * seconds;
-        setState(() { _clockText = sprintf("%02d:%03d", [seconds, millis]); });
-		  }));
-    }
+		if (_clockUpdateTimer == null) {
+			_clockUpdateTimer = Timer.periodic(_clockUpdateRate, (Timer timer) => setState(() {
+				Duration elapsedTime = _stopwatch.elapsed;
+				int seconds = elapsedTime.inSeconds;
+				int millis	= elapsedTime.inMilliseconds - 1000 * seconds;
+				setState(() { _clockText = sprintf("%02d:%03d", [seconds, millis]); });
+			}));
+		}
 	}
 
 	void _stopClock () {
-    if (_clockUpdateTimer != null) {
-      _stopwatch.stop();
-      _clockUpdateTimer.cancel();
-      _clockUpdateTimer = null;
-		  newMatch.climbtime = _stopwatch.elapsedMilliseconds / 1000;
-    }
+		if (_clockUpdateTimer != null) {
+			_stopwatch.stop();
+			_clockUpdateTimer.cancel();
+			_clockUpdateTimer = null;
+			newMatch.climbtime = _stopwatch.elapsedMilliseconds / 1000;
+		}
 	}
 
 	void _resetClock () {
-    if (_clockUpdateTimer != null) {
-      _clockUpdateTimer.cancel();
-      _clockUpdateTimer = null;
-    }
-    _stopwatch.stop();
-    _stopwatch.reset();
-    setState(() { _clockText = "00:000"; });
+		if (_clockUpdateTimer != null) {
+			_clockUpdateTimer.cancel();
+			_clockUpdateTimer = null;
+		}
+		_stopwatch.stop();
+		_stopwatch.reset();
+		newMatch.climbtime = 0;
+		setState(() { _clockText = "00:000"; });
 	}
 
 	@override
@@ -142,10 +143,10 @@ class _ScoutModeState extends State<ScoutMode> {
 												max: 10.0,
 												divisions: 10,
 											),*/
-                      Text("Preloaded Number of Fuel Cells?"),
+											Text("Preloaded Number of Fuel Cells?"),
 											DropdownButton(
 												items: [
-                          DropdownMenuItem(value: 0, child: Text("0")),
+													DropdownMenuItem(value: 0, child: Text("0")),
 													DropdownMenuItem(value: 1, child: Text("1")),
 													DropdownMenuItem(value: 2, child: Text("2")),
 													DropdownMenuItem(value: 3, child: Text("3"))
@@ -222,111 +223,154 @@ class _ScoutModeState extends State<ScoutMode> {
 												hint: Text("End Game State?"),
 												value: newMatch.park,
 											),
-											Text("Level Ability?"),
-											Switch(
-												value: newMatch.levelability,
-												onChanged: (bool s) {
-													setState(() {
-														newMatch.levelability = s;
-													});
-												},
+											Divider(
+												height: 30.0,
+												indent: 5.0,
+												color: Colors.black,
 											),
-											Text("Assist?"),
-											Switch(
-												value: newMatch.assist,
-												onChanged: (bool s) {
-													setState(() {
-														newMatch.assist = s;
-													});
-												},
-											),
-											Text("Active or Passive Assist?"),
-											Switch(
-												value: newMatch.typeassist,
-												onChanged: (bool s) {
-													setState(() {
-														newMatch.typeassist = s;
-													});
-												},
-											),
+											Row(children: <Widget>[
+												Column(children: <Widget>[
+													Text('Leveling ability?'),
+													RaisedButton(
+														child: Text(newMatch.levelability ? 'Yes' : 'No'),
+														color: newMatch.levelability ? Colors.greenAccent : Colors.grey,
+														onPressed: () {
+															newMatch.levelability = !newMatch.levelability;
+															setState(() {});
+														}
+													)
+												]),
+												VerticalDivider(width: 5.0),
+												Column(children: <Widget>[
+													Text('Assisted?'),
+													RaisedButton(
+														child: Text(newMatch.assist ? 'Yes' : 'No'),
+														color: newMatch.assist ? Colors.greenAccent : Colors.grey,
+														onPressed: () {
+															newMatch.assist = !newMatch.assist;
+															if (!newMatch.assist) { newMatch.typeassist = false; }
+															setState(() {});
+														}
+													)
+												]),
+												VerticalDivider(width: 5.0),
+												newMatch.assist ?
+													Column(children: <Widget>[
+														Text('Assist type'),
+														RaisedButton(
+															child: Text(newMatch.typeassist ? 'Active' : 'Passive'),
+															color: newMatch.typeassist ? Colors.greenAccent : Colors.grey,
+															onPressed: () {
+																newMatch.typeassist = !newMatch.typeassist;
+																setState(() {});
+															}
+														)
+													]) :
+													Container()
+											]),
 											Divider(
 												height: 30.0,
 												indent: 5.0,
 												color: Colors.black,
 											),
 											Text("Post-Match"),
-											Text("General Success"),
-											SmoothStarRating(
-													allowHalfRating: true,
-													onRatingChanged: (v) {
-														newMatch.generalSuccess = v;
-														setState(() {});
-													},
-													starCount: 5,
-													rating: newMatch.generalSuccess,
-													size: 40.0,
-													filledIconData: Icons.blur_off,
-													halfFilledIconData: Icons.blur_on,
-													color: Colors.blue,
-													borderColor: Colors.blue,
-													spacing: 0.0),
-											Text("Defensive Success"),
-											SmoothStarRating(
-													allowHalfRating: true,
-													onRatingChanged: (v) {
-														newMatch.defensiveSuccess = v;
-														setState(() {});
-													},
-													starCount: 5,
-													rating: newMatch.defensiveSuccess,
-													size: 40.0,
-													filledIconData: Icons.blur_off,
-													halfFilledIconData: Icons.blur_on,
-													color: Colors.blue,
-													borderColor: Colors.blue,
-													spacing: 0.0),
-											Text("Accuracy Rating"),
-											SmoothStarRating(
-													allowHalfRating: true,
-													onRatingChanged: (v) {
-														newMatch.accuracy = v;
-														setState(() {});
-													},
-													starCount: 5,
-													rating: newMatch.accuracy,
-													size: 40.0,
-													filledIconData: Icons.blur_off,
-													halfFilledIconData: Icons.blur_on,
-													color: Colors.blue,
-													borderColor: Colors.blue,
-													spacing: 0.0),
-											Text("Floor Pickup?"),
-											Switch(
-												value: newMatch.floorpickup,
-												onChanged: (bool s) {
-													setState(() {
-														newMatch.floorpickup = s;
-													});
-												},
+											Column(children: <Widget>[
+												Text("General Success"),
+												SmoothStarRating(
+														allowHalfRating: true,
+														onRatingChanged: (v) {
+															newMatch.generalSuccess = v;
+															setState(() {});
+														},
+														starCount: 5,
+														rating: newMatch.generalSuccess,
+														size: 40.0,
+														filledIconData: Icons.star,
+														halfFilledIconData: Icons.star_half,
+														color: Colors.blue,
+														borderColor: Colors.blue,
+														spacing: 0.0),
+												Text("Defensive Success"),
+												SmoothStarRating(
+														allowHalfRating: true,
+														onRatingChanged: (v) {
+															newMatch.defensiveSuccess = v;
+															setState(() {});
+														},
+														starCount: 5,
+														rating: newMatch.defensiveSuccess,
+														size: 40.0,
+														filledIconData: Icons.star,
+														halfFilledIconData: Icons.star_half,
+														color: Colors.blue,
+														borderColor: Colors.blue,
+														spacing: 0.0),
+												Text("Accuracy Rating"),
+												SmoothStarRating(
+														allowHalfRating: true,
+														onRatingChanged: (v) {
+															newMatch.accuracy = v;
+															setState(() {});
+														},
+														starCount: 5,
+														rating: newMatch.accuracy,
+														size: 40.0,
+														filledIconData: Icons.star,
+														halfFilledIconData: Icons.star_half,
+														color: Colors.blue,
+														borderColor: Colors.blue,
+														spacing: 0.0),
+											],
+											mainAxisAlignment: MainAxisAlignment.center,),
+											Divider(
+												height: 30.0,
+												indent: 5.0,
+												color: Colors.black,
 											),
-											Text("Eggregious Fouls?"),
-											Switch(
-												value: newMatch.fouls,
-												onChanged: (bool s) {
-													setState(() {
-														newMatch.fouls = s;
-													});
-												},
+											Row(children: <Widget>[
+												Column(children: <Widget>[
+													Text('Floor Pickup?'),
+													RaisedButton(
+														child: Text(newMatch.floorpickup ? 'Yes' : 'No'),
+														color: newMatch.floorpickup ? Colors.greenAccent : Colors.grey,
+														onPressed: () {
+															newMatch.floorpickup = !newMatch.floorpickup;
+															setState(() {});
+														}
+													)
+												]),
+												VerticalDivider(width: 10.0),
+												Column(children: <Widget>[
+													Text('Egregious	Fouls?'),
+													RaisedButton(
+														child: Text(newMatch.fouls ? 'Yes' : 'No'),
+														color: newMatch.fouls ? Colors.greenAccent : Colors.grey,
+														onPressed: () {
+															newMatch.fouls = !newMatch.fouls;
+															setState(() {});
+														}
+													)
+												]),
+												VerticalDivider(width: 10.0),
+												Column(children: <Widget>[
+													Text('Had Problems?'),
+													RaisedButton(
+														child: Text(newMatch.problems ? 'Yes' : 'No'),
+														color: newMatch.problems ? Colors.greenAccent : Colors.grey,
+														onPressed: () {
+															newMatch.problems = !newMatch.problems;
+															setState(() {});
+														}
+													 )
+													])
+											],
+											mainAxisAlignment: MainAxisAlignment.center),
+											Divider(
+												height: 30.0,
+												indent: 5.0,
+												color: Colors.black,
 											),
-											Text("Had Problems?"),
-											Switch(
-												value: newMatch.problems,
-												onChanged: (bool s) {
-													setState(() {
-														newMatch.problems = s;
-													});
-												},
-											),
+											
 											Container(
 													padding: const EdgeInsets.symmetric(
 															vertical: 16.0, horizontal: 16.0),
