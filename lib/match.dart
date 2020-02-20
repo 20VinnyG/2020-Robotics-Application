@@ -4,11 +4,11 @@ import 'shot.dart';
 class MatchData {
 	//Pregame
 	String initials = '';
-	int position;
+	int position = -1;
 	int matchNumber = 0;
 	int teamNumber = 0;
 	double initiationlinepos = 0;
-	int preloadedfuelcells;
+	int preloadedfuelcells = 0;
 	int id;
 	//Auton
 	List<Offset> autopathpoints = [];
@@ -19,7 +19,7 @@ class MatchData {
 	List<Shot> teleopshots = [];
 	//Endgame
 	double climbtime=0;
-	int park;
+	int park = 3; // TODO: Convert to int 1-3 before QR
 	bool levelability = false;
 	bool assist = false;
 	bool typeassist = false;
