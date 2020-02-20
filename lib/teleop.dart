@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:frc1640scoutingframework/match.dart';
@@ -19,18 +21,12 @@ bool val = true;
 
 class _TeleopState extends State<Teleop> {
 
-  Offset screenPos;
+	Offset screenPos;
 
 	void onTapDown(BuildContext context, TapDownDetails details) {
 		final RenderBox box = context.findRenderObject();
 		final Offset localOffset = box.globalToLocal(details.globalPosition);
-    screenPos = localOffset;
-	}
-
-	onSwitchValueChanged(bool newVal) {
-		setState(() {
-			val = newVal;
-		});
+		screenPos = localOffset;
 	}
 
 	@override
@@ -38,92 +34,105 @@ class _TeleopState extends State<Teleop> {
 		return Scaffold(
 				body: new GestureDetector(
 					child: new Stack(
-            children: <Widget>[
-              new Container(
-                decoration: new BoxDecoration(
-                    image: new DecorationImage(
-                        image: new AssetImage('assets/images/field.png'),
-                        fit: BoxFit.cover)),
-              ),
-              new CustomPaint(
+						children: <Widget>[
+							new Container(
+								decoration: new BoxDecoration(
+										image: new DecorationImage(
+												image: new AssetImage('assets/images/field.png'),
+												fit: BoxFit.cover)),
+							),
+							new CustomPaint(
 								painter: new MyPainter(shotList: widget.matchData.teleopshots),
 								size: Size.infinite,
 							)
-            ],
-		    	),
-			// floatingActionButton: SpeedDial(
-			//		 animatedIcon: AnimatedIcons.menu_close,
-			//		 children: [
-			//			 SpeedDialChild(
-			//					 backgroundColor: Colors.red,
-			//					 child: Icon(Icons.clear),
-			//					 label: "Clear Path",
-			//					 onTap: () => points.clear()),
-			//			 SpeedDialChild(
-			//					 backgroundColor: Colors.green,
-			//					 child: Icon(Icons.check),
-			//					 label: "Completed Path",
-			//					 onTap: () {
-			//						 condensePoints();
-			//						 Navigator.pop(context);
-			//					 })
-			//		 ],
-			//	 ));
+						],
+					),
 			onTapDown: (TapDownDetails details) => onTapDown(context, details),
-			onTap: () {
+			onTap: () async {
 				Shot newShot = new Shot();
-        newShot.pos = screenPos;
-				return showDialog(
+				newShot.pos = screenPos;
+				await showDialog(
 						context: context,
 						builder: (context) {
-							return AlertDialog(
+							return StatefulBuilder(builder: (context, setState) {
+								return AlertDialog(
 									title: Text("Enter Number of Balls Made"),
 									content: Column(
-                    mainAxisSize: MainAxisSize.min,
 										children: <Widget>[
-											DropdownButton(
-												items: [
-													DropdownMenuItem(
-															value: int.parse("0"), child: Text("0")),
-													DropdownMenuItem(
-															value: int.parse("1"), child: Text("1")),
-													DropdownMenuItem(
-															value: int.parse("2"), child: Text("2")),
-													DropdownMenuItem(
-															value: int.parse("3"), child: Text("3")),
-													DropdownMenuItem(
-															value: int.parse("4"), child: Text("4")),
-													DropdownMenuItem(
-															value: int.parse("5"), child: Text("5")),
+											Row(
+												children: <Widget>[
+													RaisedButton(
+														child: Text('0'),
+														color: newShot.shotsMade == 0 ? Colors.greenAccent : Colors.grey,
+														onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 0) ? -1 : 0; }); }
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
+														child: Text('1'),
+														color: newShot.shotsMade == 1 ? Colors.greenAccent : Colors.grey,
+														onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 1) ? -1 : 1; }); }
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
+														child: Text('2'),
+														color: newShot.shotsMade == 2 ? Colors.greenAccent : Colors.grey,
+														onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 2) ? -1 : 2; }); }
+													),
 												],
-												onChanged: (value) {
-													setState(() {
-														newShot.shotsMade = value;
-													});
-												},
-												hint: Text("Balls Made"),
-												value: newShot.shotsMade,
+												mainAxisAlignment: MainAxisAlignment.center,
 											),
-											Switch(
-													value: newShot.shotType,
-													onChanged: (bool s) {
-														setState(() {
-															newShot.shotType = s;
-														});
-													},
-												),
+											Row(
+												children: <Widget>[
+													RaisedButton(
+														child: Text('3'),
+														color: newShot.shotsMade == 3 ? Colors.greenAccent : Colors.grey,
+														onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 3) ? -1 : 3; }); }
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
+														child: Text('4'),
+														color: newShot.shotsMade == 4 ? Colors.greenAccent : Colors.grey,
+														onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 4) ? -1 : 4; }); }
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
+														child: Text('5'),
+														color: newShot.shotsMade == 5 ? Colors.greenAccent : Colors.grey,
+														onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 5) ? -1 : 5; }); }
+													)
+												],
+												mainAxisAlignment: MainAxisAlignment.center,
+											),
+											Divider(
+												height: 30.0,
+												indent: 5.0,
+												color: Colors.black,
+											),
+											Text('Shot on which goal?'),
 											RaisedButton(
-												child: Text("Done"),
-												onPressed: () {
-                          setState(() {
-                            widget.matchData.teleopshots.add(newShot);
-                          });
+												child: Text(newShot.shotType ? 'High' : 'Low'),
+												onPressed: () { setState(() { newShot.shotType = !newShot.shotType; }); }
+											),
+											Divider(
+												height: 30.0,
+												indent: 5.0,
+												color: Colors.black,
+											),
+											RaisedButton(
+												child: Text('Save'),
+												onPressed: (newShot.shotsMade != -1) ? () {
+													setState(() { widget.matchData.teleopshots.add(newShot); });
 													Navigator.pop(context);
-												},
+												} : null
 											)
 										],
-									));
-						});
+										mainAxisAlignment: MainAxisAlignment.center,
+										mainAxisSize: MainAxisSize.min,
+									)
+								);
+						});	
+					});
+					setState(() {});
 			},
 		));
 	}
@@ -131,15 +140,29 @@ class _TeleopState extends State<Teleop> {
 
 class MyPainter extends CustomPainter {
 
-  List<Shot> shotList;
+	final double _circleRadius = 20.0;
+	final double _halfRadius = 10.0;
 
-  MyPainter({this.shotList});
+	List<Shot> shotList;
+
+	MyPainter({this.shotList});
 	
-  @override
+	@override
 	void paint(Canvas canvas, Size size) {
-    for (int i = 0; i < shotList.length; i++) {
-      canvas.drawCircle(shotList[i].pos, 20.0, Paint()..color = Colors.yellow);
-    }
+		for (int i = 0; i < shotList.length; i++) {
+			Offset shotPos = shotList[i].pos;
+			int shotsMade = shotList[i].shotsMade;
+
+			canvas.drawCircle(shotPos, _circleRadius, Paint()..color = Colors.yellow);
+
+			TextPainter tp = TextPainter(
+				text: TextSpan(text: '$shotsMade', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25)),
+				textAlign: TextAlign.center,
+				textDirection: TextDirection.ltr,
+			)..layout(maxWidth: size.width);
+			
+			tp.paint(canvas, Offset(shotPos.dx - _halfRadius, shotPos.dy - _halfRadius));
+		}
 	}
 
 	@override
