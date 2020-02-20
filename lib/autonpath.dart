@@ -14,7 +14,7 @@ class AutonPath extends StatefulWidget {
 }
 
 class AutonPathState extends State<AutonPath> {
-	int group;
+
 	@override
 	Widget build(BuildContext context) {
 		List<Offset> points = widget.matchData.autopathpoints;
@@ -39,115 +39,88 @@ class AutonPathState extends State<AutonPath> {
 								Shot newShot = new Shot();
 								newShot.pos = points[points.length - 1];
 								await showDialog(
-										context: context,
-										builder: (context) {
-											return StatefulBuilder(builder: (context, setState) {
-												return AlertDialog(
-														title: Text("Enter Number of Balls Made"),
-														content: Column(
-															mainAxisSize: MainAxisSize.min,
+									context: context,
+									builder: (context) {
+										return StatefulBuilder(builder: (context, setState) {
+											return AlertDialog(
+												title: Text("Enter Number of Balls Made"),
+												content: Column(
+													children: <Widget>[
+														Row(
 															children: <Widget>[
-																RadioListTile(
-																	value: 0,
-																	title: Text("0 Shots Made"),
-																	activeColor: Colors.black,
-																	groupValue: group,
-																	onChanged: (int e) {
-																		setState(() {
-																			newShot.shotsMade = e;
-																			group = e;
-																			print(newShot.shotsMade);
-																		});
-																	},
-																),
-																RadioListTile(
-																	value: 1,
-																	title: Text("1 Shot Made"),
-																	activeColor: Colors.black,
-																	groupValue: group,
-																	onChanged: (int e) {
-																		setState(() {
-																			newShot.shotsMade = e;
-																			group = e;
-																			print(newShot.shotsMade);
-																		});
-																	},
-																),
-																RadioListTile(
-																	value: 2,
-																	title: Text("2 Shots Made"),
-																	activeColor: Colors.black,
-																	groupValue: group,
-																	onChanged: (int e) {
-																		setState(() {
-																			newShot.shotsMade = e;
-																			group = e;
-																			print(newShot.shotsMade);
-																		});
-																	},
-																),
-																RadioListTile(
-																	value: 3,
-																	title: Text("3 Shots Made"),
-																	activeColor: Colors.black,
-																	groupValue: group,
-																	onChanged: (int e) {
-																		setState(() {
-																			newShot.shotsMade = e;
-																			group = e;
-																			print(newShot.shotsMade);
-																		});
-																	},
-																),
-																RadioListTile(
-																	value: 4,
-																	title: Text("4 Shots Made"),
-																	activeColor: Colors.black,
-																	groupValue: group,
-																	onChanged: (int e) {
-																		setState(() {
-																			newShot.shotsMade = e;
-																			group = e;
-																			print(newShot.shotsMade);
-																		});
-																	},
-																),
-																RadioListTile(
-																	value: 5,
-																	title: Text("5 Shots Made"),
-																	activeColor: Colors.black,
-																	groupValue: group,
-																	onChanged: (int e) {
-																		setState(() {
-																			newShot.shotsMade = e;
-																			group = e;
-																			print(newShot.shotsMade);
-																		});
-																	},
-																),
-																Switch(
-																	value: newShot.shotType,
-																	onChanged: (bool s) {
-																		setState(() {
-																			newShot.shotType = s;
-																		});
-																	},
-																),
 																RaisedButton(
-																	child: Text("Done"),
-																	onPressed: () {
-                                    widget.matchData.autoshots.add(newShot);
-																		setState(() {});
-																		Navigator.pop(context);
-																	},	
+																	child: Text('0'),
+																	color: newShot.shotsMade == 0 ? Colors.greenAccent : Colors.grey,
+																	onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 0) ? -1 : 0; }); }
+																),
+																VerticalDivider(width: 5.0),
+																RaisedButton(
+																	child: Text('1'),
+																	color: newShot.shotsMade == 1 ? Colors.greenAccent : Colors.grey,
+																	onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 1) ? -1 : 1; }); }
+																),
+																VerticalDivider(width: 5.0),
+																RaisedButton(
+																	child: Text('2'),
+																	color: newShot.shotsMade == 2 ? Colors.greenAccent : Colors.grey,
+																	onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 2) ? -1 : 2; }); }
+																),
+															],
+															mainAxisAlignment: MainAxisAlignment.center,
+														),
+														Row(
+															children: <Widget>[
+																RaisedButton(
+																	child: Text('3'),
+																	color: newShot.shotsMade == 3 ? Colors.greenAccent : Colors.grey,
+																	onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 3) ? -1 : 3; }); }
+																),
+																VerticalDivider(width: 5.0),
+																RaisedButton(
+																	child: Text('4'),
+																	color: newShot.shotsMade == 4 ? Colors.greenAccent : Colors.grey,
+																	onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 4) ? -1 : 4; }); }
+																),
+																VerticalDivider(width: 5.0),
+																RaisedButton(
+																	child: Text('5'),
+																	color: newShot.shotsMade == 5 ? Colors.greenAccent : Colors.grey,
+																	onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 5) ? -1 : 5; }); }
 																)
 															],
-														));
-									  });
-                    
+															mainAxisAlignment: MainAxisAlignment.center,
+														),
+														Divider(
+															height: 30.0,
+															indent: 5.0,
+															color: Colors.black,
+														),
+														Text('Shot on which goal?'),
+														RaisedButton(
+															child: Text(newShot.shotType ? 'High' : 'Low'),
+															onPressed: () { setState(() { newShot.shotType = !newShot.shotType; }); }
+														),
+														Divider(
+															height: 30.0,
+															indent: 5.0,
+															color: Colors.black,
+														),
+														RaisedButton(
+															child: Text('Save'),
+															onPressed: (newShot.shotsMade != -1) ? () {
+																setState(() { widget.matchData.autoshots.add(newShot); });
+																Navigator.pop(context);
+															} : null
+														)
+													],
+													mainAxisAlignment: MainAxisAlignment.center,
+													mainAxisSize: MainAxisSize.min,
+												)
+											);
+									});	
 							});
-              setState(() {});
-            },
+							setState(() {});
+						},
 							child: new CustomPaint(
 								painter: new AutoPath(points: widget.matchData.autopathpoints, shotList: widget.matchData.autoshots),
 								size: Size.infinite,
@@ -188,8 +161,13 @@ class AutonPathState extends State<AutonPath> {
 }
 
 class AutoPath extends CustomPainter {
+
+	final double _circleRadius = 20.0;
+	final double _halfRadius = 10.0;
+
 	List<Offset> points;
 	List<Shot> shotList;
+
 	AutoPath({this.points, this.shotList});
 
 	@override
@@ -206,7 +184,18 @@ class AutoPath extends CustomPainter {
 		}
 
 		for (int i = 0; i < shotList.length; i++) {
-			canvas.drawCircle(shotList[i].pos, 20.0, Paint()..color = Colors.yellow);
+			Offset shotPos = shotList[i].pos;
+			int shotsMade = shotList[i].shotsMade;
+
+			canvas.drawCircle(shotPos, _circleRadius, Paint()..color = Colors.yellow);
+			
+			TextPainter tp = TextPainter(
+				text: TextSpan(text: '$shotsMade', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25)),
+				textAlign: TextAlign.center,
+				textDirection: TextDirection.ltr,
+			)..layout(maxWidth: size.width);
+			
+			tp.paint(canvas, Offset(shotPos.dx - _halfRadius, shotPos.dy - _halfRadius));
 		}
 	}
 
