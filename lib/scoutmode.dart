@@ -109,23 +109,6 @@ class _ScoutModeState extends State<ScoutMode> {
 													onSaved: (input) => newMatch.matchNumber = int.parse(input),
 													onChanged: (input) => newMatch.matchNumber = int.parse(input),
 													onFieldSubmitted: (input) => newMatch.matchNumber = int.parse(input)),
-											DropdownButton(
-												items: [
-													DropdownMenuItem(value: 1, child: Text("Blue1")),
-													DropdownMenuItem(value: 2, child: Text("Blue2")),
-													DropdownMenuItem(value: 3, child: Text("Blue3")),
-													DropdownMenuItem(value: 4, child: Text("Red1")),
-													DropdownMenuItem(value: 5, child: Text("Red2")),
-													DropdownMenuItem(value: 6, child: Text("Red3")),
-												],
-												onChanged: (value) {
-													setState(() {
-														newMatch.position = value;
-													});
-												},
-												hint: Text("Robot Position"),
-												value: newMatch.position,
-											),
 											TextFormField(
 												decoration: const InputDecoration(hintText: "Enter Team Number"),
 												keyboardType: TextInputType.number,
@@ -134,31 +117,112 @@ class _ScoutModeState extends State<ScoutMode> {
 												onChanged: (input) => newMatch.teamNumber = int.parse(input),
 												onFieldSubmitted: (input) => newMatch.teamNumber = int.parse(input),
 											),
-											/*Slider(
-												value: newMatch.initiationlinepos,
-												onChanged: (double delta) {
-													setState(() => newMatch.initiationlinepos = delta);
-												},
-												min: 0.0,
-												max: 10.0,
-												divisions: 10,
-											),*/
-											Text("Preloaded Number of Fuel Cells?"),
-											DropdownButton(
-												items: [
-													DropdownMenuItem(value: 0, child: Text("0")),
-													DropdownMenuItem(value: 1, child: Text("1")),
-													DropdownMenuItem(value: 2, child: Text("2")),
-													DropdownMenuItem(value: 3, child: Text("3"))
+											Text('Select robot position'),
+											Column(children: <Widget>[
+												Row(children: <Widget>[
+													RaisedButton(
+														child: Text('Blue 1'),
+														color: (newMatch.position == 1) ? Colors.blueAccent : Colors.grey,
+														onPressed: () {
+															newMatch.position = (newMatch.position == 1) ? -1 : 1;
+															setState(() {});
+														}
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
+														child: Text('Blue 2'),
+														color: (newMatch.position == 2) ? Colors.blueAccent : Colors.grey,
+														onPressed: () {
+															newMatch.position = (newMatch.position == 2) ? -1 : 2;
+															setState(() {});
+														}
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
+														child: Text('Blue 3'),
+														color: (newMatch.position == 3) ? Colors.blueAccent : Colors.grey,
+														onPressed: () {
+															newMatch.position = (newMatch.position == 3) ? -1 : 3;
+															setState(() {});
+														}
+													)
 												],
-												onChanged: (value) {
-													setState(() {
-														newMatch.preloadedfuelcells = value;
-													});
-												},
-												hint: Text("Number of Preloaded Fuel Cells"),
-												value: newMatch.preloadedfuelcells,
+												mainAxisAlignment: MainAxisAlignment.center),
+												Row(children: <Widget>[
+													RaisedButton(
+														child: Text('Red 1'),
+														color: (newMatch.position == 4) ? Colors.redAccent : Colors.grey,
+														onPressed: () {
+															newMatch.position = (newMatch.position == 4) ? -1 : 4;
+															setState(() {});
+														}
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
+														child: Text('Red 2'),
+														color: (newMatch.position == 5) ? Colors.redAccent : Colors.grey,
+														onPressed: () {
+															newMatch.position = (newMatch.position == 5) ? -1 : 5;
+															setState(() {});
+														}
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
+														child: Text('Red 3'),
+														color: (newMatch.position == 6) ? Colors.redAccent : Colors.grey,
+														onPressed: () {
+															newMatch.position = (newMatch.position == 6) ? -1 : 6;
+															setState(() {});
+														}
+													)
+												],
+												mainAxisAlignment: MainAxisAlignment.center)
+											],
+											mainAxisAlignment: MainAxisAlignment.center),
+											Divider(
+												height: 30.0,
+												indent: 5.0,
+												color: Colors.black,
 											),
+											Text('Preloaded number of fuel cells'),
+											Column(children: <Widget>[
+												
+												Row(children: <Widget>[
+													RaisedButton(
+														child: Text('0'),
+														color: newMatch.preloadedfuelcells == 0 ? Colors.greenAccent : Colors.grey,
+														onPressed: () {
+															setState(() { newMatch.preloadedfuelcells = 0; });
+														}
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
+														child: Text('1'),
+														color: newMatch.preloadedfuelcells == 1 ? Colors.greenAccent : Colors.grey,
+														onPressed: () {
+															setState(() { newMatch.preloadedfuelcells = 1; });
+														}
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
+														child: Text('2'),
+														color: newMatch.preloadedfuelcells == 2 ? Colors.greenAccent : Colors.grey,
+														onPressed: () {
+															setState(() { newMatch.preloadedfuelcells = 2; });
+														}
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
+														child: Text('3'),
+														color: newMatch.preloadedfuelcells == 3 ? Colors.greenAccent : Colors.grey,
+														onPressed: () {
+															setState(() { newMatch.preloadedfuelcells = 3; });
+														}
+													)
+												],
+												mainAxisAlignment: MainAxisAlignment.center
+												)
+											]),
 											Divider(
 												height: 30.0,
 												indent: 5.0,
@@ -209,20 +273,41 @@ class _ScoutModeState extends State<ScoutMode> {
 													mainAxisAlignment: MainAxisAlignment.center
 													)
 											]),
-											DropdownButton(
-												items: [
-													DropdownMenuItem(value: int.parse("1"), child: Text("Park")),
-													DropdownMenuItem(value: int.parse("2"), child: Text("Climb")),
-													DropdownMenuItem(value: int.parse("3"), child: Text("Neither")),
-												],
-												onChanged: (value) {
-													setState(() {
-														newMatch.park = value;
-													});
-												},
-												hint: Text("End Game State?"),
-												value: newMatch.park,
+											Divider(
+												height: 30.0,
+												indent: 5.0,
+												color: Colors.black,
 											),
+											Column(children: <Widget>[
+												Text('End game state'),
+												Row(children: <Widget>[
+													RaisedButton(
+														child: Text('Neither'),
+														color: newMatch.park == 3 ? Colors.greenAccent : Colors.grey,
+														onPressed: () {
+															setState(() { newMatch.park = 3; });
+														}
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
+														child: Text('Park'),
+														color: newMatch.park == 1 ? Colors.greenAccent : Colors.grey,
+														onPressed: () {
+															setState(() { newMatch.park = 1; });
+														}
+													),
+													VerticalDivider(width: 5.0),
+													RaisedButton(
+														child: Text('Climb'),
+														color: newMatch.park == 2 ? Colors.greenAccent : Colors.grey,
+														onPressed: () {
+															setState(() { newMatch.park = 2; });
+														}
+													)
+												],
+												mainAxisAlignment: MainAxisAlignment.center
+												)
+											]),
 											Divider(
 												height: 30.0,
 												indent: 5.0,
