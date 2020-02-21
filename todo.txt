@@ -5,3 +5,6 @@ teleop:
 
 scoutmode:
 	-- fix issues with empty text fields
+
+auton/teleop:
+	-- image sizing issues
