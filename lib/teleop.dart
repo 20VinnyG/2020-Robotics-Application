@@ -49,92 +49,105 @@ class _TeleopState extends State<Teleop> {
 					),
 			onTapDown: (TapDownDetails details) => onTapDown(context, details),
 			onTap: () async {
-				Shot newShot = new Shot();
-				newShot.pos = screenPos;
-				await showDialog(
-						context: context,
-						builder: (context) {
-							return StatefulBuilder(builder: (context, setState) {
-								return AlertDialog(
-									title: Text("Enter Number of Balls Made"),
-									content: Column(
+        await _buildShotPrompt();
+        setState(() {});
+      },
+      onPanUpdate: (DragUpdateDetails details) {
+        final RenderBox box = context.findRenderObject();
+        final Offset localOffset = box.globalToLocal(details.globalPosition);
+        screenPos = localOffset;
+      },
+      onPanEnd: (DragEndDetails details) async {
+        await _buildShotPrompt();
+        setState(() {});
+      }
+		));
+	}
+
+  Future<T> _buildShotPrompt<T> () async {
+    Shot newShot = new Shot();
+		newShot.pos = screenPos;
+		return showDialog(
+				context: context,
+				builder: (context) {
+					return StatefulBuilder(builder: (context, setState) {
+						return AlertDialog(
+							title: Text("Enter Number of Balls Made"),
+							content: Column(
+								children: <Widget>[
+									Row(
 										children: <Widget>[
-											Row(
-												children: <Widget>[
-													RaisedButton(
-														child: Text('0'),
-														color: newShot.shotsMade == 0 ? Colors.greenAccent : Colors.grey,
-														onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 0) ? -1 : 0; }); }
-													),
-													VerticalDivider(width: 5.0),
-													RaisedButton(
-														child: Text('1'),
-														color: newShot.shotsMade == 1 ? Colors.greenAccent : Colors.grey,
-														onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 1) ? -1 : 1; }); }
-													),
-													VerticalDivider(width: 5.0),
-													RaisedButton(
-														child: Text('2'),
-														color: newShot.shotsMade == 2 ? Colors.greenAccent : Colors.grey,
-														onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 2) ? -1 : 2; }); }
-													),
-												],
-												mainAxisAlignment: MainAxisAlignment.center,
-											),
-											Row(
-												children: <Widget>[
-													RaisedButton(
-														child: Text('3'),
-														color: newShot.shotsMade == 3 ? Colors.greenAccent : Colors.grey,
-														onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 3) ? -1 : 3; }); }
-													),
-													VerticalDivider(width: 5.0),
-													RaisedButton(
-														child: Text('4'),
-														color: newShot.shotsMade == 4 ? Colors.greenAccent : Colors.grey,
-														onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 4) ? -1 : 4; }); }
-													),
-													VerticalDivider(width: 5.0),
-													RaisedButton(
-														child: Text('5'),
-														color: newShot.shotsMade == 5 ? Colors.greenAccent : Colors.grey,
-														onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 5) ? -1 : 5; }); }
-													)
-												],
-												mainAxisAlignment: MainAxisAlignment.center,
-											),
-											Divider(
-												height: 30.0,
-												indent: 5.0,
-												color: Colors.black,
-											),
-											Text('Shot on which goal?'),
 											RaisedButton(
-												child: Text(newShot.shotType ? 'High' : 'Low'),
-												onPressed: () { setState(() { newShot.shotType = !newShot.shotType; }); }
+												child: Text('0'),
+												color: newShot.shotsMade == 0 ? Colors.greenAccent : Colors.grey,
+												onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 0) ? -1 : 0; }); }
 											),
-											Divider(
-												height: 30.0,
-												indent: 5.0,
-												color: Colors.black,
-											),
+											VerticalDivider(width: 5.0),
 											RaisedButton(
-												child: Text('Save'),
-												onPressed: (newShot.shotsMade != -1) ? () {
-													setState(() { widget.matchData.teleopshots.add(newShot); });
-													Navigator.pop(context);
-												} : null
+												child: Text('1'),
+												color: newShot.shotsMade == 1 ? Colors.greenAccent : Colors.grey,
+												onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 1) ? -1 : 1; }); }
+											),
+											VerticalDivider(width: 5.0),
+											RaisedButton(
+												child: Text('2'),
+												color: newShot.shotsMade == 2 ? Colors.greenAccent : Colors.grey,
+												onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 2) ? -1 : 2; }); }
+											),
+										],
+										mainAxisAlignment: MainAxisAlignment.center,
+									),
+									Row(
+										children: <Widget>[
+											RaisedButton(
+												child: Text('3'),
+												color: newShot.shotsMade == 3 ? Colors.greenAccent : Colors.grey,
+												onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 3) ? -1 : 3; }); }
+											),
+											VerticalDivider(width: 5.0),
+											RaisedButton(
+												child: Text('4'),
+												color: newShot.shotsMade == 4 ? Colors.greenAccent : Colors.grey,
+												onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 4) ? -1 : 4; }); }
+											),
+											VerticalDivider(width: 5.0),
+											RaisedButton(
+												child: Text('5'),
+												color: newShot.shotsMade == 5 ? Colors.greenAccent : Colors.grey,
+												onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 5) ? -1 : 5; }); }
 											)
 										],
 										mainAxisAlignment: MainAxisAlignment.center,
-										mainAxisSize: MainAxisSize.min,
+									),
+									Divider(
+										height: 30.0,
+										indent: 5.0,
+										color: Colors.black,
+									),
+									Text('Shot on which goal?'),
+									RaisedButton(
+										child: Text(newShot.shotType ? 'High' : 'Low'),
+										onPressed: () { setState(() { newShot.shotType = !newShot.shotType; }); }
+									),
+									Divider(
+										height: 30.0,
+										indent: 5.0,
+										color: Colors.black,
+									),
+									RaisedButton(
+										child: Text('Save'),
+										onPressed: (newShot.shotsMade != -1) ? () {
+											setState(() { widget.matchData.teleopshots.add(newShot); });
+											Navigator.pop(context);
+										} : null
 									)
-								);
-						});	
-					});
-					setState(() {});
-			},
-		));
+								],
+								mainAxisAlignment: MainAxisAlignment.center,
+								mainAxisSize: MainAxisSize.min,
+							)
+						);
+				});	
+			});
 	}
 }
 

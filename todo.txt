@@ -1,0 +1,4 @@
+teleop:
+	-- different box on spinner
+		-- phase 2 question (times around - accuracy)
+		-- phase 3 question (end on color - accuracy)
