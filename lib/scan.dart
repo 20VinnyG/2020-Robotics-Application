@@ -37,6 +37,8 @@ void _initializeSpreadSheet() async {
 		'Team Number',
 		'Initiation Line Position',
 		'Preloaded Fuel Cells',
+    'Control Type',
+    'Successful',
 		'ClimbTime',
 		'Park',
 		'General Success',

@@ -516,10 +516,13 @@ class _ScoutModeState extends State<ScoutMode> {
 				'autoshotsy': autoshotsy,
 				'autoshotsmade': autoshotsmade,
 				'autoshotstype': autoshotstype,
+        
 				'teleopshotsx': teleopshotsx,
 				'teleopshotsy': teleopshotsy,
 				'teleopshotsmade': teleopshotsmade,
 				'teleopshotstype': teleopshotstype,
+        'rotationControl': newMatch.spins.controlType,
+        'spinoutcome': newMatch.spins.succesful,
 				'generalsuccess': newMatch.generalSuccess,
 				'defensivesuccess': newMatch.defensiveSuccess,
 				'accuracy': newMatch.accuracy,

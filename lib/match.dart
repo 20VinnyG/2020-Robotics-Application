@@ -18,7 +18,7 @@ class MatchData {
 	List<Shot> autoshots = [];
 	//Telop
 	List<Shot> teleopshots = [];
-  List<Spin> spins = [];
+  Spin spins = new Spin();
 	//Endgame
 	double climbtime=0;
 	int park = 3; // TODO: Convert to int 1-3 before QR

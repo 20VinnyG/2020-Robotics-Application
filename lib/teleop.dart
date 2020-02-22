@@ -82,7 +82,6 @@ class _TeleopState extends State<Teleop> {
 	}
 
   _buildSpinnerPrompt () {
-		Spin newSpin = new Spin();
 		return showDialog(
 				context: context,
 				builder: (context) {
@@ -92,21 +91,21 @@ class _TeleopState extends State<Teleop> {
 							content: Column(
 								children: <Widget>[
                   RaisedButton(
-                    child: Text(newSpin.controlType ? "Position Control": "Rotation Control"),
-                    color: newSpin.controlType ? Colors.greenAccent : Colors.grey,
+                    child: Text(widget.matchData.spins.controlType ? "Position Control": "Rotation Control"),
+                    color: widget.matchData.spins.controlType ? Colors.greenAccent : Colors.grey,
                     onPressed: () {
                       setState(() {
-                        newSpin.controlType = !newSpin.controlType; 
+                        widget.matchData.spins.controlType = !widget.matchData.spins.controlType; 
                       }
                       );
                     },
                   ),
                   RaisedButton(
-                    child: Text(newSpin.succesful ? "Successful": "Failed"),
-                    color: newSpin.succesful ? Colors.greenAccent : Colors.grey,
+                    child: Text(widget.matchData.spins.succesful ? "Successful": "Failed"),
+                    color: widget.matchData.spins.succesful ? Colors.greenAccent : Colors.grey,
                     onPressed: () {
                       setState(() {
-                        newSpin.succesful = !newSpin.succesful; 
+                        widget.matchData.spins.succesful = !widget.matchData.spins.succesful; 
                       }
                       );
                     },
@@ -114,7 +113,6 @@ class _TeleopState extends State<Teleop> {
                   RaisedButton(
                     child: Text("Done"),
                     onPressed: () {
-                      widget.matchData.spins.add(newSpin);
                       Navigator.pop(context);
                     },
                   )
