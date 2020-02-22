@@ -25,7 +25,7 @@ class AutonPathState extends State<AutonPath> {
 						decoration: new BoxDecoration(
 								image: new DecorationImage(
 										image: new AssetImage('assets/images/field.png'),
-										fit: BoxFit.cover)),
+										fit: BoxFit.fill)),
 					),
 					new GestureDetector(
 							onPanUpdate: (DragUpdateDetails details) {
@@ -87,9 +87,9 @@ class AutonPathState extends State<AutonPath> {
 			Row(
 				children: <Widget>[
 					_buildShotButton(newShot, 0, setState),
-					VerticalDivider(width: 5.0),
+					Container(width: 5.0),
 					_buildShotButton(newShot, 1, setState),
-					VerticalDivider(width: 5.0),
+					Container(width: 5.0),
 					_buildShotButton(newShot, 2, setState),
 				],
 				mainAxisAlignment: MainAxisAlignment.center,
@@ -97,9 +97,9 @@ class AutonPathState extends State<AutonPath> {
 			Row(
 				children: <Widget>[
 					_buildShotButton(newShot, 3, setState),
-					VerticalDivider(width: 5.0),
+					Container(width: 5.0),
 					_buildShotButton(newShot, 4, setState),
-					VerticalDivider(width: 5.0),
+					Container(width: 5.0),
 					_buildShotButton(newShot, 5, setState)
 				],
 				mainAxisAlignment: MainAxisAlignment.center,

@@ -5,6 +5,9 @@ teleop:
 
 scoutmode:
 	-- fix issues with empty text fields
+	-- do something about the shots and auton path
 
 auton/teleop:
 	-- image sizing issues
+		--> Changed to fill type, but stretches awkwardly on rotate
+	-- rotate image when in landscape vs portrait

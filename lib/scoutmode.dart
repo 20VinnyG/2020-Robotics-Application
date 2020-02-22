@@ -23,16 +23,16 @@ class _ScoutModeState extends State<ScoutMode> {
 
 	final formKey = GlobalKey<FormState>();
 	MatchData newMatch = new MatchData();
-	List<int> teleopshotsx = <int>[];
-	List<int> teleopshotsy = <int>[];
-	List<int> autoshotsx = <int>[];
-	List<int> autoshotsy = <int>[];
-	List<int> autoshotsmade = <int>[];
-	List<int> teleopshotsmade = <int>[];
-	List<int> autoshotstype = <int>[];
-	List<int> teleopshotstype = <int>[];
+	// List<int> teleopshotsx = <int>[];
+	// List<int> teleopshotsy = <int>[];
+	// List<int> autoshotsx = <int>[];
+	// List<int> autoshotsy = <int>[];
+	// List<int> autoshotsmade = <int>[];
+	// List<int> teleopshotsmade = <int>[];
+	// List<int> autoshotstype = <int>[];
+	// List<int> teleopshotstype = <int>[];
 
-	String _clockText = "00:000";
+	String _clockText = "00:00";
 	Timer _clockUpdateTimer;
 	Duration _clockUpdateRate = Duration(milliseconds: 100);
 
@@ -43,7 +43,7 @@ class _ScoutModeState extends State<ScoutMode> {
 				Duration elapsedTime = _stopwatch.elapsed;
 				int seconds = elapsedTime.inSeconds;
 				int millis	= elapsedTime.inMilliseconds - 1000 * seconds;
-        _clockText = sprintf("%02d:%03d", [seconds, millis]);
+				_clockText = sprintf("%02d:%02d", [seconds, (millis/10).round()]);
 			}));
 		}
 	}
@@ -65,7 +65,7 @@ class _ScoutModeState extends State<ScoutMode> {
 		_stopwatch.stop();
 		_stopwatch.reset();
 		newMatch.climbtime = 0;
-		setState(() { _clockText = "00:000"; });
+		setState(() { _clockText = "00:00"; });
 	}
 
 	@override
@@ -101,7 +101,7 @@ class _ScoutModeState extends State<ScoutMode> {
 												),
 												Text("Prematch"),
 												TextFormField(
-                          initialValue: newMatch.initials,
+													initialValue: newMatch.initials,
 													decoration: const InputDecoration(labelText: 'Enter your initials'),
 													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
 													onSaved: (input) { setState(() { newMatch.initials = input; }); },
@@ -109,16 +109,16 @@ class _ScoutModeState extends State<ScoutMode> {
 													onChanged: (input) { setState(() { newMatch.initials = input; }); },
 												),
 												TextFormField(
-                          initialValue: newMatch.matchNumber,
+													initialValue: newMatch.matchNumber,
 													decoration: const InputDecoration(labelText: 'Enter the match number'),
 													keyboardType: TextInputType.number,
 													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
 													onSaved: (input) { setState(() { newMatch.matchNumber = input; }); },
 													onChanged: (input) { setState(() { newMatch.matchNumber = input; }); },
 													onFieldSubmitted: (input) { setState(() { newMatch.matchNumber = input; }); }
-                        ),
+												),
 												TextFormField(
-                          initialValue: newMatch.teamNumber,
+													initialValue: newMatch.teamNumber,
 													decoration: const InputDecoration(labelText: "Enter Team Number"),
 													keyboardType: TextInputType.number,
 													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
@@ -137,7 +137,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																setState(() {});
 															}
 														),
-														VerticalDivider(width: 5.0),
+														Container(width: 5.0),
 														RaisedButton(
 															child: Text('Red 2'),
 															color: (newMatch.position == 5) ? Colors.redAccent : Colors.grey,
@@ -146,7 +146,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																setState(() {});
 															}
 														),
-														VerticalDivider(width: 5.0),
+														Container(width: 5.0),
 														RaisedButton(
 															child: Text('Red 3'),
 															color: (newMatch.position == 6) ? Colors.redAccent : Colors.grey,
@@ -166,7 +166,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																setState(() {});
 															}
 														),
-														VerticalDivider(width: 5.0),
+														Container(width: 5.0),
 														RaisedButton(
 															child: Text('Blue 2'),
 															color: (newMatch.position == 2) ? Colors.blueAccent : Colors.grey,
@@ -175,7 +175,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																setState(() {});
 															}
 														),
-														VerticalDivider(width: 5.0),
+														Container(width: 5.0),
 														RaisedButton(
 															child: Text('Blue 3'),
 															color: (newMatch.position == 3) ? Colors.blueAccent : Colors.grey,
@@ -203,7 +203,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																setState(() { newMatch.preloadedfuelcells = 0; });
 															}
 														),
-														VerticalDivider(width: 5.0),
+														Container(width: 5.0),
 														RaisedButton(
 															child: Text('1'),
 															color: newMatch.preloadedfuelcells == 1 ? Colors.greenAccent : Colors.grey,
@@ -211,7 +211,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																setState(() { newMatch.preloadedfuelcells = 1; });
 															}
 														),
-														VerticalDivider(width: 5.0),
+														Container(width: 5.0),
 														RaisedButton(
 															child: Text('2'),
 															color: newMatch.preloadedfuelcells == 2 ? Colors.greenAccent : Colors.grey,
@@ -219,7 +219,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																setState(() { newMatch.preloadedfuelcells = 2; });
 															}
 														),
-														VerticalDivider(width: 5.0),
+														Container(width: 5.0),
 														RaisedButton(
 															child: Text('3'),
 															color: newMatch.preloadedfuelcells == 3 ? Colors.greenAccent : Colors.grey,
@@ -245,7 +245,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																Navigator.push(context, new MaterialPageRoute(builder: (context) => AutonPath(matchData: newMatch)));
 															},
 														),
-														VerticalDivider(width: 5.0),
+														Container(width: 5.0),
 														RaisedButton(
 															child: Text("Teleop"),
 															onPressed: () {
@@ -270,7 +270,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																	_stopClock();
 																},
 															),
-															VerticalDivider(width: 5.0),
+															Container(width: 5.0),
 															RaisedButton(
 																child: Text("Reset Climb Timer"),
 																onPressed: () {
@@ -295,7 +295,7 @@ class _ScoutModeState extends State<ScoutMode> {
 															setState(() { newMatch.park = 3; });
 														}
 													),
-													VerticalDivider(width: 5.0),
+													Container(width: 5.0),
 													RaisedButton(
 														child: Text('Park'),
 														color: newMatch.park == 1 ? Colors.greenAccent : Colors.grey,
@@ -303,7 +303,7 @@ class _ScoutModeState extends State<ScoutMode> {
 															setState(() { newMatch.park = 1; });
 														}
 													),
-													VerticalDivider(width: 5.0),
+													Container(width: 5.0),
 													RaisedButton(
 														child: Text('Climb'),
 														color: newMatch.park == 2 ? Colors.greenAccent : Colors.grey,
@@ -331,7 +331,7 @@ class _ScoutModeState extends State<ScoutMode> {
 															}
 														)
 													]),
-													VerticalDivider(width: 5.0),
+													Container(width: 5.0),
 													Column(children: <Widget>[
 														Text('Assisted?'),
 														RaisedButton(
@@ -344,7 +344,7 @@ class _ScoutModeState extends State<ScoutMode> {
 															}
 														)
 													]),
-													VerticalDivider(width: 5.0),
+													Container(width: 5.0),
 													newMatch.assist ?
 														Column(children: <Widget>[
 															Text('Assist type'),
@@ -430,7 +430,7 @@ class _ScoutModeState extends State<ScoutMode> {
 															}
 														)
 													]),
-													VerticalDivider(width: 10.0),
+													Container(width: 10.0),
 													Column(children: <Widget>[
 														Text('Egregious	Fouls?'),
 														RaisedButton(
@@ -442,7 +442,7 @@ class _ScoutModeState extends State<ScoutMode> {
 															}
 														)
 													]),
-													VerticalDivider(width: 10.0),
+													Container(width: 10.0),
 													Column(children: <Widget>[
 														Text('Had Problems?'),
 														RaisedButton(
@@ -476,9 +476,14 @@ class _ScoutModeState extends State<ScoutMode> {
 																vertical: 16.0, horizontal: 16.0),
 														child: RaisedButton(
 															child: Text("Clear"),
-															onPressed:() {
-																AutoPath().points = <Offset>[];
-																Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => ScoutMode()));
+															onPressed:() async {
+																bool shouldClear = await _confirmationPrompt(context, 'Are you sure you want to clear?');
+																if (shouldClear) {
+																	print('Clearing');
+																	Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => ScoutMode()));
+																} else {
+																	print('Not clearing...');
+																}
 															},
 														)),
 											],
@@ -496,49 +501,61 @@ class _ScoutModeState extends State<ScoutMode> {
 	}
 
 	void _submit() {
-    int teamNumber = newMatch.teamNumber == '' ? 0 : int.parse(newMatch.teamNumber);
-    int matchNumber = newMatch.matchNumber == '' ? 0 : int.parse(newMatch.matchNumber);
+		int teamNumber = newMatch.teamNumber == '' ? 0 : int.parse(newMatch.teamNumber);
+		int matchNumber = newMatch.matchNumber == '' ? 0 : int.parse(newMatch.matchNumber);
 
-		_generateId(teamNumber, matchNumber);
-		_extractshootingshootingpoints();
+		// _generateId(teamNumber, matchNumber);
+		// _extractshootingshootingpoints();
+
 		if (formKey.currentState.validate()) {
 			formKey.currentState.save();
-			var payload = {
-				'initials': newMatch.initials,
-				'id': newMatch.id,
-				'teamnumber': int.parse(newMatch.teamNumber),
-				'matchnumber': int.parse(newMatch.matchNumber),
-				'initiationposition': newMatch.initiationlinepos,
-				'preloadedfuelcells': newMatch.preloadedfuelcells,
-				'autopathx': newMatch.autopathx,
-				'autopathy': newMatch.autopathy,
-				'autoshotsx': autoshotsx,
-				'autoshotsy': autoshotsy,
-				'autoshotsmade': autoshotsmade,
-				'autoshotstype': autoshotstype,
-				'teleopshotsx': teleopshotsx,
-				'teleopshotsy': teleopshotsy,
-				'teleopshotsmade': teleopshotsmade,
-				'teleopshotstype': teleopshotstype,
-				'generalsuccess': newMatch.generalSuccess,
-				'defensivesuccess': newMatch.defensiveSuccess,
-				'accuracy': newMatch.accuracy,
-				'floorpickup': newMatch.floorpickup ? 1 : 0,
-				'fouls': newMatch.fouls ? 1 : 0,
-				'problems': newMatch.problems ? 1 : 0
-			};
+			Map<String,dynamic> payload = newMatch.toMap();
+
 			List<int> stringBytes = utf8.encode(json.encode(payload));
 			List<int> gzipBytes = new GZipEncoder().encode(stringBytes);
 			String compressedString = base64.encode(gzipBytes);
+
 			showDialog (
-					context: context,
-					builder: (context) {
-						return Dialog(
-								child: QrImage(
-							data: compressedString,
-						));
-					});
+				context: context,
+				builder: (context) {
+					return Dialog(
+							child: QrImage(
+						data: compressedString,
+					));
+				});
 		}
+	}
+
+	Future<bool> _confirmationPrompt (BuildContext context, String prompt) async {
+		bool confirmation = false;
+		await showDialog(
+				context: context,
+				builder: (context) {
+					return AlertDialog(
+						title: Text(prompt),
+						content: Column(
+							children: <Widget>[
+								Row(
+									children: <Widget>[
+										RaisedButton(
+											child: Text('Yes'),
+											onPressed: () { confirmation = true; Navigator.pop(context); }
+										),
+										Container(width: 5.0),
+										RaisedButton(
+											child: Text('No'),
+											onPressed: () { confirmation = false; Navigator.pop(context); }
+										)
+									],
+									mainAxisAlignment: MainAxisAlignment.center,
+									mainAxisSize: MainAxisSize.min,
+								)
+							],
+							mainAxisAlignment: MainAxisAlignment.center,
+							mainAxisSize: MainAxisSize.min
+						));
+			});
+			return confirmation;
 	}
 
 	int _getTeam() {
@@ -557,24 +574,24 @@ class _ScoutModeState extends State<ScoutMode> {
 		return int.parse(scheduledTeam);
 	}
 
-	_generateId(int teamNumber, int matchNumber) {
-		int id = teamNumber * 10000 + matchNumber;
-		newMatch.id = id;
-	}
+	// _generateId(int teamNumber, int matchNumber) {
+	// 	int id = teamNumber * 10000 + matchNumber;
+	// 	newMatch.id = id;
+	// }
 
-	_extractshootingshootingpoints() {
-		for(int i=0; i < newMatch.autoshots.length; i++) {
-			autoshotsx.add(newMatch.autoshots[i].pos.dx.round());
-			autoshotsy.add(newMatch.autoshots[i].pos.dy.round());
-			autoshotsmade.add(newMatch.autoshots[i].shotsMade);
-			autoshotstype.add(newMatch.autoshots[i].shotType ? 1 : 0);
-		}
-		for(int i=0; i< newMatch.autoshots.length; i++) {
-			teleopshotsx.add(newMatch.teleopshots[i].pos.dx.round());
-			teleopshotsy.add(newMatch.teleopshots[i].pos.dy.round());
-			teleopshotsmade.add(newMatch.teleopshots[i].shotsMade);
-			teleopshotstype.add(newMatch.teleopshots[i].shotType ? 1 : 0);
-		}
+	// _extractshootingshootingpoints() {
+	// 	for(int i=0; i < newMatch.autoshots.length; i++) {
+	// 		autoshotsx.add(newMatch.autoshots[i].pos.dx.round());
+	// 		autoshotsy.add(newMatch.autoshots[i].pos.dy.round());
+	// 		autoshotsmade.add(newMatch.autoshots[i].shotsMade);
+	// 		autoshotstype.add(newMatch.autoshots[i].shotType ? 1 : 0);
+	// 	}
+	// 	for(int i=0; i< newMatch.autoshots.length; i++) {
+	// 		teleopshotsx.add(newMatch.teleopshots[i].pos.dx.round());
+	// 		teleopshotsy.add(newMatch.teleopshots[i].pos.dy.round());
+	// 		teleopshotsmade.add(newMatch.teleopshots[i].shotsMade);
+	// 		teleopshotstype.add(newMatch.teleopshots[i].shotType ? 1 : 0);
+	// 	}
 		
-	}
+	// }
 }
