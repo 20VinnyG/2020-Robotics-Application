@@ -43,7 +43,7 @@ class _ScoutModeState extends State<ScoutMode> {
 				Duration elapsedTime = _stopwatch.elapsed;
 				int seconds = elapsedTime.inSeconds;
 				int millis	= elapsedTime.inMilliseconds - 1000 * seconds;
-				_clockText = sprintf("%02d:%03d", [seconds, millis]);
+        _clockText = sprintf("%02d:%03d", [seconds, millis]);
 			}));
 		}
 	}

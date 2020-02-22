@@ -45,81 +45,14 @@ class AutonPathState extends State<AutonPath> {
 											return AlertDialog(
 												title: Text("Enter Number of Balls Made"),
 												content: Column(
-													children: <Widget>[
-														Row(
-															children: <Widget>[
-																RaisedButton(
-																	child: Text('0'),
-																	color: newShot.shotsMade == 0 ? Colors.greenAccent : Colors.grey,
-																	onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 0) ? -1 : 0; }); }
-																),
-																VerticalDivider(width: 5.0),
-																RaisedButton(
-																	child: Text('1'),
-																	color: newShot.shotsMade == 1 ? Colors.greenAccent : Colors.grey,
-																	onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 1) ? -1 : 1; }); }
-																),
-																VerticalDivider(width: 5.0),
-																RaisedButton(
-																	child: Text('2'),
-																	color: newShot.shotsMade == 2 ? Colors.greenAccent : Colors.grey,
-																	onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 2) ? -1 : 2; }); }
-																),
-															],
-															mainAxisAlignment: MainAxisAlignment.center,
-														),
-														Row(
-															children: <Widget>[
-																RaisedButton(
-																	child: Text('3'),
-																	color: newShot.shotsMade == 3 ? Colors.greenAccent : Colors.grey,
-																	onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 3) ? -1 : 3; }); }
-																),
-																VerticalDivider(width: 5.0),
-																RaisedButton(
-																	child: Text('4'),
-																	color: newShot.shotsMade == 4 ? Colors.greenAccent : Colors.grey,
-																	onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 4) ? -1 : 4; }); }
-																),
-																VerticalDivider(width: 5.0),
-																RaisedButton(
-																	child: Text('5'),
-																	color: newShot.shotsMade == 5 ? Colors.greenAccent : Colors.grey,
-																	onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == 5) ? -1 : 5; }); }
-																)
-															],
-															mainAxisAlignment: MainAxisAlignment.center,
-														),
-														Divider(
-															height: 30.0,
-															indent: 5.0,
-															color: Colors.black,
-														),
-														Text('Shot on which goal?'),
-														RaisedButton(
-															child: Text(newShot.shotType ? 'High' : 'Low'),
-															onPressed: () { setState(() { newShot.shotType = !newShot.shotType; }); }
-														),
-														Divider(
-															height: 30.0,
-															indent: 5.0,
-															color: Colors.black,
-														),
-														RaisedButton(
-															child: Text('Save'),
-															onPressed: (newShot.shotsMade != -1) ? () {
-																setState(() { widget.matchData.autoshots.add(newShot); });
-																Navigator.pop(context);
-															} : null
-														)
-													],
+													children: _buildShotInfoEntryLayout (newShot, setState),
 													mainAxisAlignment: MainAxisAlignment.center,
 													mainAxisSize: MainAxisSize.min,
 												)
 											);
 									});	
 							});
-							setState(() {});
+              setState(() {});
 						},
 							child: new CustomPaint(
 								painter: new AutoPath(points: widget.matchData.autopathpoints, shotList: widget.matchData.autoshots),
@@ -147,6 +80,53 @@ class AutonPathState extends State<AutonPath> {
 								})
 					],
 				));
+	}
+
+  	List<Widget> _buildShotInfoEntryLayout (Shot newShot, Function setState) {
+		return <Widget>[
+			Row(
+				children: <Widget>[
+					_buildShotButton(newShot, 0, setState),
+					VerticalDivider(width: 5.0),
+					_buildShotButton(newShot, 1, setState),
+					VerticalDivider(width: 5.0),
+					_buildShotButton(newShot, 2, setState),
+				],
+				mainAxisAlignment: MainAxisAlignment.center,
+			),
+			Row(
+				children: <Widget>[
+					_buildShotButton(newShot, 3, setState),
+					VerticalDivider(width: 5.0),
+					_buildShotButton(newShot, 4, setState),
+					VerticalDivider(width: 5.0),
+					_buildShotButton(newShot, 5, setState)
+				],
+				mainAxisAlignment: MainAxisAlignment.center,
+			),
+			Divider(	height: 30.0, indent: 5.0, color: Colors.black),
+			Text('Shot on which goal?'),
+			RaisedButton(
+				child: Text(newShot.shotType ? 'High' : 'Low'),
+				onPressed: () { setState(() { newShot.shotType = !newShot.shotType; }); }
+			),
+			Divider(	height: 30.0, indent: 5.0, color: Colors.black),
+			RaisedButton(
+				child: Text('Save'),
+				onPressed: (newShot.shotsMade != -1) ? () {
+					setState(() { widget.matchData.autoshots.add(newShot); });
+					Navigator.pop(context);
+				} : null
+			)
+		];
+	}
+
+	RaisedButton _buildShotButton (Shot newShot, int count, Function setState) {
+		return RaisedButton(
+			child: Text(count.toString()),
+			color: newShot.shotsMade == count ? Colors.greenAccent : Colors.grey,
+			onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == count) ? -1 : count; }); }
+		);
 	}
 
 	condensePoints() {
