@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:frc1640scoutingframework/match.dart';
+import 'package:frc1640scoutingframework/spin.dart';
 import "shot.dart";
 
 class Teleop extends StatefulWidget {
@@ -56,7 +57,8 @@ class _TeleopState extends State<Teleop> {
 			},
 			onPanEnd: (DragEndDetails details) {
 				_buildShotPrompt();
-			}
+			},
+      onLongPress: () {_buildSpinnerPrompt();},
 		));
 	}
 
@@ -71,6 +73,52 @@ class _TeleopState extends State<Teleop> {
 							title: Text("Enter Number of Balls Made"),
 							content: Column(
 								children: _buildShotInfoEntryLayout(newShot, setState),
+								mainAxisAlignment: MainAxisAlignment.center,
+								mainAxisSize: MainAxisSize.min,
+							)
+						);
+				});	
+			});
+	}
+
+  _buildSpinnerPrompt () {
+		Spin newSpin = new Spin();
+		return showDialog(
+				context: context,
+				builder: (context) {
+					return StatefulBuilder(builder: (context, setState) {
+						return AlertDialog(
+							title: Text("Enter Number of Balls Made"),
+							content: Column(
+								children: <Widget>[
+                  RaisedButton(
+                    child: Text(newSpin.controlType ? "Position Control": "Rotation Control"),
+                    color: newSpin.controlType ? Colors.greenAccent : Colors.grey,
+                    onPressed: () {
+                      setState(() {
+                        newSpin.controlType = !newSpin.controlType; 
+                      }
+                      );
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text(newSpin.succesful ? "Successful": "Failed"),
+                    color: newSpin.succesful ? Colors.greenAccent : Colors.grey,
+                    onPressed: () {
+                      setState(() {
+                        newSpin.succesful = !newSpin.succesful; 
+                      }
+                      );
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text("Done"),
+                    onPressed: () {
+                      widget.matchData.spins.add(newSpin);
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
 								mainAxisAlignment: MainAxisAlignment.center,
 								mainAxisSize: MainAxisSize.min,
 							)
