@@ -87,20 +87,21 @@ void _appendPath (SheetsApi api) async {
 		print('Shot data: ' + jsonData.toString());
 
 		int pathLength = (jsonData['autopathx'] as List<dynamic>).length;
-		List<dynamic> row = [];
+
+		List<dynamic> pathx = jsonData['autopathx'];
+		List<dynamic> pathy = jsonData['autopathy'];
 
 		for (int j = 0; j < pathLength; j++) {
-			pathSheetMap.forEach((colName, jsonName) {
-				if (jsonName.contains('autopath')) {
-					row.add(jsonData[jsonName][j]);
-				} else if (colName.contains('Sequence')) {
-					row.add(i);
-				} else {
-					row.add(jsonData[jsonName]);
-				}
-			});
+			List<dynamic> row = [];
+
+			row.add(jsonData['matchnumber']);
+			row.add(jsonData['teamnumber']);
+			row.add(jsonData['id']);
+			row.add(j);
+			row.add(pathx[j]);
+			row.add(pathy[j]);
+
 			payload.add(row);
-			row.clear();
 		}
 
 		ValueRange vr = ValueRange.fromJson({ 'values': payload 	});
@@ -115,20 +116,48 @@ void _appendShots (SheetsApi api) async {
 	for (int i = 0; i < data.length; i++) {
 		Map<String,dynamic> jsonData = jsonDecode(data[i]);
 		print('Path data: ' + jsonData.toString());
+		
+		List<dynamic> autoShotsX = jsonData['autoshotsx'];
+		List<dynamic> autoShotsY = jsonData['autoshotsy'];
+		List<dynamic> autoShotsMade = jsonData['autoshotsmade'];
+		List<dynamic> autoShotsType = jsonData['autoshotstype'];
 
-		int nShots = (jsonData['autoshotsx'] as List<dynamic>).length;
-		List<dynamic> row = [];
+		List<dynamic> teleShotsX = jsonData['teleopshotsx'];
+		List<dynamic> teleShotsY = jsonData['teleopshotsy'];
+		List<dynamic> teleShotsMade = jsonData['teleopshotsmade'];
+		List<dynamic> teleShotsType = jsonData['teleopshotstype'];
 
-		for (int j = 0; j < nShots; j++) {
-			shotSheetMap.forEach((colName, jsonName) {
-				if (jsonName.contains('autoshots')) {
-					row.add(jsonData[jsonName][j]);
-				} else {
-					row.add(jsonData[jsonName]);
-				}
-			});
+		for (int j = 0; j < autoShotsX.length; j++) {
+			List<dynamic> row = [];
+
+			row.add(jsonData['matchnumber']);
+			row.add(jsonData['teamnumber']);
+			row.add(jsonData['id']);
+			row.add('auton');
+
+			row.add(autoShotsX[j]);
+			row.add(autoShotsY[j]);
+			row.add(autoShotsMade[j]);
+			row.add(autoShotsType[j]);
+
 			payload.add(row);
-			row.clear();
+			row = [];
+		}
+
+		for (int j = 0; j < teleShotsX.length; j++) {
+			List<dynamic> row = [];
+
+			row.add(jsonData['matchnumber']);
+			row.add(jsonData['teamnumber']);
+			row.add(jsonData['id']);
+			row.add('teleop');
+
+			row.add(teleShotsX[j]);
+			row.add(teleShotsY[j]);
+			row.add(teleShotsMade[j]);
+			row.add(teleShotsType[j]);
+			
+			payload.add(row);
 		}
 
 		ValueRange vr = ValueRange.fromJson({ 'values': payload });
