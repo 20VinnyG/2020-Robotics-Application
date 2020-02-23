@@ -248,13 +248,14 @@ class _ScoutModeState extends State<ScoutMode> {
 														VerticalDivider(width: 5.0),
 														RaisedButton(
 															child: Text("Teleop"),
-															onPressed: () {
-																Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: newMatch)));
+															onPressed: () async {
+																await Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: newMatch, onTap: () => _startClock())));
+                                _startClock();
 															},
 														)
 													],
 													mainAxisAlignment: MainAxisAlignment.center
-												),
+												),  
 												Divider(
 													height: 30.0,
 													indent: 5.0,
@@ -268,6 +269,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																child: Text("Stop Climb Timer"),
 																onPressed: () {
 																	_stopClock();
+                                  print(_stopwatch.elapsedMilliseconds);
 																},
 															),
 															VerticalDivider(width: 5.0),

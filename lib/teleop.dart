@@ -1,26 +1,23 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:scoutmobile2020/match.dart';
-import 'package:scoutmobile2020/spin.dart';
 import "shot.dart";
 
 class Teleop extends StatefulWidget {
 	// final List<Shot> teleopshotsList;
 	final MatchData matchData;
+  VoidCallback onTap;
 
 	@override
 	_TeleopState createState() => _TeleopState();
 
-	Teleop({ this.matchData });
+	Teleop({ this.matchData, this.onTap });
 }
 
 bool val = true;
 
 class _TeleopState extends State<Teleop> {
-
 	Offset screenPos;
-
 	void onTapDown(BuildContext context, TapDownDetails details) {
 		final RenderBox box = context.findRenderObject();
 		final Offset localOffset = box.globalToLocal(details.globalPosition);
@@ -42,7 +39,15 @@ class _TeleopState extends State<Teleop> {
 							new CustomPaint(
 								painter: new MyPainter(shotList: widget.matchData.teleopshots),
 								size: Size.infinite,
-							)
+							),
+              new FloatingActionButton(
+                onPressed: () {
+                  setState(() {
+                    widget.onTap();
+                    Navigator.pop(context);
+                  });
+                },
+              ),
 						],
 					),
 			onTapDown: (TapDownDetails details) => onTapDown(context, details),

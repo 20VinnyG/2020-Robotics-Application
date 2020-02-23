@@ -250,6 +250,7 @@ class _ScanModeState extends State<ScanMode> {
 			appBar: new AppBar(
 					title: new Text("Scan Mode"), backgroundColor: Colors.blue[900]),
 			body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
 				children: <Widget>[
 					// TextFormField(
 					// 	decoration: const InputDecoration(
