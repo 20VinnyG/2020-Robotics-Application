@@ -5,7 +5,7 @@ teleop:
 
 scoutmode:
 	-- fix issues with empty text fields
-	-- success stars
+	-- replace x/y, auton/teleop lists with objects/arrays instead
 
 auton/teleop:
 	-- image sizing issues

@@ -14,8 +14,6 @@ List<String> data = [];
 String sheetName;
 String result = "Hey there !";
 
-String _spreadsheetId = '1K3AQE7kr5u0Z-_c-_YGsHVGHImtGfy47bBikxvjjdUQ';
-
 String _matchSheetId = '';
 String _shotSheetId = '';
 String _pathSheetId = '';
@@ -42,8 +40,8 @@ final Map<String,String> matchSheetMap = {
 };
 
 final Map<String,String> shotSheetMap = {
-	'Match': 'match',
-	'Robot': 'robot',
+	'Match': 'matchnumber',
+	'Team Number': 'teamnumber',
 	'Id': 'id',
 	'Period': 'period',
 	'Shots X': 'shotsx',
@@ -53,7 +51,7 @@ final Map<String,String> shotSheetMap = {
 };
 
 final Map<String,String> pathSheetMap = {
-	'Match': 'match',
+	'Match': 'matchnumber',
 	'Team Number': 'teamnumber',
 	'Id': 'id',
 	'Sequence': 'sequence',
@@ -93,11 +91,14 @@ void _appendPath (SheetsApi api) async {
 			pathSheetMap.forEach((colName, jsonName) {
 				if (jsonName.contains('autopath')) {
 					row.add(jsonData[jsonName][j]);
-				} else {
+				} else if (colName.contains('Sequence')) {
+          row.add(i);
+        } else {
 					row.add(jsonData[jsonName]);
 				}
 			});
 			payload.add(row);
+      row.clear();
 		}
 
 		ValueRange vr = ValueRange.fromJson({ 'values': payload 	});
@@ -125,10 +126,11 @@ void _appendShots (SheetsApi api) async {
 				}
 			});
 			payload.add(row);
+      row.clear();
 		}
 
 		ValueRange vr = ValueRange.fromJson({ 'values': payload });
-		await api.spreadsheets.values.append(vr, _shotSheetId, 'A:F', valueInputOption: 'USER_ENTERED');
+		await api.spreadsheets.values.append(vr, _shotSheetId, 'A:H', valueInputOption: 'USER_ENTERED');
 
 		print('Done appending shot data');
 	}
@@ -160,29 +162,6 @@ Future<Client> _getGoogleClientForCurrentUser () async {
 
 	return authenticatedClient(Client(), creds);
 }
-
-// void _testSheetsApi () async {
-// 	Client client = await _getGoogleClientForCurrentUser();
-
-// 	SheetsApi sheetsApi = SheetsApi(client);
-// 	Spreadsheet sheet = await sheetsApi.spreadsheets.create(Spreadsheet.fromJson({
-// 		'properties': {
-// 			'title': 'nvk-test-sheet'
-// 		}
-// 	}));
-// 	String sheetId = sheet.spreadsheetId;
-
-// 	ValueRange vr = ValueRange.fromJson({
-// 		'values': [
-// 			['A', 'B', 'C', 'D', 'E'],
-// 			['F', 'G', 'H', 'I', 'J']
-// 		]
-// 	});
-
-// 	await sheetsApi.spreadsheets.values.append(vr, sheetId, 'A:E', valueInputOption: 'USER_ENTERED');
-
-// 	client.close();
-// }
 
 void _createSheetsForEvent (String eventName) async {
 	Client client = await _getGoogleClientForCurrentUser();
@@ -272,24 +251,24 @@ class _ScanModeState extends State<ScanMode> {
 					title: new Text("Scan Mode"), backgroundColor: Colors.blue[900]),
 			body: Column(
 				children: <Widget>[
-					TextFormField(
-						decoration: const InputDecoration(
-							hintText: 'Enter sheet ID',
-						),
-						validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-						onSaved: (input) => _spreadsheetId = input,
-						onFieldSubmitted: (input) => _spreadsheetId = input,
-						onChanged: (input) => _spreadsheetId = input,
-					),
-					TextFormField(
-						decoration: const InputDecoration(
-							hintText: 'Enter ',
-						),
-						validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-						onSaved: (input) => sheetName = input,
-						onFieldSubmitted: (input) => sheetName = input,
-						onChanged: (input) => sheetName = input,
-					),
+					// TextFormField(
+					// 	decoration: const InputDecoration(
+					// 		hintText: 'Enter sheet ID',
+					// 	),
+					// 	validator: (input) => input.isEmpty ? 'Not a valid input' : null,
+					// 	onSaved: (input) => _spreadsheetId = input,
+					// 	onFieldSubmitted: (input) => _spreadsheetId = input,
+					// 	onChanged: (input) => _spreadsheetId = input,
+					// ),
+					// TextFormField(
+					// 	decoration: const InputDecoration(
+					// 		hintText: 'Enter ',
+					// 	),
+					// 	validator: (input) => input.isEmpty ? 'Not a valid input' : null,
+					// 	onSaved: (input) => sheetName = input,
+					// 	onFieldSubmitted: (input) => sheetName = input,
+					// 	onChanged: (input) => sheetName = input,
+					// ),
 					RaisedButton(
 						child: Text("Format Sheets"),
 						onPressed: () {
