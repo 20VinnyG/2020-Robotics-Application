@@ -4,6 +4,7 @@ import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/drive/v3.dart';
 import 'package:googleapis/sheets/v4.dart';
 import 'package:googleapis_auth/auth.dart';
 import 'package:googleapis_auth/auth_io.dart';
@@ -17,6 +18,8 @@ String result = "Hey there !";
 String _matchSheetId = '';
 String _shotSheetId = '';
 String _pathSheetId = '';
+
+final String _eventsParentFolderId = '1aygdfoJX-V0zoLdpnstT6B44aYWJrBjz';
 
 final Map<String,String> matchSheetMap = {
 		'Initials': 'initials',
@@ -91,13 +94,13 @@ void _appendPath (SheetsApi api) async {
 				if (jsonName.contains('autopath')) {
 					row.add(jsonData[jsonName][j]);
 				} else if (colName.contains('Sequence')) {
-          row.add(i);
-        } else {
+					row.add(i);
+				} else {
 					row.add(jsonData[jsonName]);
 				}
 			});
 			payload.add(row);
-      row.clear();
+			row.clear();
 		}
 
 		ValueRange vr = ValueRange.fromJson({ 'values': payload 	});
@@ -125,7 +128,7 @@ void _appendShots (SheetsApi api) async {
 				}
 			});
 			payload.add(row);
-      row.clear();
+			row.clear();
 		}
 
 		ValueRange vr = ValueRange.fromJson({ 'values': payload });
@@ -162,38 +165,81 @@ Future<Client> _getGoogleClientForCurrentUser () async {
 	return authenticatedClient(Client(), creds);
 }
 
-void _createSheetsForEvent (String eventName) async {
-	Client client = await _getGoogleClientForCurrentUser();
-	SheetsApi api = SheetsApi(client);
+// eventId is a google drive folder it
+Future _loadSheetsForEvent (String eventDriveFolderId, BuildContext context) async {
+	if (eventDriveFolderId.isEmpty) { print('Id empty: ' + eventDriveFolderId); return; }
+	print('event id: ' + eventDriveFolderId);
 
-	Spreadsheet matchSheet = await api.spreadsheets.create(Spreadsheet.fromJson({
-		'properties': {
-			'title': '${eventName}-matches'
-		}
-	}));
-	_matchSheetId = matchSheet.spreadsheetId;
+	Client client = await _getGoogleClientForCurrentUser();
+	DriveApi api = DriveApi(client);
+
+	_matchSheetId = '';
+	_pathSheetId = '';
+	_shotSheetId = '';
+
+	List<String> filenames = [];
+
+	FileList eventFolders = await api.files.list(q: '\'${eventDriveFolderId}\' in parents');
+	eventFolders.files.forEach((file) {
+		if (file.name.endsWith('-matches')) { _matchSheetId = file.id; filenames.add(file.name); }
+		if (file.name.endsWith('-paths')) { _pathSheetId = file.id; filenames.add(file.name); }
+		if (file.name.endsWith('-shots')) { _shotSheetId = file.id; filenames.add(file.name); }
+	});
+
+	print('match sheet id: ' + _matchSheetId);
+	print('path sheet id: ' + _pathSheetId);
+	print('shot sheet id: ' + _shotSheetId);
+
+	// Scaffold.of(context).showSnackBar(SnackBar(content: Text('Loaded ' + filenames.length.toString() + ' sheets: ' + filenames.toString())));
+} 
+
+Future<bool> _createSheetsForEvent (String eventName) async {
+	if (eventName.isEmpty) { return false; }
+
+	Client client = await _getGoogleClientForCurrentUser();
+	DriveApi driveApi = DriveApi(client);
+	SheetsApi api = SheetsApi(client);
+	
+	// Create a folder for the event:
+	File eventFolder = await driveApi.files.create(
+		File()
+			..name = eventName
+			..parents = [_eventsParentFolderId] 
+			..mimeType = 'application/vnd.google-apps.folder'
+	);
+	String eventFolderId = eventFolder.id;
+
+	File matchSheet = await driveApi.files.create(
+		File()
+			..name = eventName + '-matches'
+			..parents = [eventFolderId]
+			..mimeType = 'application/vnd.google-apps.spreadsheet'  
+	);
+	_matchSheetId = matchSheet.id;
 	ValueRange matchVR = ValueRange.fromJson({
 		'values': [ matchSheetMap.keys.toList() ]
 	});
 	await api.spreadsheets.values.append(matchVR, _matchSheetId, 'A:R', valueInputOption: 'USER_ENTERED');
 
-	Spreadsheet shotSheet = await api.spreadsheets.create(Spreadsheet.fromJson({
-		'properties': {
-			'title': '${eventName}-shots'
-		}
-	}));
-	_shotSheetId = shotSheet.spreadsheetId;
+	File shotSheet = await driveApi.files.create(
+		File()
+			..name = eventName + '-shots'
+			..parents = [eventFolderId]
+			..mimeType = 'application/vnd.google-apps.spreadsheet'  
+	);
+	_shotSheetId = shotSheet.id;
 	ValueRange shotVR = ValueRange.fromJson({
 		'values': [ shotSheetMap.keys.toList() ]
 	});
 	await api.spreadsheets.values.append(shotVR, _shotSheetId, 'A:H', valueInputOption: 'USER_ENTERED');
 
-	Spreadsheet pathSheet = await api.spreadsheets.create(Spreadsheet.fromJson({
-		'properties': {
-			'title': '${eventName}-paths'
-		}
-	}));
-	_pathSheetId = pathSheet.spreadsheetId;
+	File pathSheet = await driveApi.files.create(
+		File()
+			..name = eventName + '-paths'
+			..parents = [eventFolderId]
+			..mimeType = 'application/vnd.google-apps.spreadsheet'  
+	);
+	_pathSheetId = pathSheet.id;
 	ValueRange pathVR = ValueRange.fromJson({
 		'values': [ pathSheetMap.keys.toList() ]
 	});
@@ -202,6 +248,8 @@ void _createSheetsForEvent (String eventName) async {
 	client.close();
 
 	print('Done setup for: ' + eventName);
+
+	return true;
 }
 
 class ScanMode extends StatefulWidget {
@@ -243,57 +291,114 @@ class _ScanModeState extends State<ScanMode> {
 		}
 	}
 
+	_buildEventLoadPrompt (BuildContext context) async {
+		Client client = await _getGoogleClientForCurrentUser();
+		DriveApi api = DriveApi(client);
+
+		FileList eventFolders = await api.files.list(q: '\'${_eventsParentFolderId}\' in parents');
+
+		client.close();
+
+		List<_SheetNameId> eventSheets = [];
+
+		eventFolders.files.forEach((file) {
+			print('name: ' + file.name + ' -- id: ' + file.id);
+			eventSheets.add(_SheetNameId(name: file.name, id: file.id));
+		});
+
+		return showDialog(
+				context: context,
+				builder: (context) {
+					return StatefulBuilder(builder: (context, setState) {
+						return AlertDialog(
+							title: Text("Select an event"),
+							content: Container(
+								width: double.maxFinite,
+								child: ListView.builder(
+									itemCount: eventSheets.length,
+									itemBuilder: (context, index) {
+										return ListTile(
+											title: Text(eventSheets[index].name),
+											onTap: () async {
+												await _loadSheetsForEvent(eventSheets[index].id, context);
+												Navigator.pop(context);
+											}
+										);
+									}
+								)
+						));
+				});	
+			});
+	}
+
 	@override
 	Widget build(BuildContext context) {
-		return new Scaffold(
-			appBar: new AppBar(
-					title: new Text("Scan Mode"), backgroundColor: Colors.blue[900]),
-			body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-				children: <Widget>[
-					// TextFormField(
-					// 	decoration: const InputDecoration(
-					// 		hintText: 'Enter sheet ID',
-					// 	),
-					// 	validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-					// 	onSaved: (input) => _spreadsheetId = input,
-					// 	onFieldSubmitted: (input) => _spreadsheetId = input,
-					// 	onChanged: (input) => _spreadsheetId = input,
-					// ),
-					// TextFormField(
-					// 	decoration: const InputDecoration(
-					// 		hintText: 'Enter ',
-					// 	),
-					// 	validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-					// 	onSaved: (input) => sheetName = input,
-					// 	onFieldSubmitted: (input) => sheetName = input,
-					// 	onChanged: (input) => sheetName = input,
-					// ),
-					RaisedButton(
-						child: Text("Format Sheets"),
-						onPressed: () {
-							_createSheetsForEvent('nvk-test-event-2');
-						},
-					),
-					RaisedButton(
-						child: Text("Push to Sheet"),
-						onPressed: () {
-							_appendAll();
-						},
-					),
-					RaisedButton(
-						child: Text('Test'),
-						onPressed: () {
-							// _testSheetsApi();
-						}
+		String eventName = '';
+
+		return GestureDetector(
+			onTap: () {
+				FocusScopeNode currentFocus = FocusScope.of(context);
+				if (!currentFocus.hasPrimaryFocus) { currentFocus.unfocus(); }
+			},
+			child: new Scaffold(
+				appBar: new AppBar(
+						title: new Text("Scan Mode"), backgroundColor: Colors.blue[900]),
+				body: Builder(builder: (context) =>
+					Column(
+						mainAxisAlignment: MainAxisAlignment.center,
+						children: <Widget>[
+							TextFormField(
+								initialValue: eventName,
+								decoration: const InputDecoration(labelText: 'New event name'),
+								validator: (input) => input.isEmpty ? 'Not a valid input' : null,
+								onSaved: (input) => eventName = input,
+								onFieldSubmitted: (input) => eventName = input,
+								onChanged: (input) => eventName = input,
+							),
+							RaisedButton(
+								child: Text("Create event"),
+								onPressed: () async {
+									bool success = await _createSheetsForEvent(eventName);
+									Scaffold.of(context).showSnackBar(SnackBar(content: Text(success ? 'Created event ' + eventName : 'Couldn\'t create event ' + eventName), duration: Duration(seconds: 5)));
+									eventName = '';
+									FocusScopeNode currentFocus = FocusScope.of(context);
+									if (!currentFocus.hasPrimaryFocus) { currentFocus.unfocus(); }
+								},
+							),
+							RaisedButton(
+								child: Text('Load event from sheets'),
+								onPressed: () async {
+									FocusScopeNode currentFocus = FocusScope.of(context);
+									if (!currentFocus.hasPrimaryFocus) { currentFocus.unfocus(); }
+									await _buildEventLoadPrompt(context);
+								}
+							),
+							RaisedButton(
+								child: Text("Push to Sheet"),
+								onPressed: () {
+									FocusScopeNode currentFocus = FocusScope.of(context);
+									if (!currentFocus.hasPrimaryFocus) { currentFocus.unfocus(); }
+									_appendAll();
+								},
+							)
+						],
 					)
-				],
-			),
-			floatingActionButton: FloatingActionButton.extended(
-				icon: Icon(Icons.camera_alt),
-				label: Text("Scan"),
-				onPressed: _scanQR,
-			),
-		);
+				),
+				floatingActionButton: FloatingActionButton.extended(
+					icon: Icon(Icons.camera_alt),
+					label: Text("Scan"),
+					onPressed: _scanQR,
+				),
+			));
 	}
+}
+
+class _SheetNameId {
+	final String name;
+	final String id;
+
+	_SheetNameId({
+		this.name,
+		this.id
+	});
 }
