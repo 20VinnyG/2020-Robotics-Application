@@ -359,7 +359,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																}
 															)
 														]) :
-														Container()
+														Container(),
 												]),
 												Divider(
 													height: 30.0,
@@ -526,8 +526,8 @@ class _ScoutModeState extends State<ScoutMode> {
 				'teleopshotstype': teleopshotstype,
 				'climbtime': newMatch.climbtime,
 				'park': newMatch.park,
-				'rotationControl': newMatch.spins.controlType,
-				'spinoutcome': newMatch.spins.succesful,
+				'positioncontrol': newMatch.spins.positionControl,
+				'colorcontrol': newMatch.spins.colorControl,
 				'generalsuccess': newMatch.generalSuccess,
 				'defensivesuccess': newMatch.defensiveSuccess,
 				'accuracy': newMatch.accuracy,

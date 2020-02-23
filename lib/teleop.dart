@@ -92,25 +92,25 @@ class _TeleopState extends State<Teleop> {
 				builder: (context) {
 					return StatefulBuilder(builder: (context, setState) {
 						return AlertDialog(
-							title: Text("Enter Number of Balls Made"),
+							title: Text("Enter Spin Status"),
 							content: Column(
 								children: <Widget>[
                   RaisedButton(
-                    child: Text(widget.matchData.spins.controlType ? "Position Control": "Rotation Control"),
-                    color: widget.matchData.spins.controlType ? Colors.greenAccent : Colors.grey,
+                    child: Text(widget.matchData.spins.positionControl ? "Position Control Successful": "Position Control Failed"),
+                    color: widget.matchData.spins.positionControl ? Colors.greenAccent : Colors.grey,
                     onPressed: () {
                       setState(() {
-                        widget.matchData.spins.controlType = !widget.matchData.spins.controlType; 
+                        widget.matchData.spins.positionControl = !widget.matchData.spins.positionControl; 
                       }
                       );
                     },
                   ),
                   RaisedButton(
-                    child: Text(widget.matchData.spins.succesful ? "Successful": "Failed"),
-                    color: widget.matchData.spins.succesful ? Colors.greenAccent : Colors.grey,
+                    child: Text(widget.matchData.spins.colorControl ? "Color Control Successful": "Color Control Failed"),
+                    color: widget.matchData.spins.colorControl ? Colors.greenAccent : Colors.grey,
                     onPressed: () {
                       setState(() {
-                        widget.matchData.spins.succesful = !widget.matchData.spins.succesful; 
+                        widget.matchData.spins.colorControl = !widget.matchData.spins.colorControl; 
                       }
                       );
                     },

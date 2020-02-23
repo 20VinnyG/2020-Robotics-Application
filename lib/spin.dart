@@ -1,4 +1,4 @@
 class Spin {
-  bool controlType=false;
-  bool succesful=false;
+  bool positionControl=false;
+  bool colorControl=false;
 }
