@@ -75,7 +75,6 @@ class AutonPathState extends State<AutonPath> {
 								child: Icon(Icons.check),
 								label: "Completed Path",
 								onTap: () {
-									condensePoints();
 									Navigator.pop(context);
 								})
 					],
@@ -127,16 +126,6 @@ class AutonPathState extends State<AutonPath> {
 			color: newShot.shotsMade == count ? Colors.greenAccent : Colors.grey,
 			onPressed: () { setState(() { newShot.shotsMade = (newShot.shotsMade == count) ? -1 : count; }); }
 		);
-	}
-
-	condensePoints() {
-		List<Offset> points = widget.matchData.autopathpoints;
-		widget.matchData.autopathx = [];
-		widget.matchData.autopathy = [];
-		for (int i = 0; i < points.length; i += 5) {
-			widget.matchData.autopathx.add(points[i].dx.round());
-			widget.matchData.autopathy.add(points[i].dy.round());
-		}
 	}
 }
 

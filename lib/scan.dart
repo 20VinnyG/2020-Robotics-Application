@@ -26,29 +26,32 @@ const _credentials = r'''{
 
 String _spreadsheetId = '1K3AQE7kr5u0Z-_c-_YGsHVGHImtGfy47bBikxvjjdUQ';
 
+final Map<String,String> sheetinitializer = {
+		'Initials': 'initials',
+    'Id': 'id',
+		'Team Number': 'teamnumber',
+		'Match Number': 'matchnumber',
+    'Position': 'position',
+		'Preloaded Fuel Cells': 'preloadedfuelcells',
+    'Control Type': 'rotationControl',
+    'Successful': 'spinoutcome',
+		'Climb Time': 'climbtime',
+		'Park': 'park',
+    'Rotation Control': 'rotationControl',
+    'Spin Outcome': 'spinoutcome',
+		'General Success': 'generalsuccess',
+		'Defensive Success': 'defensivesuccess',
+		'Accuracy': 'accuracy',
+		'Floorpickup': 'floorpickup',
+		'Fouls': 'fouls',
+		'Problems': 'problems'
+};
+
 void _initializeSpreadSheet() async {
 	final gsheets = GSheets(_credentials);
 	final ss = await gsheets.spreadsheet(_spreadsheetId);
 	var sheet = ss.worksheetByTitle("Sheet1");
-	final sheetinitializer = [
-		'Initials',
-		'Position',
-		'Match Number',
-		'Team Number',
-		'Initiation Line Position',
-		'Preloaded Fuel Cells',
-    'Control Type',
-    'Successful',
-		'ClimbTime',
-		'Park',
-		'General Success',
-		'Defensive Success',
-		'Accuracy',
-		'Floorpickup',
-		'Fouls',
-		'Problems'
-	];
-	await sheet.values.insertRow(1, sheetinitializer);
+	await sheet.values.insertRow(1, sheetinitializer.keys.toList());
 }
 
 List<String> _toStringList (List list) {
@@ -68,12 +71,16 @@ List<int> _toIntList (List list) {
 }
 
 void _appendGeneral() async {
+  print('data length: ' + data.length.toString());
 	final gsheets = GSheets(_credentials);
 	final ss = await gsheets.spreadsheet(_spreadsheetId);
 	var sheet = ss.worksheetByTitle("Sheet1");
 	for (int i = 0; i < data.length; i++) {
-		 List<String> payload =
-				new List<String>.from(jsonDecode(data[i]).values.toList());
+    List<String> payload = [];
+    Map<String,dynamic> jsonData = jsonDecode(data[i]);
+    sheetinitializer.forEach((colName, jsonName) {
+      payload.add(jsonData[jsonName].toString());
+    });
 		await sheet.values.appendRow(payload);
 	}
 }
@@ -84,6 +91,7 @@ void _appendPath() async {
 	var sheet = ss.worksheetByTitle("Sheet2");
 	for (int i = 0; i < data.length; i++) {
 		dynamic data2 = jsonDecode(data[i]);
+    print('data2: ' + data2.toString());
 		List<String> xStringList = _toStringList(data2['autopathx']);
 		List<String> yStringList = _toStringList(data2['autopathy']);
 		List<String> appender = <String>[];
@@ -140,6 +148,7 @@ class _ScanModeState extends State<ScanMode> {
 	Future _scanQR() async {
 		try {
 			data.clear();
+      print('Cleared scan data: ' + data.length.toString());
 			for (int i = 0; i < 6; i++) {
 				String qrResult = await BarcodeScanner.scan();
 				List<int> stringBytesDecoded = base64.decode(qrResult);
