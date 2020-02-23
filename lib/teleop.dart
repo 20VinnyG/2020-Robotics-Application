@@ -1,8 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:frc1640scoutingframework/match.dart';
-import 'package:frc1640scoutingframework/spin.dart';
+import 'package:scoutmobile2020/match.dart';
+import 'package:scoutmobile2020/spin.dart';
 import "shot.dart";
 
 class Teleop extends StatefulWidget {

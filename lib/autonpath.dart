@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:frc1640scoutingframework/match.dart';
-import 'package:frc1640scoutingframework/shot.dart';
+import 'package:scoutmobile2020/match.dart';
+import 'package:scoutmobile2020/shot.dart';
 
 class AutonPath extends StatefulWidget {
 	final MatchData matchData;

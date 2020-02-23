@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:frc1640scoutingframework/autonpath.dart';
-import 'package:frc1640scoutingframework/bluealliance.dart';
-import 'package:frc1640scoutingframework/teleop.dart';
+import 'package:scoutmobile2020/autonpath.dart';
+import 'package:scoutmobile2020/bluealliance.dart';
+import 'package:scoutmobile2020/teleop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:sprintf/sprintf.dart';
@@ -585,7 +585,7 @@ class _ScoutModeState extends State<ScoutMode> {
 			autoshotsmade.add(newMatch.autoshots[i].shotsMade);
 			autoshotstype.add(newMatch.autoshots[i].shotType ? 1 : 0);
 		}
-		for(int i=0; i< newMatch.autoshots.length; i++) {
+		for(int i=0; i < newMatch.teleopshots.length; i++) {
 			teleopshotsx.add(newMatch.teleopshots[i].pos.dx.round());
 			teleopshotsy.add(newMatch.teleopshots[i].pos.dy.round());
 			teleopshotsmade.add(newMatch.teleopshots[i].shotsMade);
