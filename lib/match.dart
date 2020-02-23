@@ -8,7 +8,6 @@ class MatchData {
 	int position = -1;
 	String matchNumber = '';
 	String teamNumber = '';
-	double initiationlinepos = 0;
 	int preloadedfuelcells = 0;
 	int id;
 	//Auton

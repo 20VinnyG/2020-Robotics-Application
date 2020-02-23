@@ -43,7 +43,7 @@ class _ScoutModeState extends State<ScoutMode> {
 				Duration elapsedTime = _stopwatch.elapsed;
 				int seconds = elapsedTime.inSeconds;
 				int millis	= elapsedTime.inMilliseconds - 1000 * seconds;
-        _clockText = sprintf("%02d:%03d", [seconds, millis]);
+				_clockText = sprintf("%02d:%03d", [seconds, millis]);
 			}));
 		}
 	}
@@ -101,7 +101,7 @@ class _ScoutModeState extends State<ScoutMode> {
 												),
 												Text("Prematch"),
 												TextFormField(
-                          initialValue: newMatch.initials,
+													initialValue: newMatch.initials,
 													decoration: const InputDecoration(labelText: 'Enter your initials'),
 													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
 													onSaved: (input) { setState(() { newMatch.initials = input; }); },
@@ -109,16 +109,16 @@ class _ScoutModeState extends State<ScoutMode> {
 													onChanged: (input) { setState(() { newMatch.initials = input; }); },
 												),
 												TextFormField(
-                          initialValue: newMatch.matchNumber,
+													initialValue: newMatch.matchNumber,
 													decoration: const InputDecoration(labelText: 'Enter the match number'),
 													keyboardType: TextInputType.number,
 													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
 													onSaved: (input) { setState(() { newMatch.matchNumber = input; }); },
 													onChanged: (input) { setState(() { newMatch.matchNumber = input; }); },
 													onFieldSubmitted: (input) { setState(() { newMatch.matchNumber = input; }); }
-                        ),
+												),
 												TextFormField(
-                          initialValue: newMatch.teamNumber,
+													initialValue: newMatch.teamNumber,
 													decoration: const InputDecoration(labelText: "Enter Team Number"),
 													keyboardType: TextInputType.number,
 													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
@@ -496,11 +496,13 @@ class _ScoutModeState extends State<ScoutMode> {
 	}
 
 	void _submit() {
-    int teamNumber = newMatch.teamNumber == '' ? 0 : int.parse(newMatch.teamNumber);
-    int matchNumber = newMatch.matchNumber == '' ? 0 : int.parse(newMatch.matchNumber);
+		int teamNumber = newMatch.teamNumber == '' ? 0 : int.parse(newMatch.teamNumber);
+		int matchNumber = newMatch.matchNumber == '' ? 0 : int.parse(newMatch.matchNumber);
 
 		_generateId(teamNumber, matchNumber);
 		_extractshootingshootingpoints();
+		_condensePoints();
+
 		if (formKey.currentState.validate()) {
 			formKey.currentState.save();
 			var payload = {
@@ -508,7 +510,7 @@ class _ScoutModeState extends State<ScoutMode> {
 				'id': newMatch.id,
 				'teamnumber': int.parse(newMatch.teamNumber),
 				'matchnumber': int.parse(newMatch.matchNumber),
-				'initiationposition': newMatch.initiationlinepos,
+				'position': newMatch.position,
 				'preloadedfuelcells': newMatch.preloadedfuelcells,
 				'autopathx': newMatch.autopathx,
 				'autopathy': newMatch.autopathy,
@@ -516,13 +518,14 @@ class _ScoutModeState extends State<ScoutMode> {
 				'autoshotsy': autoshotsy,
 				'autoshotsmade': autoshotsmade,
 				'autoshotstype': autoshotstype,
-        
 				'teleopshotsx': teleopshotsx,
 				'teleopshotsy': teleopshotsy,
 				'teleopshotsmade': teleopshotsmade,
 				'teleopshotstype': teleopshotstype,
-        'rotationControl': newMatch.spins.controlType,
-        'spinoutcome': newMatch.spins.succesful,
+				'climbtime': newMatch.climbtime,
+				'park': newMatch.park,
+				'rotationControl': newMatch.spins.controlType,
+				'spinoutcome': newMatch.spins.succesful,
 				'generalsuccess': newMatch.generalSuccess,
 				'defensivesuccess': newMatch.defensiveSuccess,
 				'accuracy': newMatch.accuracy,
@@ -541,6 +544,16 @@ class _ScoutModeState extends State<ScoutMode> {
 							data: compressedString,
 						));
 					});
+		}
+	}
+
+	_condensePoints() {
+		List<Offset> points = newMatch.autopathpoints;
+		newMatch.autopathx = [];
+		newMatch.autopathy = [];
+		for (int i = 0; i < points.length; i += 5) {
+			newMatch.autopathx.add(points[i].dx.round());
+			newMatch.autopathy.add(points[i].dy.round());
 		}
 	}
 

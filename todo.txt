@@ -5,6 +5,11 @@ teleop:
 
 scoutmode:
 	-- fix issues with empty text fields
+	-- success stars
 
 auton/teleop:
 	-- image sizing issues
+
+scan:
+	-- check list of scanned matches
+	-- Sheet formatting
