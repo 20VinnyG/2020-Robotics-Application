@@ -10,7 +10,7 @@ import 'package:googleapis_auth/auth.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
 
-List<String> data = [];
+List<dynamic> data = [];
 
 String sheetName;
 String result = "Hey there !";
@@ -67,7 +67,7 @@ void _appendGeneral (SheetsApi api) async {
 	List<dynamic> payload = [];
 	for (int i = 0; i < data.length; i++) {
 		List<String> row = [];
-		Map<String,dynamic> jsonData = jsonDecode(data[i]);
+		Map<String,dynamic> jsonData = data[i];
 		matchSheetMap.forEach((colName, jsonName) {
 			row.add(jsonData[jsonName].toString());
 		});
@@ -83,7 +83,7 @@ void _appendGeneral (SheetsApi api) async {
 void _appendPath (SheetsApi api) async {
 	List<dynamic> payload = [];
 	for (int i = 0; i < data.length; i++) {
-		Map<String,dynamic> jsonData = jsonDecode(data[i]);
+		Map<String,dynamic> jsonData = data[i];
 		print('Shot data: ' + jsonData.toString());
 
 		int pathLength = (jsonData['autopathx'] as List<dynamic>).length;
@@ -103,19 +103,19 @@ void _appendPath (SheetsApi api) async {
 
 			payload.add(row);
 		}
-
-		ValueRange vr = ValueRange.fromJson({ 'values': payload 	});
-		await api.spreadsheets.values.append(vr, _pathSheetId, 'A:F', valueInputOption: 'USER_ENTERED');
-
-		print('Done appending path data');
 	}
+
+	ValueRange vr = ValueRange.fromJson({ 'values': payload 	});
+	await api.spreadsheets.values.append(vr, _pathSheetId, 'A:F', valueInputOption: 'USER_ENTERED');
+
+	print('Done appending path data');
 }
 
 void _appendShots (SheetsApi api) async {
 	List<dynamic> payload = [];
 	for (int i = 0; i < data.length; i++) {
-		Map<String,dynamic> jsonData = jsonDecode(data[i]);
-		print('Path data: ' + jsonData.toString());
+		Map<String,dynamic> jsonData = data[i];
+		print('Path data: ' + jsonEncode(jsonData).toString());
 		
 		List<dynamic> autoShotsX = jsonData['autoshotsx'];
 		List<dynamic> autoShotsY = jsonData['autoshotsy'];
@@ -141,7 +141,6 @@ void _appendShots (SheetsApi api) async {
 			row.add(autoShotsType[j]);
 
 			payload.add(row);
-			row = [];
 		}
 
 		for (int j = 0; j < teleShotsX.length; j++) {
@@ -159,12 +158,12 @@ void _appendShots (SheetsApi api) async {
 			
 			payload.add(row);
 		}
-
-		ValueRange vr = ValueRange.fromJson({ 'values': payload });
-		await api.spreadsheets.values.append(vr, _shotSheetId, 'A:H', valueInputOption: 'USER_ENTERED');
-
-		print('Done appending shot data');
 	}
+
+	ValueRange vr = ValueRange.fromJson({ 'values': payload });
+	await api.spreadsheets.values.append(vr, _shotSheetId, 'A:H', valueInputOption: 'USER_ENTERED');
+
+	print('Done appending shot data');
 }
 
 void _appendAll () async {
@@ -288,16 +287,18 @@ class ScanMode extends StatefulWidget {
 
 class _ScanModeState extends State<ScanMode> {
 	Future _scanQR() async {
+		Map<int,dynamic> scannedData = {};
+
 		try {
-			data.clear();
-			print('Cleared scan data: ' + data.length.toString());
-			for (int i = 0; i < 6; i++) {
+			for (;;) {
 				String qrResult = await BarcodeScanner.scan();
 				List<int> stringBytesDecoded = base64.decode(qrResult);
 				List<int> gzipBytesDecoded = new GZipDecoder().decodeBytes(stringBytesDecoded);
 				String decodedqr = new Utf8Codec().decode(gzipBytesDecoded);
-				data.add(decodedqr);
-				print("transmitted: " + qrResult.length.toString() + " -- decoded: " + decodedqr.length.toString());
+				
+				Map<String,dynamic> json = jsonDecode(decodedqr);
+				int id = json['id'];
+				scannedData[id] = json;
 			}
 		} on PlatformException catch (ex) {
 			if (ex.code == BarcodeScanner.CameraAccessDenied) {
@@ -318,6 +319,10 @@ class _ScanModeState extends State<ScanMode> {
 				result = "Unknown Error $ex";
 			});
 		}
+
+		data.clear();
+		data.addAll(scannedData.values);
+		print('Scan mode complete. Scanned ' + data.length.toString() + ' unique matches');
 	}
 
 	_buildEventLoadPrompt (BuildContext context) async {
