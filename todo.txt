@@ -1,11 +1,7 @@
 teleop:
-	-- different box on spinner
-		-- phase 2 question (times around - accuracy)
-		-- phase 3 question (end on color - accuracy)
 
 scoutmode:
-	-- fix issues with empty text fields
-	-- success stars
+	-- replace x/y, auton/teleop lists with objects/arrays instead
 
 auton/teleop:
 	-- image sizing issues
@@ -13,3 +9,4 @@ auton/teleop:
 scan:
 	-- check list of scanned matches
 	-- Sheet formatting
+	-- Fix newly introduced issues

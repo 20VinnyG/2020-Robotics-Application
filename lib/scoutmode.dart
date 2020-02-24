@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:frc1640scoutingframework/autonpath.dart';
-import 'package:frc1640scoutingframework/bluealliance.dart';
-import 'package:frc1640scoutingframework/teleop.dart';
+import 'package:scoutmobile2020/autonpath.dart';
+import 'package:scoutmobile2020/bluealliance.dart';
+import 'package:scoutmobile2020/teleop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:sprintf/sprintf.dart';
@@ -249,12 +249,12 @@ class _ScoutModeState extends State<ScoutMode> {
 														RaisedButton(
 															child: Text("Teleop"),
 															onPressed: () {
-																Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: newMatch)));
+																Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: newMatch, onTap: () => _startClock())));
 															},
 														)
 													],
 													mainAxisAlignment: MainAxisAlignment.center
-												),
+												),  
 												Divider(
 													height: 30.0,
 													indent: 5.0,
@@ -264,15 +264,23 @@ class _ScoutModeState extends State<ScoutMode> {
 												Column(children: <Widget>[
 														Text('$_clockText', style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 3.0)),
 														Row(children: <Widget>[
-															RaisedButton(
-																child: Text("Stop Climb Timer"),
+                              RaisedButton(
+																child: Text("Start Timer"),
 																onPressed: () {
-																	_stopClock();
+																	_startClock();
 																},
 															),
-															VerticalDivider(width: 5.0),
+                              Container(width: 5.0),
 															RaisedButton(
-																child: Text("Reset Climb Timer"),
+																child: Text("Stop Timer"),
+																onPressed: () {
+																	_stopClock();
+                                  print(_stopwatch.elapsedMilliseconds);
+																},
+															),
+															Container(width: 5.0),
+															RaisedButton(
+																child: Text("Reset Timer"),
 																onPressed: () {
 																	_resetClock();
 																},
@@ -357,7 +365,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																}
 															)
 														]) :
-														Container()
+														Container(),
 												]),
 												Divider(
 													height: 30.0,
@@ -370,8 +378,7 @@ class _ScoutModeState extends State<ScoutMode> {
 													SmoothStarRating(
 															allowHalfRating: true,
 															onRatingChanged: (v) {
-																newMatch.generalSuccess = v;
-																setState(() {});
+																setState(() { newMatch.generalSuccess = v; });
 															},
 															starCount: 5,
 															rating: newMatch.generalSuccess,
@@ -385,8 +392,7 @@ class _ScoutModeState extends State<ScoutMode> {
 													SmoothStarRating(
 															allowHalfRating: true,
 															onRatingChanged: (v) {
-																newMatch.defensiveSuccess = v;
-																setState(() {});
+																setState(() { newMatch.defensiveSuccess = v; });
 															},
 															starCount: 5,
 															rating: newMatch.defensiveSuccess,
@@ -400,8 +406,7 @@ class _ScoutModeState extends State<ScoutMode> {
 													SmoothStarRating(
 															allowHalfRating: true,
 															onRatingChanged: (v) {
-																newMatch.accuracy = v;
-																setState(() {});
+                                setState(() { newMatch.accuracy = v; });
 															},
 															starCount: 5,
 															rating: newMatch.accuracy,
@@ -484,13 +489,6 @@ class _ScoutModeState extends State<ScoutMode> {
 											],
 											scrollDirection: Axis.vertical,
 										)))),
-				floatingActionButton: FloatingActionButton.extended(
-					icon: Icon(Icons.timer),
-					label: Text("Start Climb Timer"),
-					onPressed: () {
-						_startClock();
-					},
-				),
 			)
 		);
 	}
@@ -524,11 +522,11 @@ class _ScoutModeState extends State<ScoutMode> {
 				'teleopshotstype': teleopshotstype,
 				'climbtime': newMatch.climbtime,
 				'park': newMatch.park,
-				'rotationControl': newMatch.spins.controlType,
-				'spinoutcome': newMatch.spins.succesful,
-				'generalsuccess': newMatch.generalSuccess,
-				'defensivesuccess': newMatch.defensiveSuccess,
-				'accuracy': newMatch.accuracy,
+				'positioncontrol': newMatch.spins.positionControl,
+				'colorcontrol': newMatch.spins.colorControl,
+				'generalsuccess': (newMatch.generalSuccess * 2).roundToDouble() / 2,
+				'defensivesuccess': (newMatch.defensiveSuccess * 2).roundToDouble() / 2,
+				'accuracy': (newMatch.accuracy * 2).roundToDouble() / 2,
 				'floorpickup': newMatch.floorpickup ? 1 : 0,
 				'fouls': newMatch.fouls ? 1 : 0,
 				'problems': newMatch.problems ? 1 : 0
@@ -585,7 +583,7 @@ class _ScoutModeState extends State<ScoutMode> {
 			autoshotsmade.add(newMatch.autoshots[i].shotsMade);
 			autoshotstype.add(newMatch.autoshots[i].shotType ? 1 : 0);
 		}
-		for(int i=0; i< newMatch.autoshots.length; i++) {
+		for(int i=0; i < newMatch.teleopshots.length; i++) {
 			teleopshotsx.add(newMatch.teleopshots[i].pos.dx.round());
 			teleopshotsy.add(newMatch.teleopshots[i].pos.dy.round());
 			teleopshotsmade.add(newMatch.teleopshots[i].shotsMade);

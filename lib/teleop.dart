@@ -1,26 +1,23 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:frc1640scoutingframework/match.dart';
-import 'package:frc1640scoutingframework/spin.dart';
+import 'package:scoutmobile2020/match.dart';
 import "shot.dart";
 
 class Teleop extends StatefulWidget {
 	// final List<Shot> teleopshotsList;
 	final MatchData matchData;
+  VoidCallback onTap;
 
 	@override
 	_TeleopState createState() => _TeleopState();
 
-	Teleop({ this.matchData });
+	Teleop({ this.matchData, this.onTap });
 }
 
 bool val = true;
 
 class _TeleopState extends State<Teleop> {
-
 	Offset screenPos;
-
 	void onTapDown(BuildContext context, TapDownDetails details) {
 		final RenderBox box = context.findRenderObject();
 		final Offset localOffset = box.globalToLocal(details.globalPosition);
@@ -42,7 +39,15 @@ class _TeleopState extends State<Teleop> {
 							new CustomPaint(
 								painter: new MyPainter(shotList: widget.matchData.teleopshots),
 								size: Size.infinite,
-							)
+							),
+              new FloatingActionButton(
+                onPressed: () {
+                  setState(() {
+                    widget.onTap();
+                    Navigator.pop(context);
+                  });
+                },
+              ),
 						],
 					),
 			onTapDown: (TapDownDetails details) => onTapDown(context, details),
@@ -87,25 +92,25 @@ class _TeleopState extends State<Teleop> {
 				builder: (context) {
 					return StatefulBuilder(builder: (context, setState) {
 						return AlertDialog(
-							title: Text("Enter Number of Balls Made"),
+							title: Text("Enter Spin Status"),
 							content: Column(
 								children: <Widget>[
                   RaisedButton(
-                    child: Text(widget.matchData.spins.controlType ? "Position Control": "Rotation Control"),
-                    color: widget.matchData.spins.controlType ? Colors.greenAccent : Colors.grey,
+                    child: Text(widget.matchData.spins.positionControl ? "Position Control Successful": "Position Control Failed"),
+                    color: widget.matchData.spins.positionControl ? Colors.greenAccent : Colors.grey,
                     onPressed: () {
                       setState(() {
-                        widget.matchData.spins.controlType = !widget.matchData.spins.controlType; 
+                        widget.matchData.spins.positionControl = !widget.matchData.spins.positionControl; 
                       }
                       );
                     },
                   ),
                   RaisedButton(
-                    child: Text(widget.matchData.spins.succesful ? "Successful": "Failed"),
-                    color: widget.matchData.spins.succesful ? Colors.greenAccent : Colors.grey,
+                    child: Text(widget.matchData.spins.colorControl ? "Color Control Successful": "Color Control Failed"),
+                    color: widget.matchData.spins.colorControl ? Colors.greenAccent : Colors.grey,
                     onPressed: () {
                       setState(() {
-                        widget.matchData.spins.succesful = !widget.matchData.spins.succesful; 
+                        widget.matchData.spins.colorControl = !widget.matchData.spins.colorControl; 
                       }
                       );
                     },

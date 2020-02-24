@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frc1640scoutingframework/about.dart';
-import 'package:frc1640scoutingframework/scan.dart';
+import 'package:scoutmobile2020/about.dart';
+import 'package:scoutmobile2020/scan.dart';
 import 'scoutmode.dart';
 
 class Homepage extends StatefulWidget {

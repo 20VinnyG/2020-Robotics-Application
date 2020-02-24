@@ -1,4 +1,4 @@
-package com.example.frc1640scoutingframework
+package com.team1640.scoutmobile2020
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

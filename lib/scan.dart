@@ -3,42 +3,36 @@ import 'package:archive/archive.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gsheets/gsheets.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/drive/v3.dart';
+import 'package:googleapis/sheets/v4.dart';
+import 'package:googleapis_auth/auth.dart';
+import 'package:googleapis_auth/auth_io.dart';
+import 'package:http/http.dart';
 
-List<String> data = [];
+List<dynamic> data = [];
 
 String sheetName;
 String result = "Hey there !";
 
-const _credentials = r'''{
-	"type": "service_account",
-	"project_id": "scout-mobile-2020",
-	"private_key_id": "5b1b348fc375c149e30286befda456f65368972b",
-	"private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCx0beG+ts1jYT7\npCOaW52DAU/i9nPx1Bn9W+/VwGknYEs0sPzy+BwFNujsdeTKBYsjRTpB+048/wdb\nVASsPXVnXgkbf8ZhNCG/9mbm8PSIIE+SFyW26/dD7IYwwWlvKlDuTPSCMe9L80GA\nmUzoWXrtI/7+NnPa51J5K/oaXaULLjoIVFJVcPOqYMBtE2ftTXEjr21zn7QxI4cE\na5t09p8vZgVIF6UDjgFiFJ5S/OMbZsc6qo69HbLBy2JAb0fEXcfKwBpyv/vYPsuk\nLAf7vQwpYna51Aess6qCu7c3WsOyahK1WjKRdeb2bzY3zfAflwdiX656uUAUu8sN\nOkXFAATvAgMBAAECggEARgA4nwcPF7BsCwItT91EDygLkl4R+7/TMWWpbzzNSIaE\nZKxOD7ozkavxmvC4Tf1LrmlYy1PKk4GUHFRheIrDNpuSu0QcTPTQWnj+PmjZ4uLR\nYEIDg1S2JQOuOfBR+MSwUndyA/TzbrNG9IClAY0EMumqPtoh1qmc0n3I+esmh1UV\nyMohHKbZHroTzdwtd0pKzhWpyNJ1gVWdzisECm7f9XeNtG/UQ9R+4WhjFbHNG9ie\nbN8xegAs3xoZ16SdlsrBzyuo8RgqqeSGL0xIDzuAf4k/IEXmeaxhmIlU8OFIUhzZ\nNluxxpT4uhowp6XrORHvgtrOPawFvhu7Nq2jcbjxdQKBgQDchJQQ9m2f1V4AG+B/\nEuCQPOTDg3UXxYm9nVieQCDA5K5pLSi0nbVj+KkqfNefnf6sbIjd4IP0veSPV+2z\nXfHfPsL4NgItO8nP9Nka/kku4T3aT1D46OXA9s4eR9ZLzSiYaMxemEk1k28mmcZ7\nI2HOUZ4/WeT37/EJFlm8zhZkWwKBgQDOblLnTN1lNfzvrcC2FY1Mxu9rL/OyGTOf\nGrscoIWmSO+clOM7tty4hYDSL3h431TNaxomsQiW9jk45+qLXIe3Nkbtc3qRiBQy\nVfNkQ/FRxMY5lMHpDtdNKoSYjS55+bHeXf00J/FRSjRNI7Tm0DB5XxUAfFalkHup\nLa0wXcg1/QKBgFG1AhPi6y2M5n6N1bnf6bsoBO94lvtO40GRupMwWbJ/SSyJYgrC\nYMKBEVU/2rk21nVW5cOoe9xEPBrszpNmXMeGPsGvaVEPVTCrnYIF9GHdbYilWPBR\ng0fjau4HWhzOEJugQRFPxdiHH2kjE0rvCj9jOIpqqY9ApYPjdy6hAeT/AoGACEfq\nsXam5vl8dQzuTx+cNHlCf3VD/GAAbyB+Yw6Zbes9GXXri6ixQAGzAjt/RLIIz9i9\nCtJNOukTsJG1GfQTSak2vS3Fu/LOhJpoEhyboKEZJpQuFzBOOL085nW7aI84sGfq\n0V3M02r7oCCPkDbHywaibAuQ2kFqhIXdjbQlZO0CgYBw6bamavKA7Oi1bofJxJTI\nDEoYOwcs8kIjFAbW+tsAb8WIynM5w77OEYuQ8b+XiI5Wgx4LtF79TLjEWocGGK1G\npTNHdmyWJZAmKvJdUu8yAILIUHOjMt0/Dyun0p1Mz/MPyf1OBiux+N5unzH6+9uo\nMiI14ONzmMiZTzMPf7t6Dw==\n-----END PRIVATE KEY-----\n",
-	"client_email": "id-640scribe@scout-mobile-2020.iam.gserviceaccount.com",
-	"client_id": "107520628007120267721",
-	"auth_uri": "https://accounts.google.com/o/oauth2/auth",
-	"token_uri": "https://oauth2.googleapis.com/token",
-	"auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-	"client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/id-640scribe%40scout-mobile-2020.iam.gserviceaccount.com"
-}
-''';
+String _matchSheetId = '';
+String _shotSheetId = '';
+String _pathSheetId = '';
 
-String _spreadsheetId = '1K3AQE7kr5u0Z-_c-_YGsHVGHImtGfy47bBikxvjjdUQ';
+final String _eventsParentFolderId = '1aygdfoJX-V0zoLdpnstT6B44aYWJrBjz';
 
-final Map<String,String> sheetinitializer = {
+final Map<String,String> matchSheetMap = {
 		'Initials': 'initials',
-    'Id': 'id',
+		'Id': 'id',
 		'Team Number': 'teamnumber',
 		'Match Number': 'matchnumber',
-    'Position': 'position',
+		'Position': 'position',
 		'Preloaded Fuel Cells': 'preloadedfuelcells',
-    'Control Type': 'rotationControl',
-    'Successful': 'spinoutcome',
+		'Successful': 'spinoutcome',
 		'Climb Time': 'climbtime',
 		'Park': 'park',
-    'Rotation Control': 'rotationControl',
-    'Spin Outcome': 'spinoutcome',
+		'Position Control': 'positioncontrol',
+		'Color Control': 'colorcontrol',
 		'General Success': 'generalsuccess',
 		'Defensive Success': 'defensivesuccess',
 		'Accuracy': 'accuracy',
@@ -47,96 +41,243 @@ final Map<String,String> sheetinitializer = {
 		'Problems': 'problems'
 };
 
-void _initializeSpreadSheet() async {
-	final gsheets = GSheets(_credentials);
-	final ss = await gsheets.spreadsheet(_spreadsheetId);
-	var sheet = ss.worksheetByTitle("Sheet1");
-	await sheet.values.insertRow(1, sheetinitializer.keys.toList());
-}
+final Map<String,String> shotSheetMap = {
+	'Match': 'matchnumber',
+	'Team Number': 'teamnumber',
+	'Id': 'id',
+	'Period': 'period',
+	'Shots X': 'shotsx',
+	'Shots Y': 'shotsy',
+	'Shots Made': 'shotsmade',
+	'Goal': 'goal'
+};
 
-List<String> _toStringList (List list) {
-	List<String> list2 = [];
-	for (int i = 0; i < list.length; i++) {
-		list2.add(list[i].toString());
-	}
-	return list2;
-}
+final Map<String,String> pathSheetMap = {
+	'Match': 'matchnumber',
+	'Team Number': 'teamnumber',
+	'Id': 'id',
+	'Sequence': 'sequence',
+	'Auton Path X': 'autopathx',
+	'Auton Path Y': 'autopathy'
+};
 
-List<int> _toIntList (List list) {
-	List<int> list2 = [];
-	for (int i = 0; i < list.length; i++) {
-		list2.add(list[i]);
-	}
-	return list2;
-}
+void _appendGeneral (SheetsApi api) async {
+	print('data length: ' + data.length.toString());
 
-void _appendGeneral() async {
-  print('data length: ' + data.length.toString());
-	final gsheets = GSheets(_credentials);
-	final ss = await gsheets.spreadsheet(_spreadsheetId);
-	var sheet = ss.worksheetByTitle("Sheet1");
+	List<dynamic> payload = [];
 	for (int i = 0; i < data.length; i++) {
-    List<String> payload = [];
-    Map<String,dynamic> jsonData = jsonDecode(data[i]);
-    sheetinitializer.forEach((colName, jsonName) {
-      payload.add(jsonData[jsonName].toString());
-    });
-		await sheet.values.appendRow(payload);
+		List<String> row = [];
+		Map<String,dynamic> jsonData = data[i];
+		matchSheetMap.forEach((colName, jsonName) {
+			row.add(jsonData[jsonName].toString());
+		});
+		payload.add(row);
 	}
+
+	ValueRange vr = ValueRange.fromJson({ 'values': payload });
+	await api.spreadsheets.values.append(vr, _matchSheetId, 'A:R', valueInputOption: 'USER_ENTERED');
+
+	print('Done appending match data');
 }
 
-void _appendPath() async {
-	final gsheets = GSheets(_credentials);
-	final ss = await gsheets.spreadsheet(_spreadsheetId);
-	var sheet = ss.worksheetByTitle("Sheet2");
+void _appendPath (SheetsApi api) async {
+	List<dynamic> payload = [];
 	for (int i = 0; i < data.length; i++) {
-		dynamic data2 = jsonDecode(data[i]);
-    print('data2: ' + data2.toString());
-		List<String> xStringList = _toStringList(data2['autopathx']);
-		List<String> yStringList = _toStringList(data2['autopathy']);
-		List<String> appender = <String>[];
-		for(int j = 0; j < xStringList.length; j++) {
-			appender.add(data2['matchnumber'].toString());
-			appender.add(data2['teamnumber'].toString());
-			appender.add(data2['id'].toString());
-			appender.add(j.toString());
-			appender.add(xStringList[j].toString());
-			appender.add(yStringList[j].toString());
-			await sheet.values.appendRow(appender);
-			appender.clear();
+		Map<String,dynamic> jsonData = data[i];
+		print('Shot data: ' + jsonData.toString());
+
+		int pathLength = (jsonData['autopathx'] as List<dynamic>).length;
+
+		List<dynamic> pathx = jsonData['autopathx'];
+		List<dynamic> pathy = jsonData['autopathy'];
+
+		for (int j = 0; j < pathLength; j++) {
+			List<dynamic> row = [];
+
+			row.add(jsonData['matchnumber']);
+			row.add(jsonData['teamnumber']);
+			row.add(jsonData['id']);
+			row.add(j);
+			row.add(pathx[j]);
+			row.add(pathy[j]);
+
+			payload.add(row);
 		}
 	}
+
+	ValueRange vr = ValueRange.fromJson({ 'values': payload 	});
+	await api.spreadsheets.values.append(vr, _pathSheetId, 'A:F', valueInputOption: 'USER_ENTERED');
+
+	print('Done appending path data');
 }
 
-void _appendShots() async {
-	final gsheets = GSheets(_credentials);
-	final ss = await gsheets.spreadsheet(_spreadsheetId);
-	var sheet = ss.worksheetByTitle("Sheet3");
-	for(int i = 0; i < data.length; i++) {
-		dynamic data2 = jsonDecode(data[i]);
-		List<int> autoshotsx = _toIntList(data2['autoshotsx']);
-		List<int> autoshotsy = _toIntList(data2['autoshotsy']);
-		List<int> autoshotsmade = _toIntList(data2['autoshotsmade']);
-		List<int> autoshotstype = _toIntList(data2['autoshotstype']);
-		List<String> appender = <String>[];
-		for(int k = 0; k < autoshotsx.length; k++) {
-			appender.add(data2['matchnumber'].toString());
-			appender.add(data2['teamnumber'].toString());
-			appender.add(data2['id'].toString());
-			appender.add(autoshotsx[k].toString());
-			appender.add(autoshotsy[k].toString());
-			appender.add(autoshotsmade[k].toString());
-			appender.add(autoshotstype[k].toString());
-			await sheet.values.appendRow(appender);
-			appender.clear();
+void _appendShots (SheetsApi api) async {
+	List<dynamic> payload = [];
+	for (int i = 0; i < data.length; i++) {
+		Map<String,dynamic> jsonData = data[i];
+		print('Path data: ' + jsonEncode(jsonData).toString());
+		
+		List<dynamic> autoShotsX = jsonData['autoshotsx'];
+		List<dynamic> autoShotsY = jsonData['autoshotsy'];
+		List<dynamic> autoShotsMade = jsonData['autoshotsmade'];
+		List<dynamic> autoShotsType = jsonData['autoshotstype'];
+
+		List<dynamic> teleShotsX = jsonData['teleopshotsx'];
+		List<dynamic> teleShotsY = jsonData['teleopshotsy'];
+		List<dynamic> teleShotsMade = jsonData['teleopshotsmade'];
+		List<dynamic> teleShotsType = jsonData['teleopshotstype'];
+
+		for (int j = 0; j < autoShotsX.length; j++) {
+			List<dynamic> row = [];
+
+			row.add(jsonData['matchnumber']);
+			row.add(jsonData['teamnumber']);
+			row.add(jsonData['id']);
+			row.add('auton');
+
+			row.add(autoShotsX[j]);
+			row.add(autoShotsY[j]);
+			row.add(autoShotsMade[j]);
+			row.add(autoShotsType[j]);
+
+			payload.add(row);
+		}
+
+		for (int j = 0; j < teleShotsX.length; j++) {
+			List<dynamic> row = [];
+
+			row.add(jsonData['matchnumber']);
+			row.add(jsonData['teamnumber']);
+			row.add(jsonData['id']);
+			row.add('teleop');
+
+			row.add(teleShotsX[j]);
+			row.add(teleShotsY[j]);
+			row.add(teleShotsMade[j]);
+			row.add(teleShotsType[j]);
+			
+			payload.add(row);
 		}
 	}
+
+	ValueRange vr = ValueRange.fromJson({ 'values': payload });
+	await api.spreadsheets.values.append(vr, _shotSheetId, 'A:H', valueInputOption: 'USER_ENTERED');
+
+	print('Done appending shot data');
 }
 
-void _appendAll() {
-  _appendGeneral();
-  _appendPath();
-  _appendShots();
+void _appendAll () async {
+	Client client = await _getGoogleClientForCurrentUser();
+	SheetsApi api = SheetsApi(client);
+	
+	_appendGeneral(api);
+	_appendPath(api);
+	_appendShots(api);
+
+	client.close();
+}
+
+Future<Client> _getGoogleClientForCurrentUser () async {
+	GoogleSignIn googleSignIn = GoogleSignIn(
+		scopes: [ 'email', 'https://www.googleapis.com/auth/contacts.readonly', SheetsApi.SpreadsheetsScope, SheetsApi.DriveFileScope ]
+	);
+	GoogleSignInAccount account = await googleSignIn.signIn();
+
+	String token = (await account.authentication).accessToken;
+
+	AccessCredentials creds = AccessCredentials(
+		AccessToken('Bearer', token, DateTime.utc(DateTime.now().year + 1)),
+		'', <String>[]
+	);
+
+	return authenticatedClient(Client(), creds);
+}
+
+// eventId is a google drive folder it
+Future _loadSheetsForEvent (String eventDriveFolderId, BuildContext context) async {
+	if (eventDriveFolderId.isEmpty) { print('Id empty: ' + eventDriveFolderId); return; }
+	print('event id: ' + eventDriveFolderId);
+
+	Client client = await _getGoogleClientForCurrentUser();
+	DriveApi api = DriveApi(client);
+
+	_matchSheetId = '';
+	_pathSheetId = '';
+	_shotSheetId = '';
+
+	List<String> filenames = [];
+
+	FileList eventFolders = await api.files.list(q: '\'${eventDriveFolderId}\' in parents');
+	eventFolders.files.forEach((file) {
+		if (file.name.endsWith('-matches')) { _matchSheetId = file.id; filenames.add(file.name); }
+		if (file.name.endsWith('-paths')) { _pathSheetId = file.id; filenames.add(file.name); }
+		if (file.name.endsWith('-shots')) { _shotSheetId = file.id; filenames.add(file.name); }
+	});
+
+	print('match sheet id: ' + _matchSheetId);
+	print('path sheet id: ' + _pathSheetId);
+	print('shot sheet id: ' + _shotSheetId);
+
+	// Scaffold.of(context).showSnackBar(SnackBar(content: Text('Loaded ' + filenames.length.toString() + ' sheets: ' + filenames.toString())));
+} 
+
+Future<bool> _createSheetsForEvent (String eventName) async {
+	if (eventName.isEmpty) { return false; }
+
+	Client client = await _getGoogleClientForCurrentUser();
+	DriveApi driveApi = DriveApi(client);
+	SheetsApi api = SheetsApi(client);
+	
+	// Create a folder for the event:
+	File eventFolder = await driveApi.files.create(
+		File()
+			..name = eventName
+			..parents = [_eventsParentFolderId] 
+			..mimeType = 'application/vnd.google-apps.folder'
+	);
+	String eventFolderId = eventFolder.id;
+
+	File matchSheet = await driveApi.files.create(
+		File()
+			..name = eventName + '-matches'
+			..parents = [eventFolderId]
+			..mimeType = 'application/vnd.google-apps.spreadsheet'  
+	);
+	_matchSheetId = matchSheet.id;
+	ValueRange matchVR = ValueRange.fromJson({
+		'values': [ matchSheetMap.keys.toList() ]
+	});
+	await api.spreadsheets.values.append(matchVR, _matchSheetId, 'A:R', valueInputOption: 'USER_ENTERED');
+
+	File shotSheet = await driveApi.files.create(
+		File()
+			..name = eventName + '-shots'
+			..parents = [eventFolderId]
+			..mimeType = 'application/vnd.google-apps.spreadsheet'  
+	);
+	_shotSheetId = shotSheet.id;
+	ValueRange shotVR = ValueRange.fromJson({
+		'values': [ shotSheetMap.keys.toList() ]
+	});
+	await api.spreadsheets.values.append(shotVR, _shotSheetId, 'A:H', valueInputOption: 'USER_ENTERED');
+
+	File pathSheet = await driveApi.files.create(
+		File()
+			..name = eventName + '-paths'
+			..parents = [eventFolderId]
+			..mimeType = 'application/vnd.google-apps.spreadsheet'  
+	);
+	_pathSheetId = pathSheet.id;
+	ValueRange pathVR = ValueRange.fromJson({
+		'values': [ pathSheetMap.keys.toList() ]
+	});
+	await api.spreadsheets.values.append(pathVR, _pathSheetId, 'A:F', valueInputOption: 'USER_ENTERED');
+
+	client.close();
+
+	print('Done setup for: ' + eventName);
+
+	return true;
 }
 
 class ScanMode extends StatefulWidget {
@@ -146,16 +287,18 @@ class ScanMode extends StatefulWidget {
 
 class _ScanModeState extends State<ScanMode> {
 	Future _scanQR() async {
+		Map<int,dynamic> scannedData = {};
+
 		try {
-			data.clear();
-      print('Cleared scan data: ' + data.length.toString());
-			for (int i = 0; i < 6; i++) {
+			for (;;) {
 				String qrResult = await BarcodeScanner.scan();
 				List<int> stringBytesDecoded = base64.decode(qrResult);
 				List<int> gzipBytesDecoded = new GZipDecoder().decodeBytes(stringBytesDecoded);
 				String decodedqr = new Utf8Codec().decode(gzipBytesDecoded);
-				data.add(decodedqr);
-				print("transmitted: " + qrResult.length.toString() + " -- decoded: " + decodedqr.length.toString());
+				
+				Map<String,dynamic> json = jsonDecode(decodedqr);
+				int id = json['id'];
+				scannedData[id] = json;
 			}
 		} on PlatformException catch (ex) {
 			if (ex.code == BarcodeScanner.CameraAccessDenied) {
@@ -176,52 +319,120 @@ class _ScanModeState extends State<ScanMode> {
 				result = "Unknown Error $ex";
 			});
 		}
+
+		data.clear();
+		data.addAll(scannedData.values);
+		print('Scan mode complete. Scanned ' + data.length.toString() + ' unique matches');
+	}
+
+	_buildEventLoadPrompt (BuildContext context) async {
+		Client client = await _getGoogleClientForCurrentUser();
+		DriveApi api = DriveApi(client);
+
+		FileList eventFolders = await api.files.list(q: '\'${_eventsParentFolderId}\' in parents');
+
+		client.close();
+
+		List<_SheetNameId> eventSheets = [];
+
+		eventFolders.files.forEach((file) {
+			print('name: ' + file.name + ' -- id: ' + file.id);
+			eventSheets.add(_SheetNameId(name: file.name, id: file.id));
+		});
+
+		return showDialog(
+				context: context,
+				builder: (context) {
+					return StatefulBuilder(builder: (context, setState) {
+						return AlertDialog(
+							title: Text("Select an event"),
+							content: Container(
+								width: double.maxFinite,
+								child: ListView.builder(
+									itemCount: eventSheets.length,
+									itemBuilder: (context, index) {
+										return ListTile(
+											title: Text(eventSheets[index].name),
+											onTap: () async {
+												await _loadSheetsForEvent(eventSheets[index].id, context);
+												Navigator.pop(context);
+											}
+										);
+									}
+								)
+						));
+				});	
+			});
 	}
 
 	@override
 	Widget build(BuildContext context) {
-		return new Scaffold(
-			appBar: new AppBar(
-					title: new Text("Scan Mode"), backgroundColor: Colors.blue[900]),
-			body: Column(
-				children: <Widget>[
-					TextFormField(
-						decoration: const InputDecoration(
-							hintText: 'Enter sheet ID',
-						),
-						validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-						onSaved: (input) => _spreadsheetId = input,
-						onFieldSubmitted: (input) => _spreadsheetId = input,
-						onChanged: (input) => _spreadsheetId = input,
-					),
-					TextFormField(
-						decoration: const InputDecoration(
-							hintText: 'Enter ',
-						),
-						validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-						onSaved: (input) => sheetName = input,
-						onFieldSubmitted: (input) => sheetName = input,
-						onChanged: (input) => sheetName = input,
-					),
-					RaisedButton(
-						child: Text("Format Sheets"),
-						onPressed: () {
-							_initializeSpreadSheet();
-						},
-					),
-					RaisedButton(
-						child: Text("Push to Sheet"),
-						onPressed: () {
-							_appendAll();
-						},
-					),
-				],
-			),
-			floatingActionButton: FloatingActionButton.extended(
-				icon: Icon(Icons.camera_alt),
-				label: Text("Scan"),
-				onPressed: _scanQR,
-			),
-		);
+		String eventName = '';
+
+		return GestureDetector(
+			onTap: () {
+				FocusScopeNode currentFocus = FocusScope.of(context);
+				if (!currentFocus.hasPrimaryFocus) { currentFocus.unfocus(); }
+			},
+			child: new Scaffold(
+				appBar: new AppBar(
+						title: new Text("Scan Mode"), backgroundColor: Colors.blue[900]),
+				body: Builder(builder: (context) =>
+					Column(
+						mainAxisAlignment: MainAxisAlignment.center,
+						children: <Widget>[
+							TextFormField(
+								initialValue: eventName,
+								decoration: const InputDecoration(labelText: 'New event name'),
+								validator: (input) => input.isEmpty ? 'Not a valid input' : null,
+								onSaved: (input) => eventName = input,
+								onFieldSubmitted: (input) => eventName = input,
+								onChanged: (input) => eventName = input,
+							),
+							RaisedButton(
+								child: Text("Create event"),
+								onPressed: () async {
+									bool success = await _createSheetsForEvent(eventName);
+									Scaffold.of(context).showSnackBar(SnackBar(content: Text(success ? 'Created event ' + eventName : 'Couldn\'t create event ' + eventName), duration: Duration(seconds: 5)));
+									eventName = '';
+									FocusScopeNode currentFocus = FocusScope.of(context);
+									if (!currentFocus.hasPrimaryFocus) { currentFocus.unfocus(); }
+								},
+							),
+							RaisedButton(
+								child: Text('Load event from sheets'),
+								onPressed: () async {
+									FocusScopeNode currentFocus = FocusScope.of(context);
+									if (!currentFocus.hasPrimaryFocus) { currentFocus.unfocus(); }
+									await _buildEventLoadPrompt(context);
+								}
+							),
+							RaisedButton(
+								child: Text("Push to Sheet"),
+								onPressed: () {
+									FocusScopeNode currentFocus = FocusScope.of(context);
+									if (!currentFocus.hasPrimaryFocus) { currentFocus.unfocus(); }
+									_appendAll();
+								},
+							)
+						],
+					)
+				),
+				floatingActionButton: FloatingActionButton.extended(
+					icon: Icon(Icons.camera_alt),
+					label: Text("Scan"),
+					onPressed: _scanQR,
+				),
+			));
 	}
+}
+
+class _SheetNameId {
+	final String name;
+	final String id;
+
+	_SheetNameId({
+		this.name,
+		this.id
+	});
 }
