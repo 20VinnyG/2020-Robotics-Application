@@ -242,7 +242,7 @@ class _ScoutModeState extends State<ScoutMode> {
 														RaisedButton(
 															child: Text("Auton"),
 															onPressed: () {
-																Navigator.push(context, new MaterialPageRoute(builder: (context) => AutonPath(matchData: newMatch)));
+																Navigator.push(context, new MaterialPageRoute(builder: (context) => AutonPath(matchData: newMatch, onTap: () => _startClock())));
 															},
 														),
 														VerticalDivider(width: 5.0),

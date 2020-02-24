@@ -3,14 +3,16 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:scoutmobile2020/match.dart';
 import 'package:scoutmobile2020/shot.dart';
+import 'teleop.dart';
 
 class AutonPath extends StatefulWidget {
 	final MatchData matchData;
+  VoidCallback onTap;
 
 	@override
 	AutonPathState createState() => AutonPathState();
 
-	AutonPath({this.matchData});
+	AutonPath({this.matchData, this.onTap});
 }
 
 class AutonPathState extends State<AutonPath> {
@@ -75,8 +77,8 @@ class AutonPathState extends State<AutonPath> {
 								child: Icon(Icons.check),
 								label: "Completed Path",
 								onTap: () {
-									Navigator.pop(context);
-								})
+									Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: widget.matchData, onTap: widget.onTap)));
+								}),
 					],
 				));
 	}
