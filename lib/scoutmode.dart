@@ -501,6 +501,13 @@ class _ScoutModeState extends State<ScoutMode> {
 		_extractshootingshootingpoints();
 		_condensePoints();
 
+    double generalSuccess = (newMatch.generalSuccess * 2).roundToDouble() / 2;
+    if (generalSuccess <= 1e-10) { generalSuccess = null; }
+    double defensiveSuccess = (newMatch.defensiveSuccess * 2).roundToDouble() / 2;
+    if (defensiveSuccess <= 1e-10) { defensiveSuccess = null; }
+    double accuracy = (newMatch.accuracy * 2).roundToDouble() / 2;
+    if (accuracy <= 1e-10) { accuracy = null; }
+
 		if (formKey.currentState.validate()) {
 			formKey.currentState.save();
 			var payload = {
@@ -524,9 +531,9 @@ class _ScoutModeState extends State<ScoutMode> {
 				'park': newMatch.park,
 				'positioncontrol': newMatch.spins.positionControl,
 				'colorcontrol': newMatch.spins.colorControl,
-				'generalsuccess': (newMatch.generalSuccess * 2).roundToDouble() / 2,
-				'defensivesuccess': (newMatch.defensiveSuccess * 2).roundToDouble() / 2,
-				'accuracy': (newMatch.accuracy * 2).roundToDouble() / 2,
+				'generalsuccess': generalSuccess,
+				'defensivesuccess': defensiveSuccess,
+				'accuracy': accuracy,
 				'floorpickup': newMatch.floorpickup ? 1 : 0,
 				'fouls': newMatch.fouls ? 1 : 0,
 				'problems': newMatch.problems ? 1 : 0
