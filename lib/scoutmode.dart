@@ -557,9 +557,11 @@ class _ScoutModeState extends State<ScoutMode> {
 		newMatch.autopathx = [];
 		newMatch.autopathy = [];
 		for (int i = 0; i < points.length; i += 5) {
-			newMatch.autopathx.add(points[i].dx.round());
-			newMatch.autopathy.add(points[i].dy.round());
+			newMatch.autopathx.add(((points[i].dx/MediaQuery.of(context).size.width)*686).round());
+			newMatch.autopathy.add(((points[i].dy/MediaQuery.of(context).size.height)*1316).round());
 		}
+    print(newMatch.autopathx);
+    print(newMatch.autopathy);
 	}
 
 	int _getTeam() {
@@ -585,14 +587,14 @@ class _ScoutModeState extends State<ScoutMode> {
 
 	_extractshootingshootingpoints() {
 		for(int i=0; i < newMatch.autoshots.length; i++) {
-			autoshotsx.add(newMatch.autoshots[i].pos.dx.round());
-			autoshotsy.add(newMatch.autoshots[i].pos.dy.round());
+			autoshotsx.add(((newMatch.autoshots[i].pos.dx/MediaQuery.of(context).size.width)*686).round());
+			autoshotsy.add(((newMatch.autoshots[i].pos.dy/MediaQuery.of(context).size.height)*1316).round());
 			autoshotsmade.add(newMatch.autoshots[i].shotsMade);
 			autoshotstype.add(newMatch.autoshots[i].shotType ? 1 : 0);
 		}
 		for(int i=0; i < newMatch.teleopshots.length; i++) {
-			teleopshotsx.add(newMatch.teleopshots[i].pos.dx.round());
-			teleopshotsy.add(newMatch.teleopshots[i].pos.dy.round());
+			teleopshotsx.add(((newMatch.teleopshots[i].pos.dx/MediaQuery.of(context).size.width)*686).round());
+			teleopshotsy.add(((newMatch.teleopshots[i].pos.dy/MediaQuery.of(context).size.height)*1316).round());
 			teleopshotsmade.add(newMatch.teleopshots[i].shotsMade);
 			teleopshotstype.add(newMatch.teleopshots[i].shotType ? 1 : 0);
 		}

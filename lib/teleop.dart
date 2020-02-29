@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:scoutmobile2020/match.dart';
+import 'package:scoutmobile2020/scoutmode.dart';
 import "shot.dart";
 
 class Teleop extends StatefulWidget {
@@ -64,8 +65,8 @@ class _TeleopState extends State<Teleop> {
         onPressed: () {
           setState(() {
             widget.onTap();
-            Navigator.pop(context);
-            Navigator.pop(context);
+            // Navigator.pop(context);
+            // Navigator.pop(context);
           });
         },
       ),
