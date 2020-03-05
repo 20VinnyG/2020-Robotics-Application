@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:scoutmobile2020/autonpath.dart';
-import 'package:scoutmobile2020/bluealliance.dart';
 import 'package:scoutmobile2020/teleop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
@@ -11,8 +10,12 @@ import 'package:sprintf/sprintf.dart';
 import 'match.dart';
 import 'package:archive/archive.dart';
 
+final _teamnumbercontroller = TextEditingController();
+
 class ScoutMode extends StatefulWidget {
-	@override
+	final List schedule;
+  @override
+  ScoutMode({this.schedule});
 	_ScoutModeState createState() => _ScoutModeState();
 }
 
@@ -85,15 +88,6 @@ class _ScoutModeState extends State<ScoutMode> {
 										key: formKey,
 										child: ListView(
 											children: [
-												Container(
-														padding: const EdgeInsets.symmetric(
-															vertical: 16.0, horizontal: 16.0),
-															child: RaisedButton(
-																child: Text("Import Schedule"),
-																onPressed: () {
-																	Navigator.push(context, new MaterialPageRoute(builder: (context) => Bluealliance()));
-																},
-														)),
 												Divider(
 													height: 30.0,
 													indent: 5.0,
@@ -101,30 +95,14 @@ class _ScoutModeState extends State<ScoutMode> {
 												),
 												Text("Prematch"),
 												TextFormField(
-													initialValue: newMatch.initials,
-													decoration: const InputDecoration(labelText: 'Enter your initials'),
-													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-													onSaved: (input) { setState(() { newMatch.initials = input; }); },
-													onFieldSubmitted: (input) { setState(() { newMatch.initials = input; }); },
-													onChanged: (input) { setState(() { newMatch.initials = input; }); },
-												),
-												TextFormField(
 													initialValue: newMatch.matchNumber,
 													decoration: const InputDecoration(labelText: 'Enter the match number'),
 													keyboardType: TextInputType.number,
 													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-													onSaved: (input) { setState(() { newMatch.matchNumber = input; }); },
+													onSaved: (input) {
+                             setState(() { newMatch.matchNumber = input; }); },
 													onChanged: (input) { setState(() { newMatch.matchNumber = input; }); },
 													onFieldSubmitted: (input) { setState(() { newMatch.matchNumber = input; }); }
-												),
-												TextFormField(
-													initialValue: newMatch.teamNumber,
-													decoration: const InputDecoration(labelText: "Enter Team Number"),
-													keyboardType: TextInputType.number,
-													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-													onSaved: (input) { setState(() { newMatch.teamNumber = input; }); },
-													onChanged: (input) { setState(() { newMatch.teamNumber = input; }); },
-													onFieldSubmitted: (input) { setState(() { newMatch.teamNumber = input; }); },
 												),
 												Text('Select robot position'),
 												Column(children: <Widget>[
@@ -134,6 +112,7 @@ class _ScoutModeState extends State<ScoutMode> {
 															color: (newMatch.position == 4) ? Colors.redAccent : Colors.grey,
 															onPressed: () {
 																newMatch.position = (newMatch.position == 4) ? -1 : 4;
+                                _getTeam();
 																setState(() {});
 															}
 														),
@@ -143,6 +122,7 @@ class _ScoutModeState extends State<ScoutMode> {
 															color: (newMatch.position == 5) ? Colors.redAccent : Colors.grey,
 															onPressed: () {
 																newMatch.position = (newMatch.position == 5) ? -1 : 5;
+                                _getTeam();
 																setState(() {});
 															}
 														),
@@ -152,6 +132,7 @@ class _ScoutModeState extends State<ScoutMode> {
 															color: (newMatch.position == 6) ? Colors.redAccent : Colors.grey,
 															onPressed: () {
 																newMatch.position = (newMatch.position == 6) ? -1 : 6;
+                                _getTeam();
 																setState(() {});
 															}
 														)
@@ -163,6 +144,7 @@ class _ScoutModeState extends State<ScoutMode> {
 															color: (newMatch.position == 1) ? Colors.blueAccent : Colors.grey,
 															onPressed: () {
 																newMatch.position = (newMatch.position == 1) ? -1 : 1;
+                                _getTeam();
 																setState(() {});
 															}
 														),
@@ -172,6 +154,7 @@ class _ScoutModeState extends State<ScoutMode> {
 															color: (newMatch.position == 2) ? Colors.blueAccent : Colors.grey,
 															onPressed: () {
 																newMatch.position = (newMatch.position == 2) ? -1 : 2;
+                                _getTeam();
 																setState(() {});
 															}
 														),
@@ -181,6 +164,7 @@ class _ScoutModeState extends State<ScoutMode> {
 															color: (newMatch.position == 3) ? Colors.blueAccent : Colors.grey,
 															onPressed: () {
 																newMatch.position = (newMatch.position == 3) ? -1 : 3;
+                                _getTeam();
 																setState(() {});
 															}
 														)
@@ -188,6 +172,9 @@ class _ScoutModeState extends State<ScoutMode> {
 													mainAxisAlignment: MainAxisAlignment.center)
 												],
 												mainAxisAlignment: MainAxisAlignment.center),
+                        TextField(
+                          controller: _teamnumbercontroller,
+                        ),
 												Divider(
 													height: 30.0,
 													indent: 5.0,
@@ -486,6 +473,15 @@ class _ScoutModeState extends State<ScoutMode> {
 																Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => ScoutMode()));
 															},
 														)),
+                        Container(
+														padding: const EdgeInsets.symmetric(
+																vertical: 16.0, horizontal: 16.0),
+														child: RaisedButton(
+															child: Text("Test"),
+															onPressed:() {
+																print(widget.schedule);
+															},
+														)),
 											],
 											scrollDirection: Axis.vertical,
 										)))),
@@ -564,7 +560,7 @@ class _ScoutModeState extends State<ScoutMode> {
     print(newMatch.autopathy);
 	}
 
-	int _getTeam() {
+	 _getTeam() {
 		String scheduledTeam;
 		String alphaPos;
 		int betaPos;
@@ -573,11 +569,15 @@ class _ScoutModeState extends State<ScoutMode> {
 		} else {
 			alphaPos = "red";
 		}
-		betaPos = newMatch.position % 3;
-		scheduledTeam = newGlobals.schedule[int.parse(newMatch.matchNumber)]["alliances"]
+		betaPos = (newMatch.position-1) % 3;
+    print(betaPos);
+		scheduledTeam = widget.schedule[int.parse(newMatch.matchNumber)-1]["alliances"]
 				[alphaPos]["team_keys"][betaPos];
 		scheduledTeam = scheduledTeam.substring(3);
-		return int.parse(scheduledTeam);
+    setState(() {
+      _teamnumbercontroller.text = scheduledTeam;
+      newMatch.teamNumber = scheduledTeam;
+    });
 	}
 
 	_generateId(int teamNumber, int matchNumber) {

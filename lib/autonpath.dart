@@ -20,7 +20,6 @@ class AutonPathState extends State<AutonPath> {
 	@override
 	Widget build(BuildContext context) {
 		List<Offset> points = widget.matchData.autopathpoints;
-
 		return new Scaffold(
 				body: new Stack(children: <Widget>[
 					Container(
