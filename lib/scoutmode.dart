@@ -501,6 +501,13 @@ class _ScoutModeState extends State<ScoutMode> {
 		_extractshootingshootingpoints();
 		_condensePoints();
 
+    double generalSuccess = (newMatch.generalSuccess * 2).roundToDouble() / 2;
+    if (generalSuccess <= 1e-10) { generalSuccess = null; }
+    double defensiveSuccess = (newMatch.defensiveSuccess * 2).roundToDouble() / 2;
+    if (defensiveSuccess <= 1e-10) { defensiveSuccess = null; }
+    double accuracy = (newMatch.accuracy * 2).roundToDouble() / 2;
+    if (accuracy <= 1e-10) { accuracy = null; }
+
 		if (formKey.currentState.validate()) {
 			formKey.currentState.save();
 			var payload = {
@@ -524,9 +531,9 @@ class _ScoutModeState extends State<ScoutMode> {
 				'park': newMatch.park,
 				'positioncontrol': newMatch.spins.positionControl,
 				'colorcontrol': newMatch.spins.colorControl,
-				'generalsuccess': (newMatch.generalSuccess * 2).roundToDouble() / 2,
-				'defensivesuccess': (newMatch.defensiveSuccess * 2).roundToDouble() / 2,
-				'accuracy': (newMatch.accuracy * 2).roundToDouble() / 2,
+				'generalsuccess': generalSuccess,
+				'defensivesuccess': defensiveSuccess,
+				'accuracy': accuracy,
 				'floorpickup': newMatch.floorpickup ? 1 : 0,
 				'fouls': newMatch.fouls ? 1 : 0,
 				'problems': newMatch.problems ? 1 : 0
@@ -550,9 +557,11 @@ class _ScoutModeState extends State<ScoutMode> {
 		newMatch.autopathx = [];
 		newMatch.autopathy = [];
 		for (int i = 0; i < points.length; i += 5) {
-			newMatch.autopathx.add(points[i].dx.round());
-			newMatch.autopathy.add(points[i].dy.round());
+			newMatch.autopathx.add(((points[i].dx/MediaQuery.of(context).size.width)*686).round());
+			newMatch.autopathy.add(((points[i].dy/MediaQuery.of(context).size.height)*1316).round());
 		}
+    print(newMatch.autopathx);
+    print(newMatch.autopathy);
 	}
 
 	int _getTeam() {
@@ -578,14 +587,14 @@ class _ScoutModeState extends State<ScoutMode> {
 
 	_extractshootingshootingpoints() {
 		for(int i=0; i < newMatch.autoshots.length; i++) {
-			autoshotsx.add(newMatch.autoshots[i].pos.dx.round());
-			autoshotsy.add(newMatch.autoshots[i].pos.dy.round());
+			autoshotsx.add(((newMatch.autoshots[i].pos.dx/MediaQuery.of(context).size.width)*686).round());
+			autoshotsy.add(((newMatch.autoshots[i].pos.dy/MediaQuery.of(context).size.height)*1316).round());
 			autoshotsmade.add(newMatch.autoshots[i].shotsMade);
 			autoshotstype.add(newMatch.autoshots[i].shotType ? 1 : 0);
 		}
 		for(int i=0; i < newMatch.teleopshots.length; i++) {
-			teleopshotsx.add(newMatch.teleopshots[i].pos.dx.round());
-			teleopshotsy.add(newMatch.teleopshots[i].pos.dy.round());
+			teleopshotsx.add(((newMatch.teleopshots[i].pos.dx/MediaQuery.of(context).size.width)*686).round());
+			teleopshotsy.add(((newMatch.teleopshots[i].pos.dy/MediaQuery.of(context).size.height)*1316).round());
 			teleopshotsmade.add(newMatch.teleopshots[i].shotsMade);
 			teleopshotstype.add(newMatch.teleopshots[i].shotType ? 1 : 0);
 		}

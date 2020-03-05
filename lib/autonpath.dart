@@ -27,7 +27,7 @@ class AutonPathState extends State<AutonPath> {
 						decoration: new BoxDecoration(
 								image: new DecorationImage(
 										image: new AssetImage('assets/images/field.png'),
-										fit: BoxFit.cover)),
+										fit: BoxFit.fill)),
 					),
 					new GestureDetector(
 							onPanUpdate: (DragUpdateDetails details) {

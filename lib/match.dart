@@ -28,7 +28,7 @@ class MatchData {
 	double generalSuccess =	0;
 	double defensiveSuccess =0;
 	double accuracy = 0;
-	bool floorpickup = false;
+	bool floorpickup = true;
 	bool fouls = false;
 	bool problems = false;
 }
