@@ -12,8 +12,25 @@ import 'match.dart';
 import 'package:archive/archive.dart';
 
 class ScoutMode extends StatefulWidget {
+	final int nextMatch;
+	final String initials;
+	final int position;
+	final MatchData matchData = new MatchData();
+
 	@override
 	_ScoutModeState createState() => _ScoutModeState();
+
+	ScoutMode({this.nextMatch, this.initials, this.position}) {
+		if (this.nextMatch != null) {
+			matchData.matchNumber = this.nextMatch.toString();
+		}
+		if (this.initials != null) {
+			matchData.initials = this.initials;
+		}
+		if (this.position != null) {
+			matchData.position = this.position;
+		}
+	}
 }
 
 class _ScoutModeState extends State<ScoutMode> {
@@ -22,7 +39,6 @@ class _ScoutModeState extends State<ScoutMode> {
 	bool state = true;
 
 	final formKey = GlobalKey<FormState>();
-	MatchData newMatch = new MatchData();
 	List<int> teleopshotsx = <int>[];
 	List<int> teleopshotsy = <int>[];
 	List<int> autoshotsx = <int>[];
@@ -32,7 +48,7 @@ class _ScoutModeState extends State<ScoutMode> {
 	List<int> autoshotstype = <int>[];
 	List<int> teleopshotstype = <int>[];
 
-	String _clockText = "00:000";
+	String _clockText = "00:00";
 	Timer _clockUpdateTimer;
 	Duration _clockUpdateRate = Duration(milliseconds: 100);
 
@@ -43,7 +59,7 @@ class _ScoutModeState extends State<ScoutMode> {
 				Duration elapsedTime = _stopwatch.elapsed;
 				int seconds = elapsedTime.inSeconds;
 				int millis	= elapsedTime.inMilliseconds - 1000 * seconds;
-				_clockText = sprintf("%02d:%03d", [seconds, millis]);
+				_clockText = sprintf("%02d:%02d", [seconds, (millis/10).round()]);
 			}));
 		}
 	}
@@ -53,7 +69,7 @@ class _ScoutModeState extends State<ScoutMode> {
 			_stopwatch.stop();
 			_clockUpdateTimer.cancel();
 			_clockUpdateTimer = null;
-			newMatch.climbtime = _stopwatch.elapsedMilliseconds / 1000;
+			widget.matchData.climbtime = _stopwatch.elapsedMilliseconds / 1000;
 		}
 	}
 
@@ -64,8 +80,8 @@ class _ScoutModeState extends State<ScoutMode> {
 		}
 		_stopwatch.stop();
 		_stopwatch.reset();
-		newMatch.climbtime = 0;
-		setState(() { _clockText = "00:000"; });
+		widget.matchData.climbtime = 0;
+		setState(() { _clockText = "00:00"; });
 	}
 
 	@override
@@ -101,57 +117,57 @@ class _ScoutModeState extends State<ScoutMode> {
 												),
 												Text("Prematch"),
 												TextFormField(
-													initialValue: newMatch.initials,
+													initialValue: widget.matchData.initials,
 													decoration: const InputDecoration(labelText: 'Enter your initials'),
 													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-													onSaved: (input) { setState(() { newMatch.initials = input; }); },
-													onFieldSubmitted: (input) { setState(() { newMatch.initials = input; }); },
-													onChanged: (input) { setState(() { newMatch.initials = input; }); },
+													onSaved: (input) { setState(() { widget.matchData.initials = input; }); },
+													onFieldSubmitted: (input) { setState(() { widget.matchData.initials = input; }); },
+													onChanged: (input) { setState(() { widget.matchData.initials = input; }); },
 												),
 												TextFormField(
-													initialValue: newMatch.matchNumber,
+													initialValue: widget.matchData.matchNumber,
 													decoration: const InputDecoration(labelText: 'Enter the match number'),
 													keyboardType: TextInputType.number,
 													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-													onSaved: (input) { setState(() { newMatch.matchNumber = input; }); },
-													onChanged: (input) { setState(() { newMatch.matchNumber = input; }); },
-													onFieldSubmitted: (input) { setState(() { newMatch.matchNumber = input; }); }
+													onSaved: (input) { setState(() { widget.matchData.matchNumber = input; }); },
+													onChanged: (input) { setState(() { widget.matchData.matchNumber = input; }); },
+													onFieldSubmitted: (input) { setState(() { widget.matchData.matchNumber = input; }); }
 												),
 												TextFormField(
-													initialValue: newMatch.teamNumber,
+													initialValue: widget.matchData.teamNumber,
 													decoration: const InputDecoration(labelText: "Enter Team Number"),
 													keyboardType: TextInputType.number,
 													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-													onSaved: (input) { setState(() { newMatch.teamNumber = input; }); },
-													onChanged: (input) { setState(() { newMatch.teamNumber = input; }); },
-													onFieldSubmitted: (input) { setState(() { newMatch.teamNumber = input; }); },
+													onSaved: (input) { setState(() { widget.matchData.teamNumber = input; }); },
+													onChanged: (input) { setState(() { widget.matchData.teamNumber = input; }); },
+													onFieldSubmitted: (input) { setState(() { widget.matchData.teamNumber = input; }); },
 												),
 												Text('Select robot position'),
 												Column(children: <Widget>[
 													Row(children: <Widget>[
 														RaisedButton(
 															child: Text('Red 1'),
-															color: (newMatch.position == 4) ? Colors.redAccent : Colors.grey,
+															color: (widget.matchData.position == 4) ? Colors.redAccent : Colors.grey,
 															onPressed: () {
-																newMatch.position = (newMatch.position == 4) ? -1 : 4;
+																widget.matchData.position = (widget.matchData.position == 4) ? -1 : 4;
 																setState(() {});
 															}
 														),
 														VerticalDivider(width: 5.0),
 														RaisedButton(
 															child: Text('Red 2'),
-															color: (newMatch.position == 5) ? Colors.redAccent : Colors.grey,
+															color: (widget.matchData.position == 5) ? Colors.redAccent : Colors.grey,
 															onPressed: () {
-																newMatch.position = (newMatch.position == 5) ? -1 : 5;
+																widget.matchData.position = (widget.matchData.position == 5) ? -1 : 5;
 																setState(() {});
 															}
 														),
 														VerticalDivider(width: 5.0),
 														RaisedButton(
 															child: Text('Red 3'),
-															color: (newMatch.position == 6) ? Colors.redAccent : Colors.grey,
+															color: (widget.matchData.position == 6) ? Colors.redAccent : Colors.grey,
 															onPressed: () {
-																newMatch.position = (newMatch.position == 6) ? -1 : 6;
+																widget.matchData.position = (widget.matchData.position == 6) ? -1 : 6;
 																setState(() {});
 															}
 														)
@@ -160,27 +176,27 @@ class _ScoutModeState extends State<ScoutMode> {
 													Row(children: <Widget>[
 														RaisedButton(
 															child: Text('Blue 1'),
-															color: (newMatch.position == 1) ? Colors.blueAccent : Colors.grey,
+															color: (widget.matchData.position == 1) ? Colors.blueAccent : Colors.grey,
 															onPressed: () {
-																newMatch.position = (newMatch.position == 1) ? -1 : 1;
+																widget.matchData.position = (widget.matchData.position == 1) ? -1 : 1;
 																setState(() {});
 															}
 														),
 														VerticalDivider(width: 5.0),
 														RaisedButton(
 															child: Text('Blue 2'),
-															color: (newMatch.position == 2) ? Colors.blueAccent : Colors.grey,
+															color: (widget.matchData.position == 2) ? Colors.blueAccent : Colors.grey,
 															onPressed: () {
-																newMatch.position = (newMatch.position == 2) ? -1 : 2;
+																widget.matchData.position = (widget.matchData.position == 2) ? -1 : 2;
 																setState(() {});
 															}
 														),
 														VerticalDivider(width: 5.0),
 														RaisedButton(
 															child: Text('Blue 3'),
-															color: (newMatch.position == 3) ? Colors.blueAccent : Colors.grey,
+															color: (widget.matchData.position == 3) ? Colors.blueAccent : Colors.grey,
 															onPressed: () {
-																newMatch.position = (newMatch.position == 3) ? -1 : 3;
+																widget.matchData.position = (widget.matchData.position == 3) ? -1 : 3;
 																setState(() {});
 															}
 														)
@@ -198,33 +214,33 @@ class _ScoutModeState extends State<ScoutMode> {
 													Row(children: <Widget>[
 														RaisedButton(
 															child: Text('0'),
-															color: newMatch.preloadedfuelcells == 0 ? Colors.greenAccent : Colors.grey,
+															color: widget.matchData.preloadedfuelcells == 0 ? Colors.greenAccent : Colors.grey,
 															onPressed: () {
-																setState(() { newMatch.preloadedfuelcells = 0; });
+																setState(() { widget.matchData.preloadedfuelcells = 0; });
 															}
 														),
 														VerticalDivider(width: 5.0),
 														RaisedButton(
 															child: Text('1'),
-															color: newMatch.preloadedfuelcells == 1 ? Colors.greenAccent : Colors.grey,
+															color: widget.matchData.preloadedfuelcells == 1 ? Colors.greenAccent : Colors.grey,
 															onPressed: () {
-																setState(() { newMatch.preloadedfuelcells = 1; });
+																setState(() { widget.matchData.preloadedfuelcells = 1; });
 															}
 														),
 														VerticalDivider(width: 5.0),
 														RaisedButton(
 															child: Text('2'),
-															color: newMatch.preloadedfuelcells == 2 ? Colors.greenAccent : Colors.grey,
+															color: widget.matchData.preloadedfuelcells == 2 ? Colors.greenAccent : Colors.grey,
 															onPressed: () {
-																setState(() { newMatch.preloadedfuelcells = 2; });
+																setState(() { widget.matchData.preloadedfuelcells = 2; });
 															}
 														),
 														VerticalDivider(width: 5.0),
 														RaisedButton(
 															child: Text('3'),
-															color: newMatch.preloadedfuelcells == 3 ? Colors.greenAccent : Colors.grey,
+															color: widget.matchData.preloadedfuelcells == 3 ? Colors.greenAccent : Colors.grey,
 															onPressed: () {
-																setState(() { newMatch.preloadedfuelcells = 3; });
+																setState(() { widget.matchData.preloadedfuelcells = 3; });
 															}
 														)
 													],
@@ -242,19 +258,19 @@ class _ScoutModeState extends State<ScoutMode> {
 														RaisedButton(
 															child: Text("Auton"),
 															onPressed: () {
-																Navigator.push(context, new MaterialPageRoute(builder: (context) => AutonPath(matchData: newMatch, onTap: () => _startClock())));
+																Navigator.push(context, new MaterialPageRoute(builder: (context) => AutonPath(matchData: widget.matchData, onTap: () => _startClock())));
 															},
 														),
 														VerticalDivider(width: 5.0),
 														RaisedButton(
 															child: Text("Teleop"),
 															onPressed: () {
-																Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: newMatch, onTap: () => _startClock())));
+																Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: widget.matchData, onTap: () => _startClock())));
 															},
 														)
 													],
 													mainAxisAlignment: MainAxisAlignment.center
-												),  
+												),	
 												Divider(
 													height: 30.0,
 													indent: 5.0,
@@ -264,18 +280,18 @@ class _ScoutModeState extends State<ScoutMode> {
 												Column(children: <Widget>[
 														Text('$_clockText', style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 3.0)),
 														Row(children: <Widget>[
-                              RaisedButton(
+															RaisedButton(
 																child: Text("Start Timer"),
 																onPressed: () {
 																	_startClock();
 																},
 															),
-                              Container(width: 5.0),
+															Container(width: 5.0),
 															RaisedButton(
 																child: Text("Stop Timer"),
 																onPressed: () {
 																	_stopClock();
-                                  print(_stopwatch.elapsedMilliseconds);
+																	print(_stopwatch.elapsedMilliseconds);
 																},
 															),
 															Container(width: 5.0),
@@ -298,25 +314,25 @@ class _ScoutModeState extends State<ScoutMode> {
 												Row(children: <Widget>[
 													RaisedButton(
 														child: Text('Neither'),
-														color: newMatch.park == 3 ? Colors.greenAccent : Colors.grey,
+														color: widget.matchData.park == 3 ? Colors.greenAccent : Colors.grey,
 														onPressed: () {
-															setState(() { newMatch.park = 3; });
+															setState(() { widget.matchData.park = 3; });
 														}
 													),
 													VerticalDivider(width: 5.0),
 													RaisedButton(
 														child: Text('Park'),
-														color: newMatch.park == 1 ? Colors.greenAccent : Colors.grey,
+														color: widget.matchData.park == 1 ? Colors.greenAccent : Colors.grey,
 														onPressed: () {
-															setState(() { newMatch.park = 1; });
+															setState(() { widget.matchData.park = 1; });
 														}
 													),
 													VerticalDivider(width: 5.0),
 													RaisedButton(
 														child: Text('Climb'),
-														color: newMatch.park == 2 ? Colors.greenAccent : Colors.grey,
+														color: widget.matchData.park == 2 ? Colors.greenAccent : Colors.grey,
 														onPressed: () {
-															setState(() { newMatch.park = 2; });
+															setState(() { widget.matchData.park = 2; });
 														}
 													)
 												],
@@ -331,10 +347,10 @@ class _ScoutModeState extends State<ScoutMode> {
 													Column(children: <Widget>[
 														Text('Leveling ability?'),
 														RaisedButton(
-															child: Text(newMatch.levelability ? 'Yes' : 'No'),
-															color: newMatch.levelability ? Colors.greenAccent : Colors.grey,
+															child: Text(widget.matchData.levelability ? 'Yes' : 'No'),
+															color: widget.matchData.levelability ? Colors.greenAccent : Colors.grey,
 															onPressed: () {
-																newMatch.levelability = !newMatch.levelability;
+																widget.matchData.levelability = !widget.matchData.levelability;
 																setState(() {});
 															}
 														)
@@ -343,24 +359,24 @@ class _ScoutModeState extends State<ScoutMode> {
 													Column(children: <Widget>[
 														Text('Assisted?'),
 														RaisedButton(
-															child: Text(newMatch.assist ? 'Yes' : 'No'),
-															color: newMatch.assist ? Colors.greenAccent : Colors.grey,
+															child: Text(widget.matchData.assist ? 'Yes' : 'No'),
+															color: widget.matchData.assist ? Colors.greenAccent : Colors.grey,
 															onPressed: () {
-																newMatch.assist = !newMatch.assist;
-																if (!newMatch.assist) { newMatch.typeassist = false; }
+																widget.matchData.assist = !widget.matchData.assist;
+																if (!widget.matchData.assist) { widget.matchData.typeassist = false; }
 																setState(() {});
 															}
 														)
 													]),
 													VerticalDivider(width: 5.0),
-													newMatch.assist ?
+													widget.matchData.assist ?
 														Column(children: <Widget>[
 															Text('Assist type'),
 															RaisedButton(
-																child: Text(newMatch.typeassist ? 'Active' : 'Passive'),
-																color: newMatch.typeassist ? Colors.greenAccent : Colors.grey,
+																child: Text(widget.matchData.typeassist ? 'Active' : 'Passive'),
+																color: widget.matchData.typeassist ? Colors.greenAccent : Colors.grey,
 																onPressed: () {
-																	newMatch.typeassist = !newMatch.typeassist;
+																	widget.matchData.typeassist = !widget.matchData.typeassist;
 																	setState(() {});
 																}
 															)
@@ -378,10 +394,10 @@ class _ScoutModeState extends State<ScoutMode> {
 													SmoothStarRating(
 															allowHalfRating: true,
 															onRatingChanged: (v) {
-																setState(() { newMatch.generalSuccess = v; });
+																setState(() { widget.matchData.generalSuccess = v; });
 															},
 															starCount: 5,
-															rating: newMatch.generalSuccess,
+															rating: widget.matchData.generalSuccess,
 															size: 40.0,
 															filledIconData: Icons.star,
 															halfFilledIconData: Icons.star_half,
@@ -392,10 +408,10 @@ class _ScoutModeState extends State<ScoutMode> {
 													SmoothStarRating(
 															allowHalfRating: true,
 															onRatingChanged: (v) {
-																setState(() { newMatch.defensiveSuccess = v; });
+																setState(() { widget.matchData.defensiveSuccess = v; });
 															},
 															starCount: 5,
-															rating: newMatch.defensiveSuccess,
+															rating: widget.matchData.defensiveSuccess,
 															size: 40.0,
 															filledIconData: Icons.star,
 															halfFilledIconData: Icons.star_half,
@@ -406,10 +422,10 @@ class _ScoutModeState extends State<ScoutMode> {
 													SmoothStarRating(
 															allowHalfRating: true,
 															onRatingChanged: (v) {
-                                setState(() { newMatch.accuracy = v; });
+																setState(() { widget.matchData.accuracy = v; });
 															},
 															starCount: 5,
-															rating: newMatch.accuracy,
+															rating: widget.matchData.accuracy,
 															size: 40.0,
 															filledIconData: Icons.star,
 															halfFilledIconData: Icons.star_half,
@@ -427,10 +443,10 @@ class _ScoutModeState extends State<ScoutMode> {
 													Column(children: <Widget>[
 														Text('Floor Pickup?'),
 														RaisedButton(
-															child: Text(newMatch.floorpickup ? 'Yes' : 'No'),
-															color: newMatch.floorpickup ? Colors.greenAccent : Colors.grey,
+															child: Text(widget.matchData.floorpickup ? 'Yes' : 'No'),
+															color: widget.matchData.floorpickup ? Colors.greenAccent : Colors.grey,
 															onPressed: () {
-																newMatch.floorpickup = !newMatch.floorpickup;
+																widget.matchData.floorpickup = !widget.matchData.floorpickup;
 																setState(() {});
 															}
 														)
@@ -439,10 +455,10 @@ class _ScoutModeState extends State<ScoutMode> {
 													Column(children: <Widget>[
 														Text('Egregious	Fouls?'),
 														RaisedButton(
-															child: Text(newMatch.fouls ? 'Yes' : 'No'),
-															color: newMatch.fouls ? Colors.greenAccent : Colors.grey,
+															child: Text(widget.matchData.fouls ? 'Yes' : 'No'),
+															color: widget.matchData.fouls ? Colors.greenAccent : Colors.grey,
 															onPressed: () {
-																newMatch.fouls = !newMatch.fouls;
+																widget.matchData.fouls = !widget.matchData.fouls;
 																setState(() {});
 															}
 														)
@@ -451,10 +467,10 @@ class _ScoutModeState extends State<ScoutMode> {
 													Column(children: <Widget>[
 														Text('Had Problems?'),
 														RaisedButton(
-															child: Text(newMatch.problems ? 'Yes' : 'No'),
-															color: newMatch.problems ? Colors.greenAccent : Colors.grey,
+															child: Text(widget.matchData.problems ? 'Yes' : 'No'),
+															color: widget.matchData.problems ? Colors.greenAccent : Colors.grey,
 															onPressed: () {
-																newMatch.problems = !newMatch.problems;
+																widget.matchData.problems = !widget.matchData.problems;
 																setState(() {});
 															}
 														)
@@ -480,11 +496,18 @@ class _ScoutModeState extends State<ScoutMode> {
 														padding: const EdgeInsets.symmetric(
 																vertical: 16.0, horizontal: 16.0),
 														child: RaisedButton(
-															child: Text("Clear"),
-															onPressed:() {
-																AutoPath().points = <Offset>[];
-																Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => ScoutMode()));
-															},
+															child: Text("Clear and Increment Match"),
+															onPressed:() async {
+																bool shouldClear = await _confirmationPrompt(context, 'Are you sure you want to clear?');
+																if (shouldClear) {
+																	print('Clearing');
+																	int nextMatch = int.tryParse(widget.matchData.matchNumber);
+																	if (nextMatch != null) { nextMatch = nextMatch + 1; }
+																	Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => ScoutMode(nextMatch:  nextMatch, initials: widget.matchData.initials, position: widget.matchData.position)));
+																} else {
+																	print('Not clearing...');
+																}
+															}
 														)),
 											],
 											scrollDirection: Axis.vertical,
@@ -494,31 +517,31 @@ class _ScoutModeState extends State<ScoutMode> {
 	}
 
 	void _submit() {
-		int teamNumber = newMatch.teamNumber == '' ? 0 : int.parse(newMatch.teamNumber);
-		int matchNumber = newMatch.matchNumber == '' ? 0 : int.parse(newMatch.matchNumber);
+		int teamNumber = widget.matchData.teamNumber == '' ? 0 : int.parse(widget.matchData.teamNumber);
+		int matchNumber = widget.matchData.matchNumber == '' ? 0 : int.parse(widget.matchData.matchNumber);
 
 		_generateId(teamNumber, matchNumber);
 		_extractshootingshootingpoints();
 		_condensePoints();
 
-    double generalSuccess = (newMatch.generalSuccess * 2).roundToDouble() / 2;
-    if (generalSuccess <= 1e-10) { generalSuccess = null; }
-    double defensiveSuccess = (newMatch.defensiveSuccess * 2).roundToDouble() / 2;
-    if (defensiveSuccess <= 1e-10) { defensiveSuccess = null; }
-    double accuracy = (newMatch.accuracy * 2).roundToDouble() / 2;
-    if (accuracy <= 1e-10) { accuracy = null; }
+		double generalSuccess = (widget.matchData.generalSuccess * 2).roundToDouble() / 2;
+		if (generalSuccess <= 1e-10) { generalSuccess = null; }
+		double defensiveSuccess = (widget.matchData.defensiveSuccess * 2).roundToDouble() / 2;
+		if (defensiveSuccess <= 1e-10) { defensiveSuccess = null; }
+		double accuracy = (widget.matchData.accuracy * 2).roundToDouble() / 2;
+		if (accuracy <= 1e-10) { accuracy = null; }
 
 		if (formKey.currentState.validate()) {
 			formKey.currentState.save();
 			var payload = {
-				'initials': newMatch.initials,
-				'id': newMatch.id,
-				'teamnumber': int.parse(newMatch.teamNumber),
-				'matchnumber': int.parse(newMatch.matchNumber),
-				'position': newMatch.position,
-				'preloadedfuelcells': newMatch.preloadedfuelcells,
-				'autopathx': newMatch.autopathx,
-				'autopathy': newMatch.autopathy,
+				'initials': widget.matchData.initials,
+				'id': widget.matchData.id,
+				'teamnumber': teamNumber,
+				'matchnumber': matchNumber,
+				'position': widget.matchData.position,
+				'preloadedfuelcells': widget.matchData.preloadedfuelcells,
+				'autopathx': widget.matchData.autopathx,
+				'autopathy': widget.matchData.autopathy,
 				'autoshotsx': autoshotsx,
 				'autoshotsy': autoshotsy,
 				'autoshotsmade': autoshotsmade,
@@ -527,16 +550,16 @@ class _ScoutModeState extends State<ScoutMode> {
 				'teleopshotsy': teleopshotsy,
 				'teleopshotsmade': teleopshotsmade,
 				'teleopshotstype': teleopshotstype,
-				'climbtime': newMatch.climbtime,
-				'park': newMatch.park,
-				'positioncontrol': newMatch.spins.positionControl,
-				'colorcontrol': newMatch.spins.colorControl,
+				'climbtime': widget.matchData.climbtime,
+				'park': widget.matchData.park,
+				'positioncontrol': widget.matchData.spins.positionControl,
+				'colorcontrol': widget.matchData.spins.colorControl,
 				'generalsuccess': generalSuccess,
 				'defensivesuccess': defensiveSuccess,
 				'accuracy': accuracy,
-				'floorpickup': newMatch.floorpickup ? 1 : 0,
-				'fouls': newMatch.fouls ? 1 : 0,
-				'problems': newMatch.problems ? 1 : 0
+				'floorpickup': widget.matchData.floorpickup ? 1 : 0,
+				'fouls': widget.matchData.fouls ? 1 : 0,
+				'problems': widget.matchData.problems ? 1 : 0
 			};
 			List<int> stringBytes = utf8.encode(json.encode(payload));
 			List<int> gzipBytes = new GZipEncoder().encode(stringBytes);
@@ -553,28 +576,28 @@ class _ScoutModeState extends State<ScoutMode> {
 	}
 
 	_condensePoints() {
-		List<Offset> points = newMatch.autopathpoints;
-		newMatch.autopathx = [];
-		newMatch.autopathy = [];
+		List<Offset> points = widget.matchData.autopathpoints;
+		widget.matchData.autopathx = [];
+		widget.matchData.autopathy = [];
 		for (int i = 0; i < points.length; i += 5) {
-			newMatch.autopathx.add(((points[i].dx/MediaQuery.of(context).size.width)*686).round());
-			newMatch.autopathy.add(((points[i].dy/MediaQuery.of(context).size.height)*1316).round());
+			widget.matchData.autopathx.add(((points[i].dx/MediaQuery.of(context).size.width)*686).round());
+			widget.matchData.autopathy.add(((points[i].dy/MediaQuery.of(context).size.height)*1316).round());
 		}
-    print(newMatch.autopathx);
-    print(newMatch.autopathy);
+		print(widget.matchData.autopathx);
+		print(widget.matchData.autopathy);
 	}
 
 	int _getTeam() {
 		String scheduledTeam;
 		String alphaPos;
 		int betaPos;
-		if (newMatch.position <= 3) {
+		if (widget.matchData.position <= 3) {
 			alphaPos = "blue";
 		} else {
 			alphaPos = "red";
 		}
-		betaPos = newMatch.position % 3;
-		scheduledTeam = newGlobals.schedule[int.parse(newMatch.matchNumber)]["alliances"]
+		betaPos = widget.matchData.position % 3;
+		scheduledTeam = newGlobals.schedule[int.parse(widget.matchData.matchNumber)]["alliances"]
 				[alphaPos]["team_keys"][betaPos];
 		scheduledTeam = scheduledTeam.substring(3);
 		return int.parse(scheduledTeam);
@@ -582,22 +605,54 @@ class _ScoutModeState extends State<ScoutMode> {
 
 	_generateId(int teamNumber, int matchNumber) {
 		int id = teamNumber * 10000 + matchNumber;
-		newMatch.id = id;
+		widget.matchData.id = id;
 	}
 
 	_extractshootingshootingpoints() {
-		for(int i=0; i < newMatch.autoshots.length; i++) {
-			autoshotsx.add(((newMatch.autoshots[i].pos.dx/MediaQuery.of(context).size.width)*686).round());
-			autoshotsy.add(((newMatch.autoshots[i].pos.dy/MediaQuery.of(context).size.height)*1316).round());
-			autoshotsmade.add(newMatch.autoshots[i].shotsMade);
-			autoshotstype.add(newMatch.autoshots[i].shotType ? 1 : 0);
+		for(int i=0; i < widget.matchData.autoshots.length; i++) {
+			autoshotsx.add(((widget.matchData.autoshots[i].pos.dx/MediaQuery.of(context).size.width)*686).round());
+			autoshotsy.add(((widget.matchData.autoshots[i].pos.dy/MediaQuery.of(context).size.height)*1316).round());
+			autoshotsmade.add(widget.matchData.autoshots[i].shotsMade);
+			autoshotstype.add(widget.matchData.autoshots[i].shotType ? 1 : 0);
 		}
-		for(int i=0; i < newMatch.teleopshots.length; i++) {
-			teleopshotsx.add(((newMatch.teleopshots[i].pos.dx/MediaQuery.of(context).size.width)*686).round());
-			teleopshotsy.add(((newMatch.teleopshots[i].pos.dy/MediaQuery.of(context).size.height)*1316).round());
-			teleopshotsmade.add(newMatch.teleopshots[i].shotsMade);
-			teleopshotstype.add(newMatch.teleopshots[i].shotType ? 1 : 0);
+		for(int i=0; i < widget.matchData.teleopshots.length; i++) {
+			teleopshotsx.add(((widget.matchData.teleopshots[i].pos.dx/MediaQuery.of(context).size.width)*686).round());
+			teleopshotsy.add(((widget.matchData.teleopshots[i].pos.dy/MediaQuery.of(context).size.height)*1316).round());
+			teleopshotsmade.add(widget.matchData.teleopshots[i].shotsMade);
+			teleopshotstype.add(widget.matchData.teleopshots[i].shotType ? 1 : 0);
 		}
 		
+	}
+
+	Future<bool> _confirmationPrompt (BuildContext context, String prompt) async {
+		bool confirmation = false;
+		await showDialog(
+				context: context,
+				builder: (context) {
+					return AlertDialog(
+						title: Text(prompt),
+						content: Column(
+							children: <Widget>[
+								Row(
+									children: <Widget>[
+										RaisedButton(
+											child: Text('Yes'),
+											onPressed: () { confirmation = true; Navigator.pop(context); }
+										),
+										Container(width: 5.0),
+										RaisedButton(
+											child: Text('No'),
+											onPressed: () { confirmation = false; Navigator.pop(context); }
+										)
+									],
+									mainAxisAlignment: MainAxisAlignment.center,
+									mainAxisSize: MainAxisSize.min,
+								)
+							],
+							mainAxisAlignment: MainAxisAlignment.center,
+							mainAxisSize: MainAxisSize.min
+						));
+			});
+			return confirmation;
 	}
 }
