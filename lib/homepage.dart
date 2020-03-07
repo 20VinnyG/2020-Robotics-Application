@@ -12,6 +12,7 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   List schedule = new List();
+  String eventcode = '';
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -54,20 +55,21 @@ class _HomepageState extends State<Homepage> {
                                   title: Text("Import Match Schedule"),
                                   content: Column(
                                     children: <Widget>[
-                                      /*TextFormField(
+                                      TextFormField(
                                         initialValue: eventcode,
                                         decoration: const InputDecoration(
                                             labelText: 'Enter event code'),
-                                        validator: (input) => input.isEmpty
-                                            ? 'Not a valid input'
-                                            : null,
                                         onChanged: (input) {
                                           setState(() {
-                                            input = eventcode;
+                                            eventcode = input;
+                                          });
+                                        },
+                                        onSaved: (input) {
+                                          setState(() {
+                                            eventcode = input;
                                           });
                                         },
                                       ),
-                                      */
                                       RaisedButton(
                                           child: Text('Import Match Schedule'),
                                           onPressed: () {
@@ -80,12 +82,6 @@ class _HomepageState extends State<Homepage> {
                             });
                           });
                     }),
-                RaisedButton(
-                    child: Text('Test'),
-                    color: Colors.yellow,
-                    onPressed: () {
-                      print(schedule);
-                    }),
               ],
             ),
           ),
@@ -93,13 +89,13 @@ class _HomepageState extends State<Homepage> {
   }
 
   Future<String> fetchSchedule() async {
+    print(eventcode);
     var matchresponse = await http.get(
-        "https://www.thebluealliance.com/api/v3/event/2019pawch/matches/simple",
+        "https://www.thebluealliance.com/api/v3/event/${eventcode}/matches/simple",
         headers: {
           "X-TBA-Auth-Key":
               "prLzMTfZitylzcN8Zwb64bTaUELuJW8G6AXnDebu20Oz0JF4hh8Voc9rhZFYArSz"
         });
     schedule = jsonDecode(matchresponse.body);
-    print(schedule);
   }
 }
