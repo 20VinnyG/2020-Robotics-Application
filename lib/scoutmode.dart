@@ -8,7 +8,7 @@ import 'package:scoutmobile2020/teleop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:sprintf/sprintf.dart';
-import 'match.dart';
+import 'package:scoutmobile2020/types/match.dart';
 import 'package:archive/archive.dart';
 
 class ScoutMode extends StatefulWidget {
@@ -525,46 +525,14 @@ class _ScoutModeState extends State<ScoutMode> {
 		int matchNumber = widget.matchData.matchNumber == '' ? 0 : int.parse(widget.matchData.matchNumber);
 
 		_generateId(teamNumber, matchNumber);
-		_extractshootingshootingpoints();
-		_condensePoints();
-
-		double generalSuccess = (widget.matchData.generalSuccess * 2).roundToDouble() / 2;
-		if (generalSuccess <= 1e-10) { generalSuccess = null; }
-		double defensiveSuccess = (widget.matchData.defensiveSuccess * 2).roundToDouble() / 2;
-		if (defensiveSuccess <= 1e-10) { defensiveSuccess = null; }
-		double accuracy = (widget.matchData.accuracy * 2).roundToDouble() / 2;
-		if (accuracy <= 1e-10) { accuracy = null; }
+		_extractshootingshootingpoints(); // TODO: 
+		_condensePoints(); // TODO:
 
 		if (formKey.currentState.validate()) {
 			formKey.currentState.save();
-			var payload = {
-				'initials': widget.matchData.initials,
-				'id': widget.matchData.id,
-				'teamnumber': teamNumber,
-				'matchnumber': matchNumber,
-				'position': widget.matchData.position,
-				'preloadedfuelcells': widget.matchData.preloadedfuelcells,
-				'autopathx': widget.matchData.autopathx,
-				'autopathy': widget.matchData.autopathy,
-				'autoshotsx': autoshotsx,
-				'autoshotsy': autoshotsy,
-				'autoshotsmade': autoshotsmade,
-				'autoshotstype': autoshotstype,
-				'teleopshotsx': teleopshotsx,
-				'teleopshotsy': teleopshotsy,
-				'teleopshotsmade': teleopshotsmade,
-				'teleopshotstype': teleopshotstype,
-				'climbtime': widget.matchData.climbtime,
-				'park': widget.matchData.park,
-				'positioncontrol': widget.matchData.spins.positionControl,
-				'colorcontrol': widget.matchData.spins.colorControl,
-				'generalsuccess': generalSuccess,
-				'defensivesuccess': defensiveSuccess,
-				'accuracy': accuracy,
-				'floorpickup': widget.matchData.floorpickup ? 1 : 0,
-				'fouls': widget.matchData.fouls ? 1 : 0,
-				'problems': widget.matchData.problems ? 1 : 0
-			};
+
+      var payload = widget.matchData.toJson();
+      print(jsonEncode(payload));
 			List<int> stringBytes = utf8.encode(json.encode(payload));
 			List<int> gzipBytes = new GZipEncoder().encode(stringBytes);
 			String compressedString = base64.encode(gzipBytes);

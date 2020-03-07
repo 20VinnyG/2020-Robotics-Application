@@ -9,6 +9,8 @@ import 'package:googleapis/sheets/v4.dart';
 import 'package:googleapis_auth/auth.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
+import 'package:scoutmobile2020/types/match.dart';
+import 'package:scoutmobile2020/types/shot.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
@@ -26,87 +28,95 @@ String _pathSheetId = '';
 final String _eventsParentFolderId = '1aygdfoJX-V0zoLdpnstT6B44aYWJrBjz';
 
 final Map<String,String> matchSheetMap = {
-		'Initials': 'initials',
+		'Initials': 'in',
 		'Id': 'id',
-		'Team Number': 'teamnumber',
-		'Match Number': 'matchnumber',
-		'Position': 'position',
-		'Preloaded Fuel Cells': 'preloadedfuelcells',
-		'Successful': 'spinoutcome',
-		'Climb Time': 'climbtime',
-		'Park': 'park',
-		'Position Control': 'positioncontrol',
-		'Color Control': 'colorcontrol',
-		'General Success': 'generalsuccess',
-		'Defensive Success': 'defensivesuccess',
-		'Accuracy': 'accuracy',
-		'Floorpickup': 'floorpickup',
-		'Fouls': 'fouls',
-		'Problems': 'problems'
+		'Team Number': 'tn',
+		'Match Number': 'mn',
+		'Position': 'po',
+		'Preloaded Fuel Cells': 'fc',
+		'Climb Time': 'ct',
+		'Park': 'pa',
+		'Position Control': 'sp:pc',
+		'Color Control': 'sp:cc',
+		'General Success': 'gs',
+		'Defensive Success': 'ds',
+		'Accuracy': 'ac',
+		'Floorpickup': 'fp',
+		'Fouls': 'fo',
+		'Problems': 'pr'
 };
 
 final Map<String,String> shotSheetMap = {
-	'Match': 'matchnumber',
-	'Team Number': 'teamnumber',
-	'Id': 'id',
-	'Period': 'period',
-	'Shots X': 'shotsx',
-	'Shots Y': 'shotsy',
-	'Shots Made': 'shotsmade',
-	'Goal': 'goal'
+	'Match': '',
+	'Team Number': '',
+	'Id': '',
+	'Period': '',
+	'Shots X': '',
+	'Shots Y': '',
+	'Shots Made': '',
+	'High Goal': ''
 };
 
 final Map<String,String> pathSheetMap = {
-	'Match': 'matchnumber',
-	'Team Number': 'teamnumber',
-	'Id': 'id',
-	'Sequence': 'sequence',
-	'Auton Path X': 'autopathx',
-	'Auton Path Y': 'autopathy'
+	'Match': '',
+	'Team Number': '',
+	'Id': '',
+	'Sequence': '',
+	'Auton Path X': '',
+	'Auton Path Y': ''
 };
 
-void _appendGeneral (SheetsApi api) async {
+void _appendMatch (SheetsApi api) async {
 	print('data length: ' + data.length.toString());
 
 	List<dynamic> payload = [];
 	for (int i = 0; i < data.length; i++) {
-		List<String> row = [];
+    print('processing scanned qr: ' + i.toString());
+
+		List<dynamic> row = [];
 		Map<String,dynamic> jsonData = data[i];
+
 		matchSheetMap.forEach((colName, jsonName) {
-			row.add(jsonData[jsonName].toString());
+      List<String> keyPath = jsonName.split(":");
+      dynamic value = jsonData[keyPath[0]];
+      for (int j = 1; j < keyPath.length; j++) {
+        value = value[keyPath[j]];
+      }
+			row.add(value);
 		});
+
+    print('row: ' + row.toString());
+
 		payload.add(row);
 	}
 
+  print('payload: ' + payload.toString());
+
 	ValueRange vr = ValueRange.fromJson({ 'values': payload });
-	await api.spreadsheets.values.append(vr, _matchSheetId, 'A:R', valueInputOption: 'USER_ENTERED');
+	await api.spreadsheets.values.append(vr, _matchSheetId, 'A:P', valueInputOption: 'USER_ENTERED');
 
 	print('Done appending match data');
 }
 
 void _appendPath (SheetsApi api) async {
 	List<dynamic> payload = [];
+
 	for (int i = 0; i < data.length; i++) {
-		Map<String,dynamic> jsonData = data[i];
-		print('Shot data: ' + jsonData.toString());
+    MatchData matchData = MatchData.fromJson(data[i]);
 
-		int pathLength = (jsonData['autopathx'] as List<dynamic>).length;
+    List<Offset> autopath = matchData.autopathpointscondensed;
+    for (int j = 0; j < autopath.length; j++) {
+      List<dynamic> row = [];
 
-		List<dynamic> pathx = jsonData['autopathx'];
-		List<dynamic> pathy = jsonData['autopathy'];
+      row.add(matchData.matchNumber);
+      row.add(matchData.teamNumber);
+      row.add(matchData.id);
+      row.add(j);
+      row.add(autopath[j].dx);
+      row.add(autopath[j].dy);
 
-		for (int j = 0; j < pathLength; j++) {
-			List<dynamic> row = [];
-
-			row.add(jsonData['matchnumber']);
-			row.add(jsonData['teamnumber']);
-			row.add(jsonData['id']);
-			row.add(j);
-			row.add(pathx[j]);
-			row.add(pathy[j]);
-
-			payload.add(row);
-		}
+      payload.add(row);
+    }
 	}
 
 	ValueRange vr = ValueRange.fromJson({ 'values': payload 	});
@@ -117,51 +127,43 @@ void _appendPath (SheetsApi api) async {
 
 void _appendShots (SheetsApi api) async {
 	List<dynamic> payload = [];
+
 	for (int i = 0; i < data.length; i++) {
-		Map<String,dynamic> jsonData = data[i];
-		print('Path data: ' + jsonEncode(jsonData).toString());
-		
-		List<dynamic> autoShotsX = jsonData['autoshotsx'];
-		List<dynamic> autoShotsY = jsonData['autoshotsy'];
-		List<dynamic> autoShotsMade = jsonData['autoshotsmade'];
-		List<dynamic> autoShotsType = jsonData['autoshotstype'];
+    MatchData matchData = MatchData.fromJson(data[i]);
 
-		List<dynamic> teleShotsX = jsonData['teleopshotsx'];
-		List<dynamic> teleShotsY = jsonData['teleopshotsy'];
-		List<dynamic> teleShotsMade = jsonData['teleopshotsmade'];
-		List<dynamic> teleShotsType = jsonData['teleopshotstype'];
+    print('MatchData: ' + matchData.toJson().toString());
 
-		for (int j = 0; j < autoShotsX.length; j++) {
-			List<dynamic> row = [];
+    List<Shot> autoShots = matchData.autoshots;
+    for (int j = 0; j < autoShots.length; j++) {
+      List<dynamic> row = [];
 
-			row.add(jsonData['matchnumber']);
-			row.add(jsonData['teamnumber']);
-			row.add(jsonData['id']);
-			row.add('auton');
+      row.add(matchData.matchNumber);
+      row.add(matchData.teamNumber);
+      row.add(matchData.id);
+      row.add('auton');
+      row.add(autoShots[j].pos.dx);
+      row.add(autoShots[j].pos.dy);
+      row.add(autoShots[j].shotsMade);
+      row.add(autoShots[j].shotType);
 
-			row.add(autoShotsX[j]);
-			row.add(autoShotsY[j]);
-			row.add(autoShotsMade[j]);
-			row.add(autoShotsType[j]);
+      payload.add(row);
+    }
 
-			payload.add(row);
-		}
+    List<Shot> teleopShots = matchData.teleopshots;
+    for (int j = 0; j < teleopShots.length; j++) {
+      List<dynamic> row = [];
 
-		for (int j = 0; j < teleShotsX.length; j++) {
-			List<dynamic> row = [];
+      row.add(matchData.matchNumber);
+      row.add(matchData.teamNumber);
+      row.add(matchData.id);
+      row.add('teleop');
+      row.add(teleopShots[j].pos.dx);
+      row.add(teleopShots[j].pos.dy);
+      row.add(teleopShots[j].shotsMade);
+      row.add(teleopShots[j].shotType);
 
-			row.add(jsonData['matchnumber']);
-			row.add(jsonData['teamnumber']);
-			row.add(jsonData['id']);
-			row.add('teleop');
-
-			row.add(teleShotsX[j]);
-			row.add(teleShotsY[j]);
-			row.add(teleShotsMade[j]);
-			row.add(teleShotsType[j]);
-			
-			payload.add(row);
-		}
+      payload.add(row);
+    }
 	}
 
 	ValueRange vr = ValueRange.fromJson({ 'values': payload });
@@ -174,7 +176,7 @@ void _appendAll () async {
 	Client client = await _getGoogleClientForCurrentUser();
 	SheetsApi api = SheetsApi(client);
 	
-	_appendGeneral(api);
+	_appendMatch(api);
 	_appendPath(api);
 	_appendShots(api);
 

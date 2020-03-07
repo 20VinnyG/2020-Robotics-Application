@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:scoutmobile2020/match.dart';
-import 'package:scoutmobile2020/shot.dart';
+import 'package:scoutmobile2020/types/match.dart';
+import 'package:scoutmobile2020/types/shot.dart';
 import 'teleop.dart';
 
 class AutonPath extends StatefulWidget {
 	final MatchData matchData;
-  VoidCallback onTap;
+	VoidCallback onTap;
 
 	@override
 	AutonPathState createState() => AutonPathState();
@@ -16,6 +16,9 @@ class AutonPath extends StatefulWidget {
 }
 
 class AutonPathState extends State<AutonPath> {
+
+	Offset _lastPosition;
+	Offset _prevDistantPoint;
 
 	@override
 	Widget build(BuildContext context) {
@@ -33,11 +36,18 @@ class AutonPathState extends State<AutonPath> {
 							onPanUpdate: (DragUpdateDetails details) {
 								setState(() {
 									RenderBox object = context.findRenderObject();
-									Offset _localPosition = object.globalToLocal(details.globalPosition);
-									points.add(_localPosition);
+									_lastPosition = object.globalToLocal(details.globalPosition);
+									points.add(_lastPosition);
+									if (_prevDistantPoint == null || (_lastPosition - _prevDistantPoint).distance >= 25.0) {
+										widget.matchData.autopathpointscondensed.add(_lastPosition);
+										_prevDistantPoint = _lastPosition;
+									}
 								});
 							},
 							onPanEnd: (DragEndDetails details) async {
+								widget.matchData.autopathpointscondensed.add(_lastPosition);
+								_prevDistantPoint = _lastPosition;
+								
 								Shot newShot = new Shot();
 								newShot.pos = points[points.length - 1];
 								await showDialog(
@@ -54,10 +64,10 @@ class AutonPathState extends State<AutonPath> {
 											);
 									});	
 							});
-              setState(() {});
+							setState(() {});
 						},
 							child: new CustomPaint(
-								painter: new AutoPath(points: widget.matchData.autopathpoints, shotList: widget.matchData.autoshots),
+								painter: new AutoPath(points: widget.matchData.autopathpoints, pointsCondensed: widget.matchData.autopathpointscondensed, shotList: widget.matchData.autoshots),
 								size: Size.infinite,
 							)),
 				]),
@@ -70,6 +80,7 @@ class AutonPathState extends State<AutonPath> {
 								label: "Clear Path and Shots",
 								onTap: () => {
 									points.clear(),
+									widget.matchData.autopathpointscondensed.clear(),
 									widget.matchData.autoshots.clear()
 								}),
 						SpeedDialChild(
@@ -83,7 +94,7 @@ class AutonPathState extends State<AutonPath> {
 				));
 	}
 
-  	List<Widget> _buildShotInfoEntryLayout (Shot newShot, Function setState) {
+		List<Widget> _buildShotInfoEntryLayout (Shot newShot, Function setState) {
 		return <Widget>[
 			Row(
 				children: <Widget>[
@@ -137,21 +148,31 @@ class AutoPath extends CustomPainter {
 	final double _halfRadius = 10.0;
 
 	List<Offset> points;
+	List<Offset> pointsCondensed;
 	List<Shot> shotList;
 
-	AutoPath({this.points, this.shotList});
+	AutoPath({this.points, this.pointsCondensed, this.shotList});
 
 	@override
 	void paint(Canvas canvas, Size size) {
 		Paint paint = new Paint()
 			..color = Colors.blue
 			..strokeCap = StrokeCap.round
-			..strokeWidth = 5.0;
+			..strokeWidth = 10.0; // 5
 
-		for (int i = 0; i < points.length - 1; i++) {
-			if (points[i] != null && points[i + 1] != null) {
-				canvas.drawLine(points[i], points[i + 1], paint);
-			}
+		Paint condensedPaint = new Paint()
+			..color = Colors.red
+			..strokeCap = StrokeCap.round
+			..strokeWidth = 5.0; // 2
+		
+		print('points: ' + points.length.toString() + ' -- condensed: ' + pointsCondensed.length.toString());
+		
+		for (int i = 1; i < points.length - 1; i++) {
+			canvas.drawLine(points[i-1], points[i], paint);
+		}
+
+		for (int i = 1; i < pointsCondensed.length - 1; i++) {
+			canvas.drawLine(pointsCondensed[i-1], pointsCondensed[i], condensedPaint);
 		}
 
 		for (int i = 0; i < shotList.length; i++) {
