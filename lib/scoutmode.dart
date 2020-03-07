@@ -86,434 +86,438 @@ class _ScoutModeState extends State<ScoutMode> {
 
 	@override
 	Widget build(BuildContext context) {
-		return GestureDetector(
-			onTap: () {
-				FocusScopeNode currentFocus = FocusScope.of(context);
-				if (!currentFocus.hasPrimaryFocus) { currentFocus.unfocus(); }
-			},
-			child: new Scaffold(
-				appBar: new AppBar(
-						title: new Text("Scout Mode"), backgroundColor: Colors.blue[900]),
-				body: new Container(
-						padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-						child: Builder(
-								builder: (context) => Form(
-										key: formKey,
-										child: ListView(
-											children: [
-												Container(
-														padding: const EdgeInsets.symmetric(
-															vertical: 16.0, horizontal: 16.0),
-															child: RaisedButton(
-																child: Text("Import Schedule"),
-																onPressed: () {
-																	Navigator.push(context, new MaterialPageRoute(builder: (context) => Bluealliance()));
-																},
-														)),
-												Divider(
-													height: 30.0,
-													indent: 5.0,
-													color: Colors.black,
-												),
-												Text("Prematch"),
-												TextFormField(
-													initialValue: widget.matchData.initials,
-													decoration: const InputDecoration(labelText: 'Enter your initials'),
-													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-													onSaved: (input) { setState(() { widget.matchData.initials = input; }); },
-													onFieldSubmitted: (input) { setState(() { widget.matchData.initials = input; }); },
-													onChanged: (input) { setState(() { widget.matchData.initials = input; }); },
-												),
-												TextFormField(
-													initialValue: widget.matchData.matchNumber,
-													decoration: const InputDecoration(labelText: 'Enter the match number'),
-													keyboardType: TextInputType.number,
-													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-													onSaved: (input) { setState(() { widget.matchData.matchNumber = input; }); },
-													onChanged: (input) { setState(() { widget.matchData.matchNumber = input; }); },
-													onFieldSubmitted: (input) { setState(() { widget.matchData.matchNumber = input; }); }
-												),
-												TextFormField(
-													initialValue: widget.matchData.teamNumber,
-													decoration: const InputDecoration(labelText: "Enter Team Number"),
-													keyboardType: TextInputType.number,
-													validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-													onSaved: (input) { setState(() { widget.matchData.teamNumber = input; }); },
-													onChanged: (input) { setState(() { widget.matchData.teamNumber = input; }); },
-													onFieldSubmitted: (input) { setState(() { widget.matchData.teamNumber = input; }); },
-												),
-												Text('Select robot position'),
-												Column(children: <Widget>[
-													Row(children: <Widget>[
-														RaisedButton(
-															child: Text('Red 1'),
-															color: (widget.matchData.position == 4) ? Colors.redAccent : Colors.grey,
-															onPressed: () {
-																widget.matchData.position = (widget.matchData.position == 4) ? -1 : 4;
-																setState(() {});
-															}
-														),
-														VerticalDivider(width: 5.0),
-														RaisedButton(
-															child: Text('Red 2'),
-															color: (widget.matchData.position == 5) ? Colors.redAccent : Colors.grey,
-															onPressed: () {
-																widget.matchData.position = (widget.matchData.position == 5) ? -1 : 5;
-																setState(() {});
-															}
-														),
-														VerticalDivider(width: 5.0),
-														RaisedButton(
-															child: Text('Red 3'),
-															color: (widget.matchData.position == 6) ? Colors.redAccent : Colors.grey,
-															onPressed: () {
-																widget.matchData.position = (widget.matchData.position == 6) ? -1 : 6;
-																setState(() {});
-															}
-														)
-													],
-													mainAxisAlignment: MainAxisAlignment.center),
-													Row(children: <Widget>[
-														RaisedButton(
-															child: Text('Blue 1'),
-															color: (widget.matchData.position == 1) ? Colors.blueAccent : Colors.grey,
-															onPressed: () {
-																widget.matchData.position = (widget.matchData.position == 1) ? -1 : 1;
-																setState(() {});
-															}
-														),
-														VerticalDivider(width: 5.0),
-														RaisedButton(
-															child: Text('Blue 2'),
-															color: (widget.matchData.position == 2) ? Colors.blueAccent : Colors.grey,
-															onPressed: () {
-																widget.matchData.position = (widget.matchData.position == 2) ? -1 : 2;
-																setState(() {});
-															}
-														),
-														VerticalDivider(width: 5.0),
-														RaisedButton(
-															child: Text('Blue 3'),
-															color: (widget.matchData.position == 3) ? Colors.blueAccent : Colors.grey,
-															onPressed: () {
-																widget.matchData.position = (widget.matchData.position == 3) ? -1 : 3;
-																setState(() {});
-															}
-														)
-													],
-													mainAxisAlignment: MainAxisAlignment.center)
-												],
-												mainAxisAlignment: MainAxisAlignment.center),
-												Divider(
-													height: 30.0,
-													indent: 5.0,
-													color: Colors.black,
-												),
-												Text('Preloaded number of fuel cells'),
-												Column(children: <Widget>[
-													Row(children: <Widget>[
-														RaisedButton(
-															child: Text('0'),
-															color: widget.matchData.preloadedfuelcells == 0 ? Colors.greenAccent : Colors.grey,
-															onPressed: () {
-																setState(() { widget.matchData.preloadedfuelcells = 0; });
-															}
-														),
-														VerticalDivider(width: 5.0),
-														RaisedButton(
-															child: Text('1'),
-															color: widget.matchData.preloadedfuelcells == 1 ? Colors.greenAccent : Colors.grey,
-															onPressed: () {
-																setState(() { widget.matchData.preloadedfuelcells = 1; });
-															}
-														),
-														VerticalDivider(width: 5.0),
-														RaisedButton(
-															child: Text('2'),
-															color: widget.matchData.preloadedfuelcells == 2 ? Colors.greenAccent : Colors.grey,
-															onPressed: () {
-																setState(() { widget.matchData.preloadedfuelcells = 2; });
-															}
-														),
-														VerticalDivider(width: 5.0),
-														RaisedButton(
-															child: Text('3'),
-															color: widget.matchData.preloadedfuelcells == 3 ? Colors.greenAccent : Colors.grey,
-															onPressed: () {
-																setState(() { widget.matchData.preloadedfuelcells = 3; });
-															}
-														)
-													],
-													mainAxisAlignment: MainAxisAlignment.center
-													)
-												]),
-												Divider(
-													height: 30.0,
-													indent: 5.0,
-													color: Colors.black,
-												),
-												Text("Path and Shots"),
-												Row(
-													children: <Widget>[
-														RaisedButton(
-															child: Text("Auton"),
-															onPressed: () {
-																Navigator.push(context, new MaterialPageRoute(builder: (context) => AutonPath(matchData: widget.matchData, onTap: () => _startClock())));
-															},
-														),
-														VerticalDivider(width: 5.0),
-														RaisedButton(
-															child: Text("Teleop"),
-															onPressed: () {
-																Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: widget.matchData, onTap: () => _startClock())));
-															},
-														)
-													],
-													mainAxisAlignment: MainAxisAlignment.center
-												),	
-												Divider(
-													height: 30.0,
-													indent: 5.0,
-													color: Colors.black,
-												),
-												Text("Endgame"),
-												Column(children: <Widget>[
-														Text('$_clockText', style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 3.0)),
-														Row(children: <Widget>[
-															RaisedButton(
-																child: Text("Start Timer"),
-																onPressed: () {
-																	_startClock();
-																},
-															),
-															Container(width: 5.0),
-															RaisedButton(
-																child: Text("Stop Timer"),
-																onPressed: () {
-																	_stopClock();
-																	print(_stopwatch.elapsedMilliseconds);
-																},
-															),
-															Container(width: 5.0),
-															RaisedButton(
-																child: Text("Reset Timer"),
-																onPressed: () {
-																	_resetClock();
-																},
-															)
-														],
-														mainAxisAlignment: MainAxisAlignment.center
-														)
-												]),
-												Divider(
-													height: 30.0,
-													indent: 5.0,
-													color: Colors.black,
-												),
-												Text('End game state'),
-												Row(children: <Widget>[
-													RaisedButton(
-														child: Text('Neither'),
-														color: widget.matchData.park == 3 ? Colors.greenAccent : Colors.grey,
-														onPressed: () {
-															setState(() { widget.matchData.park = 3; });
-														}
-													),
-													VerticalDivider(width: 5.0),
-													RaisedButton(
-														child: Text('Park'),
-														color: widget.matchData.park == 1 ? Colors.greenAccent : Colors.grey,
-														onPressed: () {
-															setState(() { widget.matchData.park = 1; });
-														}
-													),
-													VerticalDivider(width: 5.0),
-													RaisedButton(
-														child: Text('Climb'),
-														color: widget.matchData.park == 2 ? Colors.greenAccent : Colors.grey,
-														onPressed: () {
-															setState(() { widget.matchData.park = 2; });
-														}
-													)
-												],
-												mainAxisAlignment: MainAxisAlignment.center
-												),
-												Divider(
-													height: 30.0,
-													indent: 5.0,
-													color: Colors.black,
-												),
-												Row(children: <Widget>[
-													Column(children: <Widget>[
-														Text('Leveling ability?'),
-														RaisedButton(
-															child: Text(widget.matchData.levelability ? 'Yes' : 'No'),
-															color: widget.matchData.levelability ? Colors.greenAccent : Colors.grey,
-															onPressed: () {
-																widget.matchData.levelability = !widget.matchData.levelability;
-																setState(() {});
-															}
-														)
-													]),
-													VerticalDivider(width: 5.0),
-													Column(children: <Widget>[
-														Text('Assisted?'),
-														RaisedButton(
-															child: Text(widget.matchData.assist ? 'Yes' : 'No'),
-															color: widget.matchData.assist ? Colors.greenAccent : Colors.grey,
-															onPressed: () {
-																widget.matchData.assist = !widget.matchData.assist;
-																if (!widget.matchData.assist) { widget.matchData.typeassist = false; }
-																setState(() {});
-															}
-														)
-													]),
-													VerticalDivider(width: 5.0),
-													widget.matchData.assist ?
-														Column(children: <Widget>[
-															Text('Assist type'),
-															RaisedButton(
-																child: Text(widget.matchData.typeassist ? 'Active' : 'Passive'),
-																color: widget.matchData.typeassist ? Colors.greenAccent : Colors.grey,
-																onPressed: () {
-																	widget.matchData.typeassist = !widget.matchData.typeassist;
-																	setState(() {});
-																}
-															)
-														]) :
-														Container(),
-												]),
-												Divider(
-													height: 30.0,
-													indent: 5.0,
-													color: Colors.black,
-												),
-												Text("Post-Match"),
-												Column(children: <Widget>[
-													Text("General Success"),
-													SmoothStarRating(
-															allowHalfRating: true,
-															onRatingChanged: (v) {
-																setState(() { widget.matchData.generalSuccess = v; });
-															},
-															starCount: 5,
-															rating: widget.matchData.generalSuccess,
-															size: 40.0,
-															filledIconData: Icons.star,
-															halfFilledIconData: Icons.star_half,
-															color: Colors.blue,
-															borderColor: Colors.blue,
-															spacing: 0.0),
-													Text("Defensive Success"),
-													SmoothStarRating(
-															allowHalfRating: true,
-															onRatingChanged: (v) {
-																setState(() { widget.matchData.defensiveSuccess = v; });
-															},
-															starCount: 5,
-															rating: widget.matchData.defensiveSuccess,
-															size: 40.0,
-															filledIconData: Icons.star,
-															halfFilledIconData: Icons.star_half,
-															color: Colors.blue,
-															borderColor: Colors.blue,
-															spacing: 0.0),
-													Text("Accuracy Rating"),
-													SmoothStarRating(
-															allowHalfRating: true,
-															onRatingChanged: (v) {
-																setState(() { widget.matchData.accuracy = v; });
-															},
-															starCount: 5,
-															rating: widget.matchData.accuracy,
-															size: 40.0,
-															filledIconData: Icons.star,
-															halfFilledIconData: Icons.star_half,
-															color: Colors.blue,
-															borderColor: Colors.blue,
-															spacing: 0.0),
-												],
-												mainAxisAlignment: MainAxisAlignment.center,),
-												Divider(
-													height: 30.0,
-													indent: 5.0,
-													color: Colors.black,
-												),
-												Row(children: <Widget>[
-													Column(children: <Widget>[
-														Text('Floor Pickup?'),
-														RaisedButton(
-															child: Text(widget.matchData.floorpickup ? 'Yes' : 'No'),
-															color: widget.matchData.floorpickup ? Colors.greenAccent : Colors.grey,
-															onPressed: () {
-																widget.matchData.floorpickup = !widget.matchData.floorpickup;
-																setState(() {});
-															}
-														)
-													]),
-													VerticalDivider(width: 10.0),
-													Column(children: <Widget>[
-														Text('Egregious	Fouls?'),
-														RaisedButton(
-															child: Text(widget.matchData.fouls ? 'Yes' : 'No'),
-															color: widget.matchData.fouls ? Colors.greenAccent : Colors.grey,
-															onPressed: () {
-																widget.matchData.fouls = !widget.matchData.fouls;
-																setState(() {});
-															}
-														)
-													]),
-													VerticalDivider(width: 10.0),
-													Column(children: <Widget>[
-														Text('Had Problems?'),
-														RaisedButton(
-															child: Text(widget.matchData.problems ? 'Yes' : 'No'),
-															color: widget.matchData.problems ? Colors.greenAccent : Colors.grey,
-															onPressed: () {
-																widget.matchData.problems = !widget.matchData.problems;
-																setState(() {});
-															}
-														)
-														])
-												],
-												mainAxisAlignment: MainAxisAlignment.center),
-												Divider(
-													height: 30.0,
-													indent: 5.0,
-													color: Colors.black,
-												),
-												
-												Container(
-														padding: const EdgeInsets.symmetric(
-																vertical: 16.0, horizontal: 16.0),
-														child: RaisedButton(
-															child: Text("Generate QR"),
-															onPressed:() {
-																_submit();
-															},
-														)),
-												Container(
-														padding: const EdgeInsets.symmetric(
-																vertical: 16.0, horizontal: 16.0),
-														child: RaisedButton(
-															child: Text("Clear and Increment Match"),
-															onPressed:() async {
-																bool shouldClear = await _confirmationPrompt(context, 'Are you sure you want to clear?');
-																if (shouldClear) {
-																	print('Clearing');
-																	int nextMatch = int.tryParse(widget.matchData.matchNumber);
-																	if (nextMatch != null) { nextMatch = nextMatch + 1; }
-																	Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => ScoutMode(nextMatch:  nextMatch, initials: widget.matchData.initials, position: widget.matchData.position)));
-																} else {
-																	print('Not clearing...');
-																}
-															}
-														)),
-											],
-											scrollDirection: Axis.vertical,
-										)))),
-			)
-		);
+		return new WillPopScope(
+      onWillPop: () async {
+        return _confirmationPrompt(context, "Erase all data and go back to home screen?");
+      },
+      child: GestureDetector(
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus) { currentFocus.unfocus(); }
+        },
+        child: new Scaffold(
+          appBar: new AppBar(
+              title: new Text("Scout Mode"), backgroundColor: Colors.blue[900]),
+          body: new Container(
+              padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+              child: Builder(
+                  builder: (context) => Form(
+                      key: formKey,
+                      child: ListView(
+                        children: [
+                          Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 16.0, horizontal: 16.0),
+                                child: RaisedButton(
+                                  child: Text("Import Schedule"),
+                                  onPressed: () {
+                                    Navigator.push(context, new MaterialPageRoute(builder: (context) => Bluealliance()));
+                                  },
+                              )),
+                          Divider(
+                            height: 30.0,
+                            indent: 5.0,
+                            color: Colors.black,
+                          ),
+                          Text("Prematch"),
+                          TextFormField(
+                            initialValue: widget.matchData.initials,
+                            decoration: const InputDecoration(labelText: 'Enter your initials'),
+                            validator: (input) => input.isEmpty ? 'Not a valid input' : null,
+                            onSaved: (input) { setState(() { widget.matchData.initials = input; }); },
+                            onFieldSubmitted: (input) { setState(() { widget.matchData.initials = input; }); },
+                            onChanged: (input) { setState(() { widget.matchData.initials = input; }); },
+                          ),
+                          TextFormField(
+                            initialValue: widget.matchData.matchNumber,
+                            decoration: const InputDecoration(labelText: 'Enter the match number'),
+                            keyboardType: TextInputType.number,
+                            validator: (input) => input.isEmpty ? 'Not a valid input' : null,
+                            onSaved: (input) { setState(() { widget.matchData.matchNumber = input; }); },
+                            onChanged: (input) { setState(() { widget.matchData.matchNumber = input; }); },
+                            onFieldSubmitted: (input) { setState(() { widget.matchData.matchNumber = input; }); }
+                          ),
+                          TextFormField(
+                            initialValue: widget.matchData.teamNumber,
+                            decoration: const InputDecoration(labelText: "Enter Team Number"),
+                            keyboardType: TextInputType.number,
+                            validator: (input) => input.isEmpty ? 'Not a valid input' : null,
+                            onSaved: (input) { setState(() { widget.matchData.teamNumber = input; }); },
+                            onChanged: (input) { setState(() { widget.matchData.teamNumber = input; }); },
+                            onFieldSubmitted: (input) { setState(() { widget.matchData.teamNumber = input; }); },
+                          ),
+                          Text('Select robot position'),
+                          Column(children: <Widget>[
+                            Row(children: <Widget>[
+                              RaisedButton(
+                                child: Text('Red 1'),
+                                color: (widget.matchData.position == 4) ? Colors.redAccent : Colors.grey,
+                                onPressed: () {
+                                  widget.matchData.position = (widget.matchData.position == 4) ? -1 : 4;
+                                  setState(() {});
+                                }
+                              ),
+                              VerticalDivider(width: 5.0),
+                              RaisedButton(
+                                child: Text('Red 2'),
+                                color: (widget.matchData.position == 5) ? Colors.redAccent : Colors.grey,
+                                onPressed: () {
+                                  widget.matchData.position = (widget.matchData.position == 5) ? -1 : 5;
+                                  setState(() {});
+                                }
+                              ),
+                              VerticalDivider(width: 5.0),
+                              RaisedButton(
+                                child: Text('Red 3'),
+                                color: (widget.matchData.position == 6) ? Colors.redAccent : Colors.grey,
+                                onPressed: () {
+                                  widget.matchData.position = (widget.matchData.position == 6) ? -1 : 6;
+                                  setState(() {});
+                                }
+                              )
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.center),
+                            Row(children: <Widget>[
+                              RaisedButton(
+                                child: Text('Blue 1'),
+                                color: (widget.matchData.position == 1) ? Colors.blueAccent : Colors.grey,
+                                onPressed: () {
+                                  widget.matchData.position = (widget.matchData.position == 1) ? -1 : 1;
+                                  setState(() {});
+                                }
+                              ),
+                              VerticalDivider(width: 5.0),
+                              RaisedButton(
+                                child: Text('Blue 2'),
+                                color: (widget.matchData.position == 2) ? Colors.blueAccent : Colors.grey,
+                                onPressed: () {
+                                  widget.matchData.position = (widget.matchData.position == 2) ? -1 : 2;
+                                  setState(() {});
+                                }
+                              ),
+                              VerticalDivider(width: 5.0),
+                              RaisedButton(
+                                child: Text('Blue 3'),
+                                color: (widget.matchData.position == 3) ? Colors.blueAccent : Colors.grey,
+                                onPressed: () {
+                                  widget.matchData.position = (widget.matchData.position == 3) ? -1 : 3;
+                                  setState(() {});
+                                }
+                              )
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.center)
+                          ],
+                          mainAxisAlignment: MainAxisAlignment.center),
+                          Divider(
+                            height: 30.0,
+                            indent: 5.0,
+                            color: Colors.black,
+                          ),
+                          Text('Preloaded number of fuel cells'),
+                          Column(children: <Widget>[
+                            Row(children: <Widget>[
+                              RaisedButton(
+                                child: Text('0'),
+                                color: widget.matchData.preloadedfuelcells == 0 ? Colors.greenAccent : Colors.grey,
+                                onPressed: () {
+                                  setState(() { widget.matchData.preloadedfuelcells = 0; });
+                                }
+                              ),
+                              VerticalDivider(width: 5.0),
+                              RaisedButton(
+                                child: Text('1'),
+                                color: widget.matchData.preloadedfuelcells == 1 ? Colors.greenAccent : Colors.grey,
+                                onPressed: () {
+                                  setState(() { widget.matchData.preloadedfuelcells = 1; });
+                                }
+                              ),
+                              VerticalDivider(width: 5.0),
+                              RaisedButton(
+                                child: Text('2'),
+                                color: widget.matchData.preloadedfuelcells == 2 ? Colors.greenAccent : Colors.grey,
+                                onPressed: () {
+                                  setState(() { widget.matchData.preloadedfuelcells = 2; });
+                                }
+                              ),
+                              VerticalDivider(width: 5.0),
+                              RaisedButton(
+                                child: Text('3'),
+                                color: widget.matchData.preloadedfuelcells == 3 ? Colors.greenAccent : Colors.grey,
+                                onPressed: () {
+                                  setState(() { widget.matchData.preloadedfuelcells = 3; });
+                                }
+                              )
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.center
+                            )
+                          ]),
+                          Divider(
+                            height: 30.0,
+                            indent: 5.0,
+                            color: Colors.black,
+                          ),
+                          Text("Path and Shots"),
+                          Row(
+                            children: <Widget>[
+                              RaisedButton(
+                                child: Text("Auton"),
+                                onPressed: () {
+                                  Navigator.push(context, new MaterialPageRoute(builder: (context) => AutonPath(matchData: widget.matchData, onTap: () => _startClock())));
+                                },
+                              ),
+                              VerticalDivider(width: 5.0),
+                              RaisedButton(
+                                child: Text("Teleop"),
+                                onPressed: () {
+                                  Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: widget.matchData, onTap: () => _startClock())));
+                                },
+                              )
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.center
+                          ),	
+                          Divider(
+                            height: 30.0,
+                            indent: 5.0,
+                            color: Colors.black,
+                          ),
+                          Text("Endgame"),
+                          Column(children: <Widget>[
+                              Text('$_clockText', style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 3.0)),
+                              Row(children: <Widget>[
+                                RaisedButton(
+                                  child: Text("Start Timer"),
+                                  onPressed: () {
+                                    _startClock();
+                                  },
+                                ),
+                                Container(width: 5.0),
+                                RaisedButton(
+                                  child: Text("Stop Timer"),
+                                  onPressed: () {
+                                    _stopClock();
+                                    print(_stopwatch.elapsedMilliseconds);
+                                  },
+                                ),
+                                Container(width: 5.0),
+                                RaisedButton(
+                                  child: Text("Reset Timer"),
+                                  onPressed: () {
+                                    _resetClock();
+                                  },
+                                )
+                              ],
+                              mainAxisAlignment: MainAxisAlignment.center
+                              )
+                          ]),
+                          Divider(
+                            height: 30.0,
+                            indent: 5.0,
+                            color: Colors.black,
+                          ),
+                          Text('End game state'),
+                          Row(children: <Widget>[
+                            RaisedButton(
+                              child: Text('Neither'),
+                              color: widget.matchData.park == 3 ? Colors.greenAccent : Colors.grey,
+                              onPressed: () {
+                                setState(() { widget.matchData.park = 3; });
+                              }
+                            ),
+                            VerticalDivider(width: 5.0),
+                            RaisedButton(
+                              child: Text('Park'),
+                              color: widget.matchData.park == 1 ? Colors.greenAccent : Colors.grey,
+                              onPressed: () {
+                                setState(() { widget.matchData.park = 1; });
+                              }
+                            ),
+                            VerticalDivider(width: 5.0),
+                            RaisedButton(
+                              child: Text('Climb'),
+                              color: widget.matchData.park == 2 ? Colors.greenAccent : Colors.grey,
+                              onPressed: () {
+                                setState(() { widget.matchData.park = 2; });
+                              }
+                            )
+                          ],
+                          mainAxisAlignment: MainAxisAlignment.center
+                          ),
+                          Divider(
+                            height: 30.0,
+                            indent: 5.0,
+                            color: Colors.black,
+                          ),
+                          Row(children: <Widget>[
+                            Column(children: <Widget>[
+                              Text('Leveling ability?'),
+                              RaisedButton(
+                                child: Text(widget.matchData.levelability ? 'Yes' : 'No'),
+                                color: widget.matchData.levelability ? Colors.greenAccent : Colors.grey,
+                                onPressed: () {
+                                  widget.matchData.levelability = !widget.matchData.levelability;
+                                  setState(() {});
+                                }
+                              )
+                            ]),
+                            VerticalDivider(width: 5.0),
+                            Column(children: <Widget>[
+                              Text('Assisted?'),
+                              RaisedButton(
+                                child: Text(widget.matchData.assist ? 'Yes' : 'No'),
+                                color: widget.matchData.assist ? Colors.greenAccent : Colors.grey,
+                                onPressed: () {
+                                  widget.matchData.assist = !widget.matchData.assist;
+                                  if (!widget.matchData.assist) { widget.matchData.typeassist = false; }
+                                  setState(() {});
+                                }
+                              )
+                            ]),
+                            VerticalDivider(width: 5.0),
+                            widget.matchData.assist ?
+                              Column(children: <Widget>[
+                                Text('Assist type'),
+                                RaisedButton(
+                                  child: Text(widget.matchData.typeassist ? 'Active' : 'Passive'),
+                                  color: widget.matchData.typeassist ? Colors.greenAccent : Colors.grey,
+                                  onPressed: () {
+                                    widget.matchData.typeassist = !widget.matchData.typeassist;
+                                    setState(() {});
+                                  }
+                                )
+                              ]) :
+                              Container(),
+                          ]),
+                          Divider(
+                            height: 30.0,
+                            indent: 5.0,
+                            color: Colors.black,
+                          ),
+                          Text("Post-Match"),
+                          Column(children: <Widget>[
+                            Text("General Success"),
+                            SmoothStarRating(
+                                allowHalfRating: true,
+                                onRatingChanged: (v) {
+                                  setState(() { widget.matchData.generalSuccess = v; });
+                                },
+                                starCount: 5,
+                                rating: widget.matchData.generalSuccess,
+                                size: 40.0,
+                                filledIconData: Icons.star,
+                                halfFilledIconData: Icons.star_half,
+                                color: Colors.blue,
+                                borderColor: Colors.blue,
+                                spacing: 0.0),
+                            Text("Defensive Success"),
+                            SmoothStarRating(
+                                allowHalfRating: true,
+                                onRatingChanged: (v) {
+                                  setState(() { widget.matchData.defensiveSuccess = v; });
+                                },
+                                starCount: 5,
+                                rating: widget.matchData.defensiveSuccess,
+                                size: 40.0,
+                                filledIconData: Icons.star,
+                                halfFilledIconData: Icons.star_half,
+                                color: Colors.blue,
+                                borderColor: Colors.blue,
+                                spacing: 0.0),
+                            Text("Accuracy Rating"),
+                            SmoothStarRating(
+                                allowHalfRating: true,
+                                onRatingChanged: (v) {
+                                  setState(() { widget.matchData.accuracy = v; });
+                                },
+                                starCount: 5,
+                                rating: widget.matchData.accuracy,
+                                size: 40.0,
+                                filledIconData: Icons.star,
+                                halfFilledIconData: Icons.star_half,
+                                color: Colors.blue,
+                                borderColor: Colors.blue,
+                                spacing: 0.0),
+                          ],
+                          mainAxisAlignment: MainAxisAlignment.center,),
+                          Divider(
+                            height: 30.0,
+                            indent: 5.0,
+                            color: Colors.black,
+                          ),
+                          Row(children: <Widget>[
+                            Column(children: <Widget>[
+                              Text('Floor Pickup?'),
+                              RaisedButton(
+                                child: Text(widget.matchData.floorpickup ? 'Yes' : 'No'),
+                                color: widget.matchData.floorpickup ? Colors.greenAccent : Colors.grey,
+                                onPressed: () {
+                                  widget.matchData.floorpickup = !widget.matchData.floorpickup;
+                                  setState(() {});
+                                }
+                              )
+                            ]),
+                            VerticalDivider(width: 10.0),
+                            Column(children: <Widget>[
+                              Text('Egregious	Fouls?'),
+                              RaisedButton(
+                                child: Text(widget.matchData.fouls ? 'Yes' : 'No'),
+                                color: widget.matchData.fouls ? Colors.greenAccent : Colors.grey,
+                                onPressed: () {
+                                  widget.matchData.fouls = !widget.matchData.fouls;
+                                  setState(() {});
+                                }
+                              )
+                            ]),
+                            VerticalDivider(width: 10.0),
+                            Column(children: <Widget>[
+                              Text('Had Problems?'),
+                              RaisedButton(
+                                child: Text(widget.matchData.problems ? 'Yes' : 'No'),
+                                color: widget.matchData.problems ? Colors.greenAccent : Colors.grey,
+                                onPressed: () {
+                                  widget.matchData.problems = !widget.matchData.problems;
+                                  setState(() {});
+                                }
+                              )
+                              ])
+                          ],
+                          mainAxisAlignment: MainAxisAlignment.center),
+                          Divider(
+                            height: 30.0,
+                            indent: 5.0,
+                            color: Colors.black,
+                          ),
+                          
+                          Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 16.0, horizontal: 16.0),
+                              child: RaisedButton(
+                                child: Text("Generate QR"),
+                                onPressed:() {
+                                  _submit();
+                                },
+                              )),
+                          Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 16.0, horizontal: 16.0),
+                              child: RaisedButton(
+                                child: Text("Clear and Increment Match"),
+                                onPressed:() async {
+                                  bool shouldClear = await _confirmationPrompt(context, 'Are you sure you want to clear?');
+                                  if (shouldClear) {
+                                    print('Clearing');
+                                    int nextMatch = int.tryParse(widget.matchData.matchNumber);
+                                    if (nextMatch != null) { nextMatch = nextMatch + 1; }
+                                    Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => ScoutMode(nextMatch:  nextMatch, initials: widget.matchData.initials, position: widget.matchData.position)));
+                                  } else {
+                                    print('Not clearing...');
+                                  }
+                                }
+                              )),
+                        ],
+                        scrollDirection: Axis.vertical,
+                      )))),
+        )
+      ));
 	}
 
 	void _submit() {
