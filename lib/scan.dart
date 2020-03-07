@@ -9,12 +9,16 @@ import 'package:googleapis/sheets/v4.dart';
 import 'package:googleapis_auth/auth.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+final Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
 
 List<dynamic> data = [];
 
 String sheetName;
 String result = "Hey there !";
 
+String _currentEventName = '';
 String _matchSheetId = '';
 String _shotSheetId = '';
 String _pathSheetId = '';
@@ -214,6 +218,12 @@ Future _loadSheetsForEvent (String eventDriveFolderId, BuildContext context) asy
 		if (file.name.endsWith('-shots')) { _shotSheetId = file.id; filenames.add(file.name); }
 	});
 
+  _sharedPreferences.then((sharedPref) {
+    sharedPref.setString('lastMatchSheetId', _matchSheetId);
+    sharedPref.setString('lastPathSheetId', _pathSheetId);
+    sharedPref.setString('lastShotSheetId', _shotSheetId);
+  });
+
 	print('match sheet id: ' + _matchSheetId);
 	print('path sheet id: ' + _pathSheetId);
 	print('shot sheet id: ' + _shotSheetId);
@@ -286,6 +296,23 @@ class ScanMode extends StatefulWidget {
 }
 
 class _ScanModeState extends State<ScanMode> {
+
+  _ScanModeState () {
+    _sharedPreferences.then((sharedPref) {
+      setState(() {
+        _currentEventName = sharedPref.getString('lastEventName') ?? '<none>';
+        _matchSheetId = sharedPref.getString('lastMatchSheetId') ?? '';
+        _pathSheetId = sharedPref.getString('lastPathSheetId') ?? '';
+        _shotSheetId = sharedPref.getString('lastShotSheetId') ?? '';
+      });
+
+      print('loaded event name: ' + _currentEventName);
+      print('loaded match sheet id: ' + _matchSheetId);
+      print('loaded path sheet id: ' + _pathSheetId);
+      print('loaded shot sheet id: ' + _shotSheetId);
+    });
+  }
+
 	Future _scanQR() async {
 		Map<int,dynamic> scannedData = {};
 
@@ -329,7 +356,7 @@ class _ScanModeState extends State<ScanMode> {
 		Client client = await _getGoogleClientForCurrentUser();
 		DriveApi api = DriveApi(client);
 
-		FileList eventFolders = await api.files.list(q: '\'${_eventsParentFolderId}\' in parents');
+		FileList eventFolders = await api.files.list(q: '\'$_eventsParentFolderId\' in parents');
 
 		client.close();
 
@@ -355,6 +382,10 @@ class _ScanModeState extends State<ScanMode> {
 											title: Text(eventSheets[index].name),
 											onTap: () async {
 												await _loadSheetsForEvent(eventSheets[index].id, context);
+                        _currentEventName = eventSheets[index].name;
+                        _sharedPreferences.then((sharedPref) {
+                          sharedPref.setString('lastEventName', _currentEventName);
+                        });
 												Navigator.pop(context);
 											}
 										);
@@ -366,8 +397,10 @@ class _ScanModeState extends State<ScanMode> {
 	}
 
 	@override
-	Widget build(BuildContext context) {
+	Widget build (BuildContext context) {
 		String eventName = '';
+
+    print('Build start -- current event: ' + _currentEventName);
 
 		return GestureDetector(
 			onTap: () {
@@ -381,6 +414,7 @@ class _ScanModeState extends State<ScanMode> {
 					Column(
 						mainAxisAlignment: MainAxisAlignment.center,
 						children: <Widget>[
+              Text('Current event: $_currentEventName'),
 							TextFormField(
 								initialValue: eventName,
 								decoration: const InputDecoration(labelText: 'New event name'),
