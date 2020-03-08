@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:scoutmobile2020/scan.dart';
+import 'package:scoutmobile2020/types/schedule.dart';
 import 'scoutmode.dart';
 
 class Homepage extends StatefulWidget {
@@ -13,7 +14,7 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  List schedule = new List();
+  Schedule schedule;
   String eventcode = '';
   @override
   Widget build(BuildContext context) {
@@ -101,10 +102,12 @@ class _HomepageState extends State<Homepage> {
           "X-TBA-Auth-Key":
               "prLzMTfZitylzcN8Zwb64bTaUELuJW8G6AXnDebu20Oz0JF4hh8Voc9rhZFYArSz"
         });
-    schedule = jsonDecode(matchresponse.body);
-    if(schedule.isNotEmpty) {
+    dynamic json = jsonDecode(matchresponse.body);
+    if(json.isNotEmpty) {
+      schedule = Schedule.fromJson(json);
       return true;
     } else {
+      schedule = null;
       return false;
     }
   }
