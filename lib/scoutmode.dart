@@ -11,8 +11,6 @@ import 'package:sprintf/sprintf.dart';
 import 'match.dart';
 import 'package:archive/archive.dart';
 
-final _teamnumbercontroller = TextEditingController();
-
 class ScoutMode extends StatefulWidget {
 	final List schedule;
 	final int nextMatch;
@@ -38,10 +36,7 @@ class ScoutMode extends StatefulWidget {
 }
 
 class _ScoutModeState extends State<ScoutMode> {
-	Stopwatch _stopwatch = new Stopwatch();
-	double showntime;
-	bool state = true;
-
+  final _teamnumbercontroller = TextEditingController();
 	final formKey = GlobalKey<FormState>();
 	List<int> teleopshotsx = <int>[];
 	List<int> teleopshotsy = <int>[];
@@ -52,41 +47,9 @@ class _ScoutModeState extends State<ScoutMode> {
 	List<int> autoshotstype = <int>[];
 	List<int> teleopshotstype = <int>[];
 
-	String _clockText = "00:00";
-	Timer _clockUpdateTimer;
-	Duration _clockUpdateRate = Duration(milliseconds: 100);
-
-	void _startClock () {
-		_stopwatch.start();
-		if (_clockUpdateTimer == null) {
-			_clockUpdateTimer = Timer.periodic(_clockUpdateRate, (Timer timer) => setState(() {
-				Duration elapsedTime = _stopwatch.elapsed;
-				int seconds = elapsedTime.inSeconds;
-				int millis	= elapsedTime.inMilliseconds - 1000 * seconds;
-				_clockText = sprintf("%02d:%02d", [seconds, (millis/10).round()]);
-			}));
-		}
-	}
-
-	void _stopClock () {
-		if (_clockUpdateTimer != null) {
-			_stopwatch.stop();
-			_clockUpdateTimer.cancel();
-			_clockUpdateTimer = null;
-			widget.matchData.climbtime = _stopwatch.elapsedMilliseconds / 1000;
-		}
-	}
-
-	void _resetClock () {
-		if (_clockUpdateTimer != null) {
-			_clockUpdateTimer.cancel();
-			_clockUpdateTimer = null;
-		}
-		_stopwatch.stop();
-		_stopwatch.reset();
-		widget.matchData.climbtime = 0;
-		setState(() { _clockText = "00:00"; });
-	}
+  String climbPartnercount = '';
+  Color climbColor = Colors.grey;
+  int climbCount = 0;
 
 	@override
 	Widget build(BuildContext context) {
@@ -141,15 +104,6 @@ class _ScoutModeState extends State<ScoutMode> {
                             onChanged: (input) { setState(() { widget.matchData.matchNumber = input; }); },
                             onFieldSubmitted: (input) { setState(() { widget.matchData.matchNumber = input; }); }
                           ),
-                          TextFormField(
-                            initialValue: widget.matchData.teamNumber,
-                            decoration: const InputDecoration(labelText: "Enter Team Number"),
-                            keyboardType: TextInputType.number,
-                            validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-                            onSaved: (input) { setState(() { widget.matchData.teamNumber = input; }); },
-                            onChanged: (input) { setState(() { widget.matchData.teamNumber = input; }); },
-                            onFieldSubmitted: (input) { setState(() { widget.matchData.teamNumber = input; }); },
-                          ),
                           Container(
                             padding: const EdgeInsets.symmetric(
                                   vertical: 16.0, horizontal: 16.0),
@@ -162,7 +116,9 @@ class _ScoutModeState extends State<ScoutMode> {
                                 color: (widget.matchData.position == 3) ? Colors.redAccent : Colors.grey,
                                 onPressed: () {
                                   setState(() { widget.matchData.position = (widget.matchData.position == 3) ? -1 : 3; });
-                                  _getTeam();
+                                  if(widget.schedule.isNotEmpty) {
+                                    _getTeam(int.parse(widget.matchData.matchNumber));
+                                  } 
                                 }
                               ),
                               VerticalDivider(width: 5.0),
@@ -171,7 +127,9 @@ class _ScoutModeState extends State<ScoutMode> {
                                 color: (widget.matchData.position == 4) ? Colors.redAccent : Colors.grey,
                                 onPressed: () {
                                   setState(() { widget.matchData.position = (widget.matchData.position == 4) ? -1 : 4; });
-                                  _getTeam();
+                                  if(widget.schedule.isNotEmpty) {
+                                    _getTeam(int.parse(widget.matchData.matchNumber));
+                                  } 
                                 }
                               ),
                               VerticalDivider(width: 5.0),
@@ -180,7 +138,9 @@ class _ScoutModeState extends State<ScoutMode> {
                                 color: (widget.matchData.position == 5) ? Colors.redAccent : Colors.grey,
                                 onPressed: () {
                                   setState(() { widget.matchData.position = (widget.matchData.position == 5) ? -1 : 5; });
-                                  _getTeam();
+                                  if(widget.schedule.isNotEmpty) {
+                                    _getTeam(int.parse(widget.matchData.matchNumber));
+                                  } 
                                 }
                               )
                             ],
@@ -191,7 +151,9 @@ class _ScoutModeState extends State<ScoutMode> {
                                 color: (widget.matchData.position == 0) ? Colors.blueAccent : Colors.grey,
                                 onPressed: () {
                                   setState(() { widget.matchData.position = (widget.matchData.position == 0) ? -1 : 0; });
-                                  _getTeam();
+                                  if(widget.schedule.isNotEmpty) {
+                                    _getTeam(int.parse(widget.matchData.matchNumber));
+                                  } 
                                 }
                               ),
                               VerticalDivider(width: 5.0),
@@ -200,7 +162,9 @@ class _ScoutModeState extends State<ScoutMode> {
                                 color: (widget.matchData.position == 1) ? Colors.blueAccent : Colors.grey,
                                 onPressed: () {
                                   setState(() { widget.matchData.position = (widget.matchData.position == 1) ? -1 : 1; });
-                                  _getTeam();
+                                  if(widget.schedule.isNotEmpty) {
+                                    _getTeam(int.parse(widget.matchData.matchNumber));
+                                  } 
                                 }
                               ),
                               VerticalDivider(width: 5.0),
@@ -209,18 +173,15 @@ class _ScoutModeState extends State<ScoutMode> {
                                 color: (widget.matchData.position == 2) ? Colors.blueAccent : Colors.grey,
                                 onPressed: () {
                                   setState(() { widget.matchData.position = (widget.matchData.position == 2) ? -1 : 2; });
-                                  _getTeam();
+                                  if(widget.schedule.isNotEmpty) {
+                                    _getTeam(int.parse(widget.matchData.matchNumber));
+                                  } 
                                 }
                               )
                             ],
                             mainAxisAlignment: MainAxisAlignment.center)
                           ],
                           mainAxisAlignment: MainAxisAlignment.center),
-                          Divider(
-                            height: 30.0,
-                            indent: 5.0,
-                            color: Colors.black,
-                          ),
                           TextField(
                             controller: _teamnumbercontroller,
                             decoration: const InputDecoration(labelText: "Enter Team Number"),
@@ -287,14 +248,14 @@ class _ScoutModeState extends State<ScoutMode> {
                               RaisedButton(
                                 child: Text("Auton"),
                                 onPressed: () {
-                                  Navigator.push(context, new MaterialPageRoute(builder: (context) => AutonPath(matchData: widget.matchData, onTap: () => _startClock())));
+                                  Navigator.push(context, new MaterialPageRoute(builder: (context) => AutonPath(matchData: widget.matchData)));
                                 },
                               ),
                               VerticalDivider(width: 5.0),
                               RaisedButton(
                                 child: Text("Teleop"),
                                 onPressed: () {
-                                  Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: widget.matchData, onTap: () => _startClock())));
+                                  Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: widget.matchData)));
                                 },
                               )
                             ],
@@ -306,40 +267,6 @@ class _ScoutModeState extends State<ScoutMode> {
                             color: Colors.black,
                           ),
                           Text("Endgame"),
-                          Column(children: <Widget>[
-                              Text('$_clockText', style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 3.0)),
-                              Row(children: <Widget>[
-                                RaisedButton(
-                                  child: Text("Start Timer"),
-                                  onPressed: () {
-                                    _startClock();
-                                  },
-                                ),
-                                Container(width: 5.0),
-                                RaisedButton(
-                                  child: Text("Stop Timer"),
-                                  onPressed: () {
-                                    _stopClock();
-                                    print(_stopwatch.elapsedMilliseconds);
-                                  },
-                                ),
-                                Container(width: 5.0),
-                                RaisedButton(
-                                  child: Text("Reset Timer"),
-                                  onPressed: () {
-                                    _resetClock();
-                                  },
-                                )
-                              ],
-                              mainAxisAlignment: MainAxisAlignment.center
-                              )
-                          ]),
-                          Divider(
-                            height: 30.0,
-                            indent: 5.0,
-                            color: Colors.black,
-                          ),
-                          Text('End game state'),
                           Row(children: <Widget>[
                             RaisedButton(
                               child: Text('Neither'),
@@ -363,7 +290,32 @@ class _ScoutModeState extends State<ScoutMode> {
                               onPressed: () {
                                 setState(() { widget.matchData.park = 2; });
                               }
-                            )
+                            ),
+                            RaisedButton(
+                      child: Text(climbPartnercount),
+                      color: climbColor,
+                      onPressed: () {
+                        climbCount++;
+                        climbCount = climbCount % 3;
+                        setState(() {
+                          if(climbCount == 0) {
+                            climbPartnercount = "Robots Climbed With: 0";
+                            climbColor = Colors.grey;
+                            widget.matchData.numberClimbedwith = 0;
+                          } else {
+                            if(climbCount == 1) {
+                            climbPartnercount = "Robots Climbed With: 1";
+                            climbColor = Colors.blue;
+                            widget.matchData.numberClimbedwith = 1;
+                            } else  {
+                            climbPartnercount = "Robots Climbed With: 2";
+                            climbColor = Colors.yellow;
+                            widget.matchData.numberClimbedwith = 2;
+                            }
+                            }
+                        });
+                      },
+                    ),
                           ],
                           mainAxisAlignment: MainAxisAlignment.center
                           ),
@@ -372,7 +324,10 @@ class _ScoutModeState extends State<ScoutMode> {
                             indent: 5.0,
                             color: Colors.black,
                           ),
-                          Row(children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                  vertical: 16.0, horizontal: 16.0),
+                            child: Row(children: <Widget>[
                             Column(children: <Widget>[
                               Text('Leveling ability?'),
                               RaisedButton(
@@ -412,6 +367,7 @@ class _ScoutModeState extends State<ScoutMode> {
                               ]) :
                               Container(),
                           ]),
+                          ),
                           Divider(
                             height: 30.0,
                             indent: 5.0,
@@ -511,7 +467,6 @@ class _ScoutModeState extends State<ScoutMode> {
                             indent: 5.0,
                             color: Colors.black,
                           ),
-                          
                           Container(
                               padding: const EdgeInsets.symmetric(
                                   vertical: 16.0, horizontal: 16.0),
@@ -537,15 +492,6 @@ class _ScoutModeState extends State<ScoutMode> {
                                     print('Not clearing...');
                                   }
                                 }
-                              )),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 16.0, horizontal: 16.0),
-                                child: RaisedButton(
-                                  child: Text("Test"),
-                                  onPressed:() {
-                                    print(widget.schedule);
-                                  },
                               )),
                         ],
                         scrollDirection: Axis.vertical,
@@ -590,8 +536,8 @@ class _ScoutModeState extends State<ScoutMode> {
 				'teleopshotstype': teleopshotstype,
 				'climbtime': widget.matchData.climbtime,
 				'park': widget.matchData.park,
-				'positioncontrol': widget.matchData.spins.positionControl,
-				'colorcontrol': widget.matchData.spins.colorControl,
+				'positioncontrol': widget.matchData.rotationControl,
+				'colorcontrol': widget.matchData.positionControl,
 				'generalsuccess': generalSuccess,
 				'defensivesuccess': defensiveSuccess,
 				'accuracy': accuracy,
@@ -623,17 +569,19 @@ class _ScoutModeState extends State<ScoutMode> {
 		}
 	}
 
-	 _getTeam() {
+	 _getTeam(int matchNumber) {
 		String scheduledTeam;
     widget.schedule.removeWhere((v) => v["comp_level"] == 'f');
     widget.schedule.removeWhere((v) => v["comp_level"] == 'sf');
     widget.schedule.removeWhere((v) => v["comp_level"] == 'qf');
     Map bluemappedschedule = new Map.fromIterable(widget.schedule, key: (v) => v["match_number"], value: (v) => v["alliances"]["blue"]['team_keys']);
     Map redmappedschedule = new Map.fromIterable(widget.schedule, key: (v) => v["match_number"], value: (v) => v["alliances"]["red"]['team_keys']);
-		if(widget.matchData.position < 3) {
-      scheduledTeam = bluemappedschedule[int.parse(widget.matchData.matchNumber)][widget.matchData.position%3];
+		if(widget.matchData.position == -1) {
+      if(widget.matchData.position < 3) {
+      scheduledTeam = bluemappedschedule[matchNumber][widget.matchData.position%3];
     } else {
-      scheduledTeam = redmappedschedule[int.parse(widget.matchData.matchNumber)][widget.matchData.position%3];
+      scheduledTeam = redmappedschedule[matchNumber][widget.matchData.position%3];
+    }
     }
 		scheduledTeam = scheduledTeam.substring(3);
     setState(() {

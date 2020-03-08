@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'shot.dart';
-import 'spin.dart';
 
 class MatchData {
 	//Pregame
@@ -17,10 +16,12 @@ class MatchData {
 	List<Shot> autoshots = [];
 	//Telop
 	List<Shot> teleopshots = [];
-  Spin spins = new Spin();
+  int rotationControl = 0;
+  int positionControl =0;
 	//Endgame
 	double climbtime=0;
 	int park = 3; // TODO: Convert to int 1-3 before QR
+  int numberClimbedwith = 0;
 	bool levelability = false;
 	bool assist = false;
 	bool typeassist = false;

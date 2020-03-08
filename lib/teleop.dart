@@ -6,17 +6,21 @@ import "shot.dart";
 class Teleop extends StatefulWidget {
   // final List<Shot> teleopshotsList;
   final MatchData matchData;
-  VoidCallback onTap;
 
   @override
   _TeleopState createState() => _TeleopState();
 
-  Teleop({this.matchData, this.onTap});
+  Teleop({this.matchData});
 }
 
 bool val = true;
 
 class _TeleopState extends State<Teleop> {
+  String rotationcontrolStatus = 'Rotation Control Not Attempted';
+  Color rotationcontrolStatusColor = Colors.grey;
+  Color positioncontrolStatusColor = Colors.grey;
+  int controlStatusVal = 0;
+  String positioncontrolStatus = 'Position Control Not Attempted';
   Offset screenPos;
   void onTapDown(BuildContext context, TapDownDetails details) {
     final RenderBox box = context.findRenderObject();
@@ -59,16 +63,6 @@ class _TeleopState extends State<Teleop> {
           _buildSpinnerPrompt();
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.timer),
-        onPressed: () {
-          setState(() {
-            widget.onTap();
-            // Navigator.pop(context);
-            // Navigator.pop(context);
-          });
-        },
-      ),
     );
   }
 
@@ -100,30 +94,52 @@ class _TeleopState extends State<Teleop> {
                 content: Column(
                   children: <Widget>[
                     RaisedButton(
-                      child: Text(widget.matchData.spins.positionControl
-                          ? "Position Control Successful"
-                          : "Position Control Failed"),
-                      color: widget.matchData.spins.positionControl
-                          ? Colors.greenAccent
-                          : Colors.grey,
+                      child: Text(rotationcontrolStatus),
+                      color: rotationcontrolStatusColor,
                       onPressed: () {
+                        controlStatusVal++;
+                        controlStatusVal = controlStatusVal % 3;
                         setState(() {
-                          widget.matchData.spins.positionControl =
-                              !widget.matchData.spins.positionControl;
+                          if(controlStatusVal == 0) {
+                            rotationcontrolStatus = "Rotation Control Not Attempted";
+                            rotationcontrolStatusColor = Colors.grey;
+                            widget.matchData.rotationControl = 0;
+                          } else {
+                            if(controlStatusVal == 1) {
+                            rotationcontrolStatus = "Rotation Control Failed";
+                            rotationcontrolStatusColor = Colors.blue;
+                            widget.matchData.rotationControl = 1;
+                            } else  {
+                            rotationcontrolStatus = "Rotation Control Succesfull";
+                            rotationcontrolStatusColor = Colors.yellow;
+                            widget.matchData.rotationControl = 2;
+                            }
+                            }
                         });
                       },
                     ),
                     RaisedButton(
-                      child: Text(widget.matchData.spins.colorControl
-                          ? "Color Control Successful"
-                          : "Color Control Failed"),
-                      color: widget.matchData.spins.colorControl
-                          ? Colors.greenAccent
-                          : Colors.grey,
+                      child: Text(positioncontrolStatus),
+                      color: positioncontrolStatusColor,
                       onPressed: () {
+                        controlStatusVal++;
+                        controlStatusVal = controlStatusVal % 3;
                         setState(() {
-                          widget.matchData.spins.colorControl =
-                              !widget.matchData.spins.colorControl;
+                          if(controlStatusVal == 0) {
+                            positioncontrolStatus = "Position Control Not Attempted";
+                            positioncontrolStatusColor = Colors.grey;
+                            widget.matchData.positionControl = 0;
+                          } else {
+                            if(controlStatusVal == 1) {
+                            positioncontrolStatus = "Position Control Failed";
+                            positioncontrolStatusColor = Colors.blue;
+                            widget.matchData.positionControl = 1;
+                            } else  {
+                            positioncontrolStatus = "Position Control Succesfull";
+                            positioncontrolStatusColor = Colors.yellow;
+                            widget.matchData.positionControl = 2;
+                            }}
+                            
                         });
                       },
                     ),

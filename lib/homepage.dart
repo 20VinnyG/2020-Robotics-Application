@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -19,7 +21,8 @@ class _HomepageState extends State<Homepage> {
         appBar: new AppBar(
             title: new Text("FRC 1640 Scouting App"),
             backgroundColor: Colors.blue[900]),
-        body: new Container(
+        body: Builder(builder: (scaffoldcontext) => 
+        new Container(
           child: new Center(
             child: new Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -73,7 +76,9 @@ class _HomepageState extends State<Homepage> {
                                       RaisedButton(
                                           child: Text('Import Match Schedule'),
                                           onPressed: () {
-                                            fetchSchedule();
+                                            fetchSchedule().then((status) {
+                                              Scaffold.of(scaffoldcontext).showSnackBar(SnackBar(content: Text(status? "Loaded Schedule":"Failed to Load Schedule"), duration: Duration(seconds: 5)));
+                                            });
                                           })
                                     ],
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -85,10 +90,10 @@ class _HomepageState extends State<Homepage> {
               ],
             ),
           ),
-        ));
+        )));
   }
 
-  Future<String> fetchSchedule() async {
+  Future<bool> fetchSchedule() async {
     print(eventcode);
     var matchresponse = await http.get(
         "https://www.thebluealliance.com/api/v3/event/${eventcode}/matches/simple",
@@ -97,5 +102,10 @@ class _HomepageState extends State<Homepage> {
               "prLzMTfZitylzcN8Zwb64bTaUELuJW8G6AXnDebu20Oz0JF4hh8Voc9rhZFYArSz"
         });
     schedule = jsonDecode(matchresponse.body);
+    if(schedule.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

@@ -7,12 +7,11 @@ import 'teleop.dart';
 
 class AutonPath extends StatefulWidget {
 	final MatchData matchData;
-  VoidCallback onTap;
 
 	@override
 	AutonPathState createState() => AutonPathState();
 
-	AutonPath({this.matchData, this.onTap});
+	AutonPath({this.matchData});
 }
 
 class AutonPathState extends State<AutonPath> {
@@ -76,12 +75,11 @@ class AutonPathState extends State<AutonPath> {
 								child: Icon(Icons.check),
 								label: "Completed Path",
 								onTap: () {
-									Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: widget.matchData, onTap: widget.onTap)));
+									Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: widget.matchData)));
 								}),
 					],
 				));
 	}
-
   	List<Widget> _buildShotInfoEntryLayout (Shot newShot, Function setState) {
 		return <Widget>[
 			Row(
