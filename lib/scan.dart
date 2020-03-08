@@ -18,7 +18,7 @@ final Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstan
 List<dynamic> data = [];
 
 String sheetName;
-String result = "Hey there !";
+String result = '';
 
 String _currentEventName = '';
 String _matchSheetId = '';
@@ -71,26 +71,26 @@ void _appendMatch (SheetsApi api) async {
 
 	List<dynamic> payload = [];
 	for (int i = 0; i < data.length; i++) {
-    print('processing scanned qr: ' + i.toString());
+		print('processing scanned qr: ' + i.toString());
 
 		List<dynamic> row = [];
 		Map<String,dynamic> jsonData = data[i];
 
 		matchSheetMap.forEach((colName, jsonName) {
-      List<String> keyPath = jsonName.split(":");
-      dynamic value = jsonData[keyPath[0]];
-      for (int j = 1; j < keyPath.length; j++) {
-        value = value[keyPath[j]];
-      }
+			List<String> keyPath = jsonName.split(":");
+			dynamic value = jsonData[keyPath[0]];
+			for (int j = 1; j < keyPath.length; j++) {
+				value = value[keyPath[j]];
+			}
 			row.add(value);
 		});
 
-    print('row: ' + row.toString());
+		print('row: ' + row.toString());
 
 		payload.add(row);
 	}
 
-  print('payload: ' + payload.toString());
+	print('payload: ' + payload.toString());
 
 	ValueRange vr = ValueRange.fromJson({ 'values': payload });
 	await api.spreadsheets.values.append(vr, _matchSheetId, 'A:P', valueInputOption: 'USER_ENTERED');
@@ -102,21 +102,21 @@ void _appendPath (SheetsApi api) async {
 	List<dynamic> payload = [];
 
 	for (int i = 0; i < data.length; i++) {
-    MatchData matchData = MatchData.fromJson(data[i]);
+		MatchData matchData = MatchData.fromJson(data[i]);
 
-    List<Offset> autopath = matchData.autopathpointscondensed;
-    for (int j = 0; j < autopath.length; j++) {
-      List<dynamic> row = [];
+		List<Offset> autopath = matchData.autopathpointscondensed;
+		for (int j = 0; j < autopath.length; j++) {
+			List<dynamic> row = [];
 
-      row.add(matchData.matchNumber);
-      row.add(matchData.teamNumber);
-      row.add(matchData.id);
-      row.add(j);
-      row.add(autopath[j].dx);
-      row.add(autopath[j].dy);
+			row.add(matchData.matchNumber);
+			row.add(matchData.teamNumber);
+			row.add(matchData.id);
+			row.add(j);
+			row.add(autopath[j].dx);
+			row.add(autopath[j].dy);
 
-      payload.add(row);
-    }
+			payload.add(row);
+		}
 	}
 
 	ValueRange vr = ValueRange.fromJson({ 'values': payload 	});
@@ -129,41 +129,41 @@ void _appendShots (SheetsApi api) async {
 	List<dynamic> payload = [];
 
 	for (int i = 0; i < data.length; i++) {
-    MatchData matchData = MatchData.fromJson(data[i]);
+		MatchData matchData = MatchData.fromJson(data[i]);
 
-    print('MatchData: ' + matchData.toJson().toString());
+		print('MatchData: ' + matchData.toJson().toString());
 
-    List<Shot> autoShots = matchData.autoshots;
-    for (int j = 0; j < autoShots.length; j++) {
-      List<dynamic> row = [];
+		List<Shot> autoShots = matchData.autoshots;
+		for (int j = 0; j < autoShots.length; j++) {
+			List<dynamic> row = [];
 
-      row.add(matchData.matchNumber);
-      row.add(matchData.teamNumber);
-      row.add(matchData.id);
-      row.add('auton');
-      row.add(autoShots[j].pos.dx);
-      row.add(autoShots[j].pos.dy);
-      row.add(autoShots[j].shotsMade);
-      row.add(autoShots[j].shotType);
+			row.add(matchData.matchNumber);
+			row.add(matchData.teamNumber);
+			row.add(matchData.id);
+			row.add('auton');
+			row.add(autoShots[j].pos.dx);
+			row.add(autoShots[j].pos.dy);
+			row.add(autoShots[j].shotsMade);
+			row.add(autoShots[j].shotType);
 
-      payload.add(row);
-    }
+			payload.add(row);
+		}
 
-    List<Shot> teleopShots = matchData.teleopshots;
-    for (int j = 0; j < teleopShots.length; j++) {
-      List<dynamic> row = [];
+		List<Shot> teleopShots = matchData.teleopshots;
+		for (int j = 0; j < teleopShots.length; j++) {
+			List<dynamic> row = [];
 
-      row.add(matchData.matchNumber);
-      row.add(matchData.teamNumber);
-      row.add(matchData.id);
-      row.add('teleop');
-      row.add(teleopShots[j].pos.dx);
-      row.add(teleopShots[j].pos.dy);
-      row.add(teleopShots[j].shotsMade);
-      row.add(teleopShots[j].shotType);
+			row.add(matchData.matchNumber);
+			row.add(matchData.teamNumber);
+			row.add(matchData.id);
+			row.add('teleop');
+			row.add(teleopShots[j].pos.dx);
+			row.add(teleopShots[j].pos.dy);
+			row.add(teleopShots[j].shotsMade);
+			row.add(teleopShots[j].shotType);
 
-      payload.add(row);
-    }
+			payload.add(row);
+		}
 	}
 
 	ValueRange vr = ValueRange.fromJson({ 'values': payload });
@@ -220,11 +220,11 @@ Future _loadSheetsForEvent (String eventDriveFolderId, BuildContext context) asy
 		if (file.name.endsWith('-shots')) { _shotSheetId = file.id; filenames.add(file.name); }
 	});
 
-  _sharedPreferences.then((sharedPref) {
-    sharedPref.setString('lastMatchSheetId', _matchSheetId);
-    sharedPref.setString('lastPathSheetId', _pathSheetId);
-    sharedPref.setString('lastShotSheetId', _shotSheetId);
-  });
+	_sharedPreferences.then((sharedPref) {
+		sharedPref.setString('lastMatchSheetId', _matchSheetId);
+		sharedPref.setString('lastPathSheetId', _pathSheetId);
+		sharedPref.setString('lastShotSheetId', _shotSheetId);
+	});
 
 	print('match sheet id: ' + _matchSheetId);
 	print('path sheet id: ' + _pathSheetId);
@@ -299,21 +299,21 @@ class ScanMode extends StatefulWidget {
 
 class _ScanModeState extends State<ScanMode> {
 
-  _ScanModeState () {
-    _sharedPreferences.then((sharedPref) {
-      setState(() {
-        _currentEventName = sharedPref.getString('lastEventName') ?? '<none>';
-        _matchSheetId = sharedPref.getString('lastMatchSheetId') ?? '';
-        _pathSheetId = sharedPref.getString('lastPathSheetId') ?? '';
-        _shotSheetId = sharedPref.getString('lastShotSheetId') ?? '';
-      });
+	_ScanModeState () {
+		_sharedPreferences.then((sharedPref) {
+			setState(() {
+				_currentEventName = sharedPref.getString('lastEventName') ?? '<none>';
+				_matchSheetId = sharedPref.getString('lastMatchSheetId') ?? '';
+				_pathSheetId = sharedPref.getString('lastPathSheetId') ?? '';
+				_shotSheetId = sharedPref.getString('lastShotSheetId') ?? '';
+			});
 
-      print('loaded event name: ' + _currentEventName);
-      print('loaded match sheet id: ' + _matchSheetId);
-      print('loaded path sheet id: ' + _pathSheetId);
-      print('loaded shot sheet id: ' + _shotSheetId);
-    });
-  }
+			print('loaded event name: ' + _currentEventName);
+			print('loaded match sheet id: ' + _matchSheetId);
+			print('loaded path sheet id: ' + _pathSheetId);
+			print('loaded shot sheet id: ' + _shotSheetId);
+		});
+	}
 
 	Future _scanQR() async {
 		Map<int,dynamic> scannedData = {};
@@ -384,10 +384,10 @@ class _ScanModeState extends State<ScanMode> {
 											title: Text(eventSheets[index].name),
 											onTap: () async {
 												await _loadSheetsForEvent(eventSheets[index].id, context);
-                        _currentEventName = eventSheets[index].name;
-                        _sharedPreferences.then((sharedPref) {
-                          sharedPref.setString('lastEventName', _currentEventName);
-                        });
+												_currentEventName = eventSheets[index].name;
+												_sharedPreferences.then((sharedPref) {
+													sharedPref.setString('lastEventName', _currentEventName);
+												});
 												Navigator.pop(context);
 											}
 										);
@@ -402,7 +402,7 @@ class _ScanModeState extends State<ScanMode> {
 	Widget build (BuildContext context) {
 		String eventName = '';
 
-    print('Build start -- current event: ' + _currentEventName);
+		print('Build start -- current event: ' + _currentEventName);
 
 		return GestureDetector(
 			onTap: () {
@@ -416,7 +416,7 @@ class _ScanModeState extends State<ScanMode> {
 					Column(
 						mainAxisAlignment: MainAxisAlignment.center,
 						children: <Widget>[
-              Text('Current event: $_currentEventName'),
+							Text('Current event: $_currentEventName'),
 							TextFormField(
 								initialValue: eventName,
 								decoration: const InputDecoration(labelText: 'New event name'),

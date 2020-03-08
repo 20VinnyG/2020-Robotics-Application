@@ -34,7 +34,7 @@ class AutonPathState extends State<AutonPath> {
 					),
 					new GestureDetector(
 							onPanUpdate: (DragUpdateDetails details) {
-                Size size = MediaQuery.of(context).size;
+								Size size = MediaQuery.of(context).size;
 								setState(() {
 									RenderBox object = context.findRenderObject();
 									_lastPosition = object.globalToLocal(details.globalPosition);
@@ -46,7 +46,7 @@ class AutonPathState extends State<AutonPath> {
 								});
 							},
 							onPanEnd: (DragEndDetails details) async {
-                Size size = MediaQuery.of(context).size;
+								Size size = MediaQuery.of(context).size;
 
 								widget.matchData.autopathpointscondensed.add(_lastPosition.scale(100.0/size.width, 100.0/size.height));
 								_prevDistantPoint = _lastPosition;
@@ -96,7 +96,7 @@ class AutonPathState extends State<AutonPath> {
 					],
 				));
 
-        return scaffold;
+				return scaffold;
 	}
 
 		List<Widget> _buildShotInfoEntryLayout (Shot newShot, Function setState) {
@@ -155,16 +155,16 @@ class AutoPath extends CustomPainter {
 	List<Offset> points;
 	List<Offset> pointsCondensed;
 	List<Shot> shotList;
-  Offset scaleFactor;
-  BuildContext context;
+	Offset scaleFactor;
+	BuildContext context;
 
 	AutoPath({this.points, this.pointsCondensed, this.shotList, this.scaleFactor, this.context});
 
 	@override
 	void paint(Canvas canvas, Size size) {
-    Size size = MediaQuery.of(context).size;
+		Size size = MediaQuery.of(context).size;
 
-    // print('size: ' + size.toString());
+		// print('size: ' + size.toString());
 
 		Paint paint = new Paint()
 			..color = Colors.blue
