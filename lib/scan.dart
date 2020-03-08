@@ -37,7 +37,7 @@ final Map<String,String> matchSheetMap = {
 		'Climb Time': 'ct',
 		'Park': 'pa',
 		'Position Control': 'sp:pc',
-		'Color Control': 'sp:cc',
+		'Rotation Control': 'sp:rc',
 		'General Success': 'gs',
 		'Defensive Success': 'ds',
 		'Accuracy': 'ac',

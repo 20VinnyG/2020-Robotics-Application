@@ -25,6 +25,7 @@ class MatchData {
 
 	//Endgame
 	double climbtime=0;
+	int numberClimbedWith = 0;
 	int park = 3; // TODO: Convert to int 1-3 before QR
 	bool levelability = false;
 	bool assist = false;
@@ -52,6 +53,7 @@ class MatchData {
 		teleopshots = [];// teleopshots - later
 		spins = Spin.fromJson(json['sp']);
 		climbtime = json['ct'];
+		numberClimbedWith = json['cw'];
 		park = json['pa'];
 		levelability = json['la'] != 0;
 		assist = json['at'] != 0;
@@ -100,6 +102,7 @@ class MatchData {
 			// teleopshots - manual
 			'sp': spins.toJson(),
 			'ct': climbtime,
+			'cw': numberClimbedWith,
 			'pa': park,
 			'la': levelability ? 1 : 0,
 			'at': assist ? 1 : 0,

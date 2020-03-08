@@ -6,12 +6,13 @@ import 'package:scoutmobile2020/autonpath.dart';
 import 'package:scoutmobile2020/bluealliance.dart';
 import 'package:scoutmobile2020/teleop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:scoutmobile2020/types/schedule.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
-import 'package:sprintf/sprintf.dart';
 import 'package:scoutmobile2020/types/match.dart';
 import 'package:archive/archive.dart';
 
 class ScoutMode extends StatefulWidget {
+	final Schedule schedule;
 	final int nextMatch;
 	final String initials;
 	final int position;
@@ -20,7 +21,7 @@ class ScoutMode extends StatefulWidget {
 	@override
 	_ScoutModeState createState() => _ScoutModeState();
 
-	ScoutMode({this.nextMatch, this.initials, this.position}) {
+	ScoutMode({this.nextMatch, this.initials, this.position, this.schedule}) {
 		if (this.nextMatch != null) {
 			matchData.matchNumber = this.nextMatch.toString();
 		}
@@ -31,53 +32,21 @@ class ScoutMode extends StatefulWidget {
 			matchData.position = this.position;
 		}
 	}
+
 }
 
 class _ScoutModeState extends State<ScoutMode> {
-	Stopwatch _stopwatch = new Stopwatch();
-	double showntime;
-	bool state = true;
-
+	final _teamnumbercontroller = TextEditingController();
 	final formKey = GlobalKey<FormState>();
 
-	String _clockText = "00:00";
-	Timer _clockUpdateTimer;
-	Duration _clockUpdateRate = Duration(milliseconds: 100);
-
-	void _startClock () {
-		_stopwatch.start();
-		if (_clockUpdateTimer == null) {
-			_clockUpdateTimer = Timer.periodic(_clockUpdateRate, (Timer timer) => setState(() {
-				Duration elapsedTime = _stopwatch.elapsed;
-				int seconds = elapsedTime.inSeconds;
-				int millis	= elapsedTime.inMilliseconds - 1000 * seconds;
-				_clockText = sprintf("%02d:%02d", [seconds, (millis/10).round()]);
-			}));
-		}
-	}
-
-	void _stopClock () {
-		if (_clockUpdateTimer != null) {
-			_stopwatch.stop();
-			_clockUpdateTimer.cancel();
-			_clockUpdateTimer = null;
-			widget.matchData.climbtime = _stopwatch.elapsedMilliseconds / 1000;
-		}
-	}
-
-	void _resetClock () {
-		if (_clockUpdateTimer != null) {
-			_clockUpdateTimer.cancel();
-			_clockUpdateTimer = null;
-		}
-		_stopwatch.stop();
-		_stopwatch.reset();
-		widget.matchData.climbtime = 0;
-		setState(() { _clockText = "00:00"; });
-	}
+	String climbPartnercount = 'Climbed with 0';
+	Color climbColor = Colors.grey;
+	int climbCount = 0;
 
 	@override
 	Widget build(BuildContext context) {
+		_getTeam(int.tryParse(widget.matchData.matchNumber) ?? -1, widget.matchData.position);
+
 		return new WillPopScope(
 			onWillPop: () async {
 				return _confirmationPrompt(context, "Erase all data and go back to home screen?");
@@ -125,46 +94,41 @@ class _ScoutModeState extends State<ScoutMode> {
 														decoration: const InputDecoration(labelText: 'Enter the match number'),
 														keyboardType: TextInputType.number,
 														validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-														onSaved: (input) { setState(() { widget.matchData.matchNumber = input; }); },
-														onChanged: (input) { setState(() { widget.matchData.matchNumber = input; }); },
-														onFieldSubmitted: (input) { setState(() { widget.matchData.matchNumber = input; }); }
+														onSaved: (input) { setState(() { widget.matchData.matchNumber = input; });  _getTeam(int.tryParse(widget.matchData.matchNumber) ?? -1, widget.matchData.position); },
+														onChanged: (input) { setState(() { widget.matchData.matchNumber = input; });  _getTeam(int.tryParse(widget.matchData.matchNumber) ?? -1, widget.matchData.position); },
+														onFieldSubmitted: (input) { setState(() { widget.matchData.matchNumber = input; });  _getTeam(int.tryParse(widget.matchData.matchNumber) ?? -1, widget.matchData.position); }
 													),
-													TextFormField(
-														initialValue: widget.matchData.teamNumber,
-														decoration: const InputDecoration(labelText: "Enter Team Number"),
-														keyboardType: TextInputType.number,
-														validator: (input) => input.isEmpty ? 'Not a valid input' : null,
-														onSaved: (input) { setState(() { widget.matchData.teamNumber = input; }); },
-														onChanged: (input) { setState(() { widget.matchData.teamNumber = input; }); },
-														onFieldSubmitted: (input) { setState(() { widget.matchData.teamNumber = input; }); },
+													Container(
+														padding: const EdgeInsets.symmetric(
+																	vertical: 16.0, horizontal: 16.0),
+														child: Text('Select robot position'),
 													),
-													Text('Select robot position'),
 													Column(children: <Widget>[
 														Row(children: <Widget>[
 															RaisedButton(
 																child: Text('Red 1'),
-																color: (widget.matchData.position == 4) ? Colors.redAccent : Colors.grey,
+																color: (widget.matchData.position == 3) ? Colors.redAccent : Colors.grey,
 																onPressed: () {
-																	widget.matchData.position = (widget.matchData.position == 4) ? -1 : 4;
-																	setState(() {});
+																	setState(() { widget.matchData.position = (widget.matchData.position == 3) ? -1 : 3; });
+																	_getTeam(int.tryParse(widget.matchData.matchNumber) ?? -1, widget.matchData.position);
 																}
 															),
 															VerticalDivider(width: 5.0),
 															RaisedButton(
 																child: Text('Red 2'),
-																color: (widget.matchData.position == 5) ? Colors.redAccent : Colors.grey,
+																color: (widget.matchData.position == 4) ? Colors.redAccent : Colors.grey,
 																onPressed: () {
-																	widget.matchData.position = (widget.matchData.position == 5) ? -1 : 5;
-																	setState(() {});
+																	setState(() { widget.matchData.position = (widget.matchData.position == 4) ? -1 : 4; });
+																	_getTeam(int.tryParse(widget.matchData.matchNumber) ?? -1, widget.matchData.position);
 																}
 															),
 															VerticalDivider(width: 5.0),
 															RaisedButton(
 																child: Text('Red 3'),
-																color: (widget.matchData.position == 6) ? Colors.redAccent : Colors.grey,
+																color: (widget.matchData.position == 5) ? Colors.redAccent : Colors.grey,
 																onPressed: () {
-																	widget.matchData.position = (widget.matchData.position == 6) ? -1 : 6;
-																	setState(() {});
+																	setState(() { widget.matchData.position = (widget.matchData.position == 5) ? -1 : 5; });
+																	_getTeam(int.tryParse(widget.matchData.matchNumber) ?? -1, widget.matchData.position);
 																}
 															)
 														],
@@ -172,40 +136,52 @@ class _ScoutModeState extends State<ScoutMode> {
 														Row(children: <Widget>[
 															RaisedButton(
 																child: Text('Blue 1'),
-																color: (widget.matchData.position == 1) ? Colors.blueAccent : Colors.grey,
+																color: (widget.matchData.position == 0) ? Colors.blueAccent : Colors.grey,
 																onPressed: () {
-																	widget.matchData.position = (widget.matchData.position == 1) ? -1 : 1;
-																	setState(() {});
+																	setState(() { widget.matchData.position = (widget.matchData.position == 0) ? -1 : 0; });
+																	_getTeam(int.tryParse(widget.matchData.matchNumber) ?? -1, widget.matchData.position);
 																}
 															),
 															VerticalDivider(width: 5.0),
 															RaisedButton(
 																child: Text('Blue 2'),
-																color: (widget.matchData.position == 2) ? Colors.blueAccent : Colors.grey,
+																color: (widget.matchData.position == 1) ? Colors.blueAccent : Colors.grey,
 																onPressed: () {
-																	widget.matchData.position = (widget.matchData.position == 2) ? -1 : 2;
-																	setState(() {});
+																	setState(() { widget.matchData.position = (widget.matchData.position == 1) ? -1 : 1; });
+																	_getTeam(int.tryParse(widget.matchData.matchNumber) ?? -1, widget.matchData.position);
 																}
 															),
 															VerticalDivider(width: 5.0),
 															RaisedButton(
 																child: Text('Blue 3'),
-																color: (widget.matchData.position == 3) ? Colors.blueAccent : Colors.grey,
+																color: (widget.matchData.position == 2) ? Colors.blueAccent : Colors.grey,
 																onPressed: () {
-																	widget.matchData.position = (widget.matchData.position == 3) ? -1 : 3;
-																	setState(() {});
+																	setState(() { widget.matchData.position = (widget.matchData.position == 2) ? -1 : 2; });
+																	_getTeam(int.tryParse(widget.matchData.matchNumber) ?? -1, widget.matchData.position);
 																}
 															)
 														],
 														mainAxisAlignment: MainAxisAlignment.center)
 													],
 													mainAxisAlignment: MainAxisAlignment.center),
+													TextField(
+														controller: _teamnumbercontroller,
+														decoration: const InputDecoration(labelText: "Enter Team Number"),
+														onChanged: (input) {
+															setState(() {
+																widget.matchData.teamNumber = input;
+															});
+													}),
 													Divider(
 														height: 30.0,
 														indent: 5.0,
 														color: Colors.black,
 													),
-													Text('Preloaded number of fuel cells'),
+													Container(
+														padding: const EdgeInsets.symmetric(
+																	vertical: 16.0, horizontal: 16.0),
+														child: Text('Preloaded Number of Fuel Cells'),
+													),
 													Column(children: <Widget>[
 														Row(children: <Widget>[
 															RaisedButton(
@@ -273,40 +249,6 @@ class _ScoutModeState extends State<ScoutMode> {
 														color: Colors.black,
 													),
 													Text("Endgame"),
-													Column(children: <Widget>[
-															Text('$_clockText', style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 3.0)),
-															Row(children: <Widget>[
-																RaisedButton(
-																	child: Text("Start Timer"),
-																	onPressed: () {
-																		_startClock();
-																	},
-																),
-																Container(width: 5.0),
-																RaisedButton(
-																	child: Text("Stop Timer"),
-																	onPressed: () {
-																		_stopClock();
-																		print(_stopwatch.elapsedMilliseconds);
-																	},
-																),
-																Container(width: 5.0),
-																RaisedButton(
-																	child: Text("Reset Timer"),
-																	onPressed: () {
-																		_resetClock();
-																	},
-																)
-															],
-															mainAxisAlignment: MainAxisAlignment.center
-															)
-													]),
-													Divider(
-														height: 30.0,
-														indent: 5.0,
-														color: Colors.black,
-													),
-													Text('End game state'),
 													Row(children: <Widget>[
 														RaisedButton(
 															child: Text('Neither'),
@@ -330,7 +272,28 @@ class _ScoutModeState extends State<ScoutMode> {
 															onPressed: () {
 																setState(() { widget.matchData.park = 2; });
 															}
-														)
+														),
+														VerticalDivider(width: 5.0),
+														RaisedButton(
+															child: Text(climbPartnercount),
+															color: climbColor,
+															onPressed: () {
+																climbCount = (climbCount + 1) % 3;
+																setState(() {
+																	if(climbCount == 0) {
+																		climbColor = Colors.grey;
+																		widget.matchData.numberClimbedWith = 0;
+																	} else if(climbCount == 1) {
+																		climbColor = Colors.blue;
+																		widget.matchData.numberClimbedWith = 1;
+																	} else  {
+																		climbColor = Colors.yellow;
+																		widget.matchData.numberClimbedWith = 2;
+																	}
+																	climbPartnercount = 'Climbed with ' + widget.matchData.numberClimbedWith.toString();
+																});
+															},
+														),
 													],
 													mainAxisAlignment: MainAxisAlignment.center
 													),
@@ -339,7 +302,10 @@ class _ScoutModeState extends State<ScoutMode> {
 														indent: 5.0,
 														color: Colors.black,
 													),
-													Row(children: <Widget>[
+													Container(
+														padding: const EdgeInsets.symmetric(
+																	vertical: 16.0, horizontal: 16.0),
+														child: Row(children: <Widget>[
 														Column(children: <Widget>[
 															Text('Leveling ability?'),
 															RaisedButton(
@@ -376,9 +342,9 @@ class _ScoutModeState extends State<ScoutMode> {
 																		setState(() {});
 																	}
 																)
-															]) :
-															Container(),
+															]) : Container(),
 													]),
+													),
 													Divider(
 														height: 30.0,
 														indent: 5.0,
@@ -478,7 +444,6 @@ class _ScoutModeState extends State<ScoutMode> {
 														indent: 5.0,
 														color: Colors.black,
 													),
-
 													Container(
 															padding: const EdgeInsets.symmetric(
 																	vertical: 16.0, horizontal: 16.0),
@@ -499,7 +464,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																		print('Clearing');
 																		int nextMatch = int.tryParse(widget.matchData.matchNumber);
 																		if (nextMatch != null) { nextMatch = nextMatch + 1; }
-																		Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => ScoutMode(nextMatch:  nextMatch, initials: widget.matchData.initials, position: widget.matchData.position)));
+																		Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => ScoutMode(nextMatch:  nextMatch, initials: widget.matchData.initials, position: widget.matchData.position, schedule: widget.schedule)));
 																	} else {
 																		print('Not clearing...');
 																	}
@@ -537,20 +502,19 @@ class _ScoutModeState extends State<ScoutMode> {
 		}
 	}
 
-	int _getTeam() {
-		String scheduledTeam;
-		String alphaPos;
-		int betaPos;
-		if (widget.matchData.position <= 3) {
-			alphaPos = "blue";
-		} else {
-			alphaPos = "red";
-		}
-		betaPos = widget.matchData.position % 3;
-		scheduledTeam = newGlobals.schedule[int.parse(widget.matchData.matchNumber)]["alliances"]
-				[alphaPos]["team_keys"][betaPos];
-		scheduledTeam = scheduledTeam.substring(3);
-		return int.parse(scheduledTeam);
+	void _getTeam (int matchNumber, int position) {
+		if (widget.schedule == null) { return; }
+
+		setState(() {
+			int teamNumber = widget.schedule[matchNumber][position];
+			if (teamNumber <= 0) {
+				_teamnumbercontroller.text = '';
+				widget.matchData.teamNumber = '';
+			} else {
+				_teamnumbercontroller.text = teamNumber.toString();
+				widget.matchData.teamNumber = teamNumber.toString();
+			}
+		});
 	}
 
 	void _generateId(int teamNumber, int matchNumber) {

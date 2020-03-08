@@ -22,8 +22,7 @@ class AutonPathState extends State<AutonPath> {
 	@override
 	Widget build(BuildContext context) {
 		List<Offset> points = widget.matchData.autopathpoints;
-
-		Scaffold scaffold = new Scaffold(
+		return new Scaffold(
 				body: new Stack(children: <Widget>[
 					Container(
 						decoration: new BoxDecoration(
@@ -95,8 +94,6 @@ class AutonPathState extends State<AutonPath> {
 								}),
 					],
 				));
-
-				return scaffold;
 	}
 
 		List<Widget> _buildShotInfoEntryLayout (Shot newShot, Function setState) {

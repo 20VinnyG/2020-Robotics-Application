@@ -1,17 +1,17 @@
 class Spin {
 
-	bool positionControl = false;
-	bool colorControl = false;
+	int positionControl = 0;
+	int rotationControl = 0;
 
 	Spin ();
 
 	Spin.fromJson (Map<String,dynamic> json) :
-		positionControl = json['pc'] != 0,
-		colorControl = json['cc'] != 0;
+		positionControl = json['pc'],
+		rotationControl = json['rc'];
 
 	Map<String,dynamic> toJson () => {
-		'pc': positionControl ? 1 : 0,
-		'cc': colorControl ? 1 : 0
+		'pc': positionControl,
+		'rc': rotationControl
 	};
 
 }
