@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:scoutmobile2020/autonpath.dart';
-import 'package:scoutmobile2020/bluealliance.dart';
+import 'package:scoutmobile2020/service/bluealliance.dart';
 import 'package:scoutmobile2020/teleop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:scoutmobile2020/types/schedule.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
-import 'match.dart';
+import 'package:scoutmobile2020/types/match.dart';
 import 'package:archive/archive.dart';
 
 class ScoutMode extends StatefulWidget {
@@ -32,24 +32,23 @@ class ScoutMode extends StatefulWidget {
 			matchData.position = this.position;
 		}
 	}
-	
+
 }
 
 class _ScoutModeState extends State<ScoutMode> {
 	final _teamnumbercontroller = TextEditingController();
 	final formKey = GlobalKey<FormState>();
-	List<int> teleopshotsx = <int>[];
-	List<int> teleopshotsy = <int>[];
-	List<int> autoshotsx = <int>[];
-	List<int> autoshotsy = <int>[];
-	List<int> autoshotsmade = <int>[];
-	List<int> teleopshotsmade = <int>[];
-	List<int> autoshotstype = <int>[];
-	List<int> teleopshotstype = <int>[];
+	Schedule schedule;
 
-	String climbPartnercount = '';
+	String climbPartnercount = 'Climbed with 0';
 	Color climbColor = Colors.grey;
 	int climbCount = 0;
+
+	@override
+	void initState () {
+		super.initState();
+		schedule = widget.schedule;
+	}
 
 	@override
 	Widget build(BuildContext context) {
@@ -79,8 +78,9 @@ class _ScoutModeState extends State<ScoutMode> {
 																vertical: 16.0, horizontal: 16.0),
 																child: RaisedButton(
 																	child: Text("Import Schedule"),
-																	onPressed: () {
-																		Navigator.push(context, new MaterialPageRoute(builder: (context) => Bluealliance()));
+																	onPressed: () async {
+																		schedule = await Bluealliance.promptForSchedule(context) ?? schedule;
+																		_getTeam(int.tryParse(widget.matchData.matchNumber) ?? 0, widget.matchData.position);
 																	},
 															)),
 													Divider(
@@ -136,7 +136,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																color: (widget.matchData.position == 5) ? Colors.redAccent : Colors.grey,
 																onPressed: () {
 																	setState(() { widget.matchData.position = (widget.matchData.position == 5) ? -1 : 5; });
-																	_getTeam(int.tryParse(widget.matchData.matchNumber) ?? -1, widget.matchData.position); 
+																	_getTeam(int.tryParse(widget.matchData.matchNumber) ?? -1, widget.matchData.position);
 																}
 															)
 														],
@@ -250,7 +250,7 @@ class _ScoutModeState extends State<ScoutMode> {
 															)
 														],
 														mainAxisAlignment: MainAxisAlignment.center
-													),	
+													),
 													Divider(
 														height: 30.0,
 														indent: 5.0,
@@ -281,31 +281,27 @@ class _ScoutModeState extends State<ScoutMode> {
 																setState(() { widget.matchData.park = 2; });
 															}
 														),
+														VerticalDivider(width: 5.0),
 														RaisedButton(
-											child: Text(climbPartnercount),
-											color: climbColor,
-											onPressed: () {
-												climbCount++;
-												climbCount = climbCount % 3;
-												setState(() {
-													if(climbCount == 0) {
-														climbPartnercount = "Robots Climbed With: 0";
-														climbColor = Colors.grey;
-														widget.matchData.numberClimbedwith = 0;
-													} else {
-														if(climbCount == 1) {
-														climbPartnercount = "Robots Climbed With: 1";
-														climbColor = Colors.blue;
-														widget.matchData.numberClimbedwith = 1;
-														} else  {
-														climbPartnercount = "Robots Climbed With: 2";
-														climbColor = Colors.yellow;
-														widget.matchData.numberClimbedwith = 2;
-														}
-														}
-												});
-											},
-										),
+															child: Text(climbPartnercount),
+															color: climbColor,
+															onPressed: () {
+																climbCount = (climbCount + 1) % 3;
+																setState(() {
+																	if(climbCount == 0) {
+																		climbColor = Colors.grey;
+																		widget.matchData.numberClimbedWith = 0;
+																	} else if(climbCount == 1) {
+																		climbColor = Colors.blue;
+																		widget.matchData.numberClimbedWith = 1;
+																	} else  {
+																		climbColor = Colors.yellow;
+																		widget.matchData.numberClimbedWith = 2;
+																	}
+																	climbPartnercount = 'Climbed with ' + widget.matchData.numberClimbedWith.toString();
+																});
+															},
+														),
 													],
 													mainAxisAlignment: MainAxisAlignment.center
 													),
@@ -354,8 +350,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																		setState(() {});
 																	}
 																)
-															]) :
-															Container(),
+															]) : Container(),
 													]),
 													),
 													Divider(
@@ -495,46 +490,12 @@ class _ScoutModeState extends State<ScoutMode> {
 		int matchNumber = widget.matchData.matchNumber == '' ? 0 : int.parse(widget.matchData.matchNumber);
 
 		_generateId(teamNumber, matchNumber);
-		_extractshootingshootingpoints();
-		_condensePoints();
-
-		double generalSuccess = (widget.matchData.generalSuccess * 2).roundToDouble() / 2;
-		if (generalSuccess <= 1e-10) { generalSuccess = null; }
-		double defensiveSuccess = (widget.matchData.defensiveSuccess * 2).roundToDouble() / 2;
-		if (defensiveSuccess <= 1e-10) { defensiveSuccess = null; }
-		double accuracy = (widget.matchData.accuracy * 2).roundToDouble() / 2;
-		if (accuracy <= 1e-10) { accuracy = null; }
 
 		if (formKey.currentState.validate()) {
 			formKey.currentState.save();
-			var payload = {
-				'initials': widget.matchData.initials,
-				'id': widget.matchData.id,
-				'teamnumber': teamNumber,
-				'matchnumber': matchNumber,
-				'position': widget.matchData.position,
-				'preloadedfuelcells': widget.matchData.preloadedfuelcells,
-				'autopathx': widget.matchData.autopathx,
-				'autopathy': widget.matchData.autopathy,
-				'autoshotsx': autoshotsx,
-				'autoshotsy': autoshotsy,
-				'autoshotsmade': autoshotsmade,
-				'autoshotstype': autoshotstype,
-				'teleopshotsx': teleopshotsx,
-				'teleopshotsy': teleopshotsy,
-				'teleopshotsmade': teleopshotsmade,
-				'teleopshotstype': teleopshotstype,
-				'climbtime': widget.matchData.climbtime,
-				'park': widget.matchData.park,
-				'positioncontrol': widget.matchData.rotationControl,
-				'colorcontrol': widget.matchData.positionControl,
-				'generalsuccess': generalSuccess,
-				'defensivesuccess': defensiveSuccess,
-				'accuracy': accuracy,
-				'floorpickup': widget.matchData.floorpickup ? 1 : 0,
-				'fouls': widget.matchData.fouls ? 1 : 0,
-				'problems': widget.matchData.problems ? 1 : 0
-			};
+
+			var payload = widget.matchData.toJson();
+			print(jsonEncode(payload));
 			List<int> stringBytes = utf8.encode(json.encode(payload));
 			List<int> gzipBytes = new GZipEncoder().encode(stringBytes);
 			String compressedString = base64.encode(gzipBytes);
@@ -549,21 +510,11 @@ class _ScoutModeState extends State<ScoutMode> {
 		}
 	}
 
-	_condensePoints() {
-		List<Offset> points = widget.matchData.autopathpoints;
-		widget.matchData.autopathx = [];
-		widget.matchData.autopathy = [];
-		for (int i = 0; i < points.length; i += 5) {
-			widget.matchData.autopathx.add(((points[i].dx/MediaQuery.of(context).size.width)*686).round());
-			widget.matchData.autopathy.add(((points[i].dy/MediaQuery.of(context).size.height)*1316).round());
-		}
-	}
-
 	void _getTeam (int matchNumber, int position) {
-		if (widget.schedule == null) { return; }
+		if (schedule == null) { return; }
 
 		setState(() {
-			int teamNumber = widget.schedule[matchNumber][position];
+			int teamNumber = schedule[matchNumber][position];
 			if (teamNumber <= 0) {
 				_teamnumbercontroller.text = '';
 				widget.matchData.teamNumber = '';
@@ -574,25 +525,9 @@ class _ScoutModeState extends State<ScoutMode> {
 		});
 	}
 
-	_generateId(int teamNumber, int matchNumber) {
+	void _generateId(int teamNumber, int matchNumber) {
 		int id = teamNumber * 10000 + matchNumber;
 		widget.matchData.id = id;
-	}
-
-	_extractshootingshootingpoints() {
-		for(int i=0; i < widget.matchData.autoshots.length; i++) {
-			autoshotsx.add(((widget.matchData.autoshots[i].pos.dx/MediaQuery.of(context).size.width)*686).round());
-			autoshotsy.add(((widget.matchData.autoshots[i].pos.dy/MediaQuery.of(context).size.height)*1316).round());
-			autoshotsmade.add(widget.matchData.autoshots[i].shotsMade);
-			autoshotstype.add(widget.matchData.autoshots[i].shotType ? 1 : 0);
-		}
-		for(int i=0; i < widget.matchData.teleopshots.length; i++) {
-			teleopshotsx.add(((widget.matchData.teleopshots[i].pos.dx/MediaQuery.of(context).size.width)*686).round());
-			teleopshotsy.add(((widget.matchData.teleopshots[i].pos.dy/MediaQuery.of(context).size.height)*1316).round());
-			teleopshotsmade.add(widget.matchData.teleopshots[i].shotsMade);
-			teleopshotstype.add(widget.matchData.teleopshots[i].shotType ? 1 : 0);
-		}
-		
 	}
 
 	Future<bool> _confirmationPrompt (BuildContext context, String prompt) async {

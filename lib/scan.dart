@@ -9,6 +9,8 @@ import 'package:googleapis/sheets/v4.dart';
 import 'package:googleapis_auth/auth.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
+import 'package:scoutmobile2020/types/match.dart';
+import 'package:scoutmobile2020/types/shot.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
@@ -16,7 +18,7 @@ final Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstan
 List<dynamic> data = [];
 
 String sheetName;
-String result = "Hey there !";
+String result = '';
 
 String _currentEventName = '';
 String _matchSheetId = '';
@@ -26,84 +28,92 @@ String _pathSheetId = '';
 final String _eventsParentFolderId = '1aygdfoJX-V0zoLdpnstT6B44aYWJrBjz';
 
 final Map<String,String> matchSheetMap = {
-		'Initials': 'initials',
+		'Initials': 'in',
 		'Id': 'id',
-		'Team Number': 'teamnumber',
-		'Match Number': 'matchnumber',
-		'Position': 'position',
-		'Preloaded Fuel Cells': 'preloadedfuelcells',
-		'Successful': 'spinoutcome',
-		'Climb Time': 'climbtime',
-		'Park': 'park',
-		'Position Control': 'positioncontrol',
-		'Color Control': 'colorcontrol',
-		'General Success': 'generalsuccess',
-		'Defensive Success': 'defensivesuccess',
-		'Accuracy': 'accuracy',
-		'Floorpickup': 'floorpickup',
-		'Fouls': 'fouls',
-		'Problems': 'problems'
+		'Team Number': 'tn',
+		'Match Number': 'mn',
+		'Position': 'po',
+		'Preloaded Fuel Cells': 'fc',
+		'Climb Time': 'ct',
+		'Park': 'pa',
+		'Position Control': 'sp:pc',
+		'Rotation Control': 'sp:rc',
+		'General Success': 'gs',
+		'Defensive Success': 'ds',
+		'Accuracy': 'ac',
+		'Floorpickup': 'fp',
+		'Fouls': 'fo',
+		'Problems': 'pr'
 };
 
 final Map<String,String> shotSheetMap = {
-	'Match': 'matchnumber',
-	'Team Number': 'teamnumber',
-	'Id': 'id',
-	'Period': 'period',
-	'Shots X': 'shotsx',
-	'Shots Y': 'shotsy',
-	'Shots Made': 'shotsmade',
-	'Goal': 'goal'
+	'Match': '',
+	'Team Number': '',
+	'Id': '',
+	'Period': '',
+	'Shots X': '',
+	'Shots Y': '',
+	'Shots Made': '',
+	'High Goal': ''
 };
 
 final Map<String,String> pathSheetMap = {
-	'Match': 'matchnumber',
-	'Team Number': 'teamnumber',
-	'Id': 'id',
-	'Sequence': 'sequence',
-	'Auton Path X': 'autopathx',
-	'Auton Path Y': 'autopathy'
+	'Match': '',
+	'Team Number': '',
+	'Id': '',
+	'Sequence': '',
+	'Auton Path X': '',
+	'Auton Path Y': ''
 };
 
-void _appendGeneral (SheetsApi api) async {
+void _appendMatch (SheetsApi api) async {
 	print('data length: ' + data.length.toString());
 
 	List<dynamic> payload = [];
 	for (int i = 0; i < data.length; i++) {
-		List<String> row = [];
+		print('processing scanned qr: ' + i.toString());
+
+		List<dynamic> row = [];
 		Map<String,dynamic> jsonData = data[i];
+
 		matchSheetMap.forEach((colName, jsonName) {
-			row.add(jsonData[jsonName].toString());
+			List<String> keyPath = jsonName.split(":");
+			dynamic value = jsonData[keyPath[0]];
+			for (int j = 1; j < keyPath.length; j++) {
+				value = value[keyPath[j]];
+			}
+			row.add(value);
 		});
+
+		print('row: ' + row.toString());
+
 		payload.add(row);
 	}
 
+	print('payload: ' + payload.toString());
+
 	ValueRange vr = ValueRange.fromJson({ 'values': payload });
-	await api.spreadsheets.values.append(vr, _matchSheetId, 'A:R', valueInputOption: 'USER_ENTERED');
+	await api.spreadsheets.values.append(vr, _matchSheetId, 'A:P', valueInputOption: 'USER_ENTERED');
 
 	print('Done appending match data');
 }
 
 void _appendPath (SheetsApi api) async {
 	List<dynamic> payload = [];
+
 	for (int i = 0; i < data.length; i++) {
-		Map<String,dynamic> jsonData = data[i];
-		print('Shot data: ' + jsonData.toString());
+		MatchData matchData = MatchData.fromJson(data[i]);
 
-		int pathLength = (jsonData['autopathx'] as List<dynamic>).length;
-
-		List<dynamic> pathx = jsonData['autopathx'];
-		List<dynamic> pathy = jsonData['autopathy'];
-
-		for (int j = 0; j < pathLength; j++) {
+		List<Offset> autopath = matchData.autopathpointscondensed;
+		for (int j = 0; j < autopath.length; j++) {
 			List<dynamic> row = [];
 
-			row.add(jsonData['matchnumber']);
-			row.add(jsonData['teamnumber']);
-			row.add(jsonData['id']);
+			row.add(matchData.matchNumber);
+			row.add(matchData.teamNumber);
+			row.add(matchData.id);
 			row.add(j);
-			row.add(pathx[j]);
-			row.add(pathy[j]);
+			row.add(autopath[j].dx);
+			row.add(autopath[j].dy);
 
 			payload.add(row);
 		}
@@ -117,49 +127,41 @@ void _appendPath (SheetsApi api) async {
 
 void _appendShots (SheetsApi api) async {
 	List<dynamic> payload = [];
+
 	for (int i = 0; i < data.length; i++) {
-		Map<String,dynamic> jsonData = data[i];
-		print('Path data: ' + jsonEncode(jsonData).toString());
-		
-		List<dynamic> autoShotsX = jsonData['autoshotsx'];
-		List<dynamic> autoShotsY = jsonData['autoshotsy'];
-		List<dynamic> autoShotsMade = jsonData['autoshotsmade'];
-		List<dynamic> autoShotsType = jsonData['autoshotstype'];
+		MatchData matchData = MatchData.fromJson(data[i]);
 
-		List<dynamic> teleShotsX = jsonData['teleopshotsx'];
-		List<dynamic> teleShotsY = jsonData['teleopshotsy'];
-		List<dynamic> teleShotsMade = jsonData['teleopshotsmade'];
-		List<dynamic> teleShotsType = jsonData['teleopshotstype'];
+		print('MatchData: ' + matchData.toJson().toString());
 
-		for (int j = 0; j < autoShotsX.length; j++) {
+		List<Shot> autoShots = matchData.autoshots;
+		for (int j = 0; j < autoShots.length; j++) {
 			List<dynamic> row = [];
 
-			row.add(jsonData['matchnumber']);
-			row.add(jsonData['teamnumber']);
-			row.add(jsonData['id']);
+			row.add(matchData.matchNumber);
+			row.add(matchData.teamNumber);
+			row.add(matchData.id);
 			row.add('auton');
-
-			row.add(autoShotsX[j]);
-			row.add(autoShotsY[j]);
-			row.add(autoShotsMade[j]);
-			row.add(autoShotsType[j]);
+			row.add(autoShots[j].pos.dx);
+			row.add(autoShots[j].pos.dy);
+			row.add(autoShots[j].shotsMade);
+			row.add(autoShots[j].shotType);
 
 			payload.add(row);
 		}
 
-		for (int j = 0; j < teleShotsX.length; j++) {
+		List<Shot> teleopShots = matchData.teleopshots;
+		for (int j = 0; j < teleopShots.length; j++) {
 			List<dynamic> row = [];
 
-			row.add(jsonData['matchnumber']);
-			row.add(jsonData['teamnumber']);
-			row.add(jsonData['id']);
+			row.add(matchData.matchNumber);
+			row.add(matchData.teamNumber);
+			row.add(matchData.id);
 			row.add('teleop');
+			row.add(teleopShots[j].pos.dx);
+			row.add(teleopShots[j].pos.dy);
+			row.add(teleopShots[j].shotsMade);
+			row.add(teleopShots[j].shotType);
 
-			row.add(teleShotsX[j]);
-			row.add(teleShotsY[j]);
-			row.add(teleShotsMade[j]);
-			row.add(teleShotsType[j]);
-			
 			payload.add(row);
 		}
 	}
@@ -173,8 +175,8 @@ void _appendShots (SheetsApi api) async {
 void _appendAll () async {
 	Client client = await _getGoogleClientForCurrentUser();
 	SheetsApi api = SheetsApi(client);
-	
-	_appendGeneral(api);
+
+	_appendMatch(api);
 	_appendPath(api);
 	_appendShots(api);
 
@@ -211,25 +213,25 @@ Future _loadSheetsForEvent (String eventDriveFolderId, BuildContext context) asy
 
 	List<String> filenames = [];
 
-	FileList eventFolders = await api.files.list(q: '\'${eventDriveFolderId}\' in parents');
+	FileList eventFolders = await api.files.list(q: '\'$eventDriveFolderId\' in parents');
 	eventFolders.files.forEach((file) {
 		if (file.name.endsWith('-matches')) { _matchSheetId = file.id; filenames.add(file.name); }
 		if (file.name.endsWith('-paths')) { _pathSheetId = file.id; filenames.add(file.name); }
 		if (file.name.endsWith('-shots')) { _shotSheetId = file.id; filenames.add(file.name); }
 	});
 
-  _sharedPreferences.then((sharedPref) {
-    sharedPref.setString('lastMatchSheetId', _matchSheetId);
-    sharedPref.setString('lastPathSheetId', _pathSheetId);
-    sharedPref.setString('lastShotSheetId', _shotSheetId);
-  });
+	_sharedPreferences.then((sharedPref) {
+		sharedPref.setString('lastMatchSheetId', _matchSheetId);
+		sharedPref.setString('lastPathSheetId', _pathSheetId);
+		sharedPref.setString('lastShotSheetId', _shotSheetId);
+	});
 
 	print('match sheet id: ' + _matchSheetId);
 	print('path sheet id: ' + _pathSheetId);
 	print('shot sheet id: ' + _shotSheetId);
 
-	// Scaffold.of(context).showSnackBar(SnackBar(content: Text('Loaded ' + filenames.length.toString() + ' sheets: ' + filenames.toString())));
-} 
+	 Scaffold.of(context).showSnackBar(SnackBar(content: Text('Loaded ' + filenames.length.toString() + ' sheets: ' + filenames.toString()), duration: Duration(seconds: 5)));
+}
 
 Future<bool> _createSheetsForEvent (String eventName) async {
 	if (eventName.isEmpty) { return false; }
@@ -237,12 +239,12 @@ Future<bool> _createSheetsForEvent (String eventName) async {
 	Client client = await _getGoogleClientForCurrentUser();
 	DriveApi driveApi = DriveApi(client);
 	SheetsApi api = SheetsApi(client);
-	
+
 	// Create a folder for the event:
 	File eventFolder = await driveApi.files.create(
 		File()
 			..name = eventName
-			..parents = [_eventsParentFolderId] 
+			..parents = [_eventsParentFolderId]
 			..mimeType = 'application/vnd.google-apps.folder'
 	);
 	String eventFolderId = eventFolder.id;
@@ -251,7 +253,7 @@ Future<bool> _createSheetsForEvent (String eventName) async {
 		File()
 			..name = eventName + '-matches'
 			..parents = [eventFolderId]
-			..mimeType = 'application/vnd.google-apps.spreadsheet'  
+			..mimeType = 'application/vnd.google-apps.spreadsheet'
 	);
 	_matchSheetId = matchSheet.id;
 	ValueRange matchVR = ValueRange.fromJson({
@@ -263,7 +265,7 @@ Future<bool> _createSheetsForEvent (String eventName) async {
 		File()
 			..name = eventName + '-shots'
 			..parents = [eventFolderId]
-			..mimeType = 'application/vnd.google-apps.spreadsheet'  
+			..mimeType = 'application/vnd.google-apps.spreadsheet'
 	);
 	_shotSheetId = shotSheet.id;
 	ValueRange shotVR = ValueRange.fromJson({
@@ -275,7 +277,7 @@ Future<bool> _createSheetsForEvent (String eventName) async {
 		File()
 			..name = eventName + '-paths'
 			..parents = [eventFolderId]
-			..mimeType = 'application/vnd.google-apps.spreadsheet'  
+			..mimeType = 'application/vnd.google-apps.spreadsheet'
 	);
 	_pathSheetId = pathSheet.id;
 	ValueRange pathVR = ValueRange.fromJson({
@@ -297,21 +299,21 @@ class ScanMode extends StatefulWidget {
 
 class _ScanModeState extends State<ScanMode> {
 
-  _ScanModeState () {
-    _sharedPreferences.then((sharedPref) {
-      setState(() {
-        _currentEventName = sharedPref.getString('lastEventName') ?? '<none>';
-        _matchSheetId = sharedPref.getString('lastMatchSheetId') ?? '';
-        _pathSheetId = sharedPref.getString('lastPathSheetId') ?? '';
-        _shotSheetId = sharedPref.getString('lastShotSheetId') ?? '';
-      });
+	_ScanModeState () {
+		_sharedPreferences.then((sharedPref) {
+			setState(() {
+				_currentEventName = sharedPref.getString('lastEventName') ?? '<none>';
+				_matchSheetId = sharedPref.getString('lastMatchSheetId') ?? '';
+				_pathSheetId = sharedPref.getString('lastPathSheetId') ?? '';
+				_shotSheetId = sharedPref.getString('lastShotSheetId') ?? '';
+			});
 
-      print('loaded event name: ' + _currentEventName);
-      print('loaded match sheet id: ' + _matchSheetId);
-      print('loaded path sheet id: ' + _pathSheetId);
-      print('loaded shot sheet id: ' + _shotSheetId);
-    });
-  }
+			print('loaded event name: ' + _currentEventName);
+			print('loaded match sheet id: ' + _matchSheetId);
+			print('loaded path sheet id: ' + _pathSheetId);
+			print('loaded shot sheet id: ' + _shotSheetId);
+		});
+	}
 
 	Future _scanQR() async {
 		Map<int,dynamic> scannedData = {};
@@ -322,7 +324,7 @@ class _ScanModeState extends State<ScanMode> {
 				List<int> stringBytesDecoded = base64.decode(qrResult);
 				List<int> gzipBytesDecoded = new GZipDecoder().decodeBytes(stringBytesDecoded);
 				String decodedqr = new Utf8Codec().decode(gzipBytesDecoded);
-				
+
 				Map<String,dynamic> json = jsonDecode(decodedqr);
 				int id = json['id'];
 				scannedData[id] = json;
@@ -352,7 +354,7 @@ class _ScanModeState extends State<ScanMode> {
 		print('Scan mode complete. Scanned ' + data.length.toString() + ' unique matches');
 	}
 
-	_buildEventLoadPrompt (BuildContext context) async {
+	_buildEventLoadPrompt (BuildContext altContext) async {
 		Client client = await _getGoogleClientForCurrentUser();
 		DriveApi api = DriveApi(client);
 
@@ -381,18 +383,18 @@ class _ScanModeState extends State<ScanMode> {
 										return ListTile(
 											title: Text(eventSheets[index].name),
 											onTap: () async {
-												await _loadSheetsForEvent(eventSheets[index].id, context);
-                        _currentEventName = eventSheets[index].name;
-                        _sharedPreferences.then((sharedPref) {
-                          sharedPref.setString('lastEventName', _currentEventName);
-                        });
+												await _loadSheetsForEvent(eventSheets[index].id, altContext);
+												_currentEventName = eventSheets[index].name;
+												_sharedPreferences.then((sharedPref) {
+													sharedPref.setString('lastEventName', _currentEventName);
+												});
 												Navigator.pop(context);
 											}
 										);
 									}
 								)
 						));
-				});	
+				});
 			});
 	}
 
@@ -400,7 +402,7 @@ class _ScanModeState extends State<ScanMode> {
 	Widget build (BuildContext context) {
 		String eventName = '';
 
-    print('Build start -- current event: ' + _currentEventName);
+		print('Build start -- current event: ' + _currentEventName);
 
 		return GestureDetector(
 			onTap: () {
@@ -414,7 +416,7 @@ class _ScanModeState extends State<ScanMode> {
 					Column(
 						mainAxisAlignment: MainAxisAlignment.center,
 						children: <Widget>[
-              Text('Current event: $_currentEventName'),
+							Text('Current event: $_currentEventName'),
 							TextFormField(
 								initialValue: eventName,
 								decoration: const InputDecoration(labelText: 'New event name'),

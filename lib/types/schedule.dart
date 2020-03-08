@@ -38,5 +38,5 @@ class _Match {
 	int operator [] (int position) {
 		return (position < 0 || position > _teams.length - 1) ? -1 : _teams[position];
 	}
-	
+
 }
