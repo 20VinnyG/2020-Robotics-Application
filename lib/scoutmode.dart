@@ -17,11 +17,12 @@ class ScoutMode extends StatefulWidget {
 	final String initials;
 	final int position;
 	final MatchData matchData = new MatchData();
+  final MatchData matchDataScan;
 
 	@override
 	_ScoutModeState createState() => _ScoutModeState();
 
-	ScoutMode({this.nextMatch, this.initials, this.position, this.schedule}) {
+	ScoutMode({this.nextMatch, this.initials, this.position, this.schedule, this.matchDataScan}) {
 		if (this.nextMatch != null) {
 			matchData.matchNumber = this.nextMatch.toString();
 		}
