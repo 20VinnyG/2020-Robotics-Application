@@ -175,7 +175,7 @@ void _appendShots (SheetsApi api) async {
 void _appendAll () async {
 	Client client = await _getGoogleClientForCurrentUser();
 	SheetsApi api = SheetsApi(client);
-	
+
 	_appendMatch(api);
 	_appendPath(api);
 	_appendShots(api);
@@ -213,7 +213,7 @@ Future _loadSheetsForEvent (String eventDriveFolderId, BuildContext context) asy
 
 	List<String> filenames = [];
 
-	FileList eventFolders = await api.files.list(q: '\'${eventDriveFolderId}\' in parents');
+	FileList eventFolders = await api.files.list(q: '\'$eventDriveFolderId\' in parents');
 	eventFolders.files.forEach((file) {
 		if (file.name.endsWith('-matches')) { _matchSheetId = file.id; filenames.add(file.name); }
 		if (file.name.endsWith('-paths')) { _pathSheetId = file.id; filenames.add(file.name); }
@@ -230,8 +230,8 @@ Future _loadSheetsForEvent (String eventDriveFolderId, BuildContext context) asy
 	print('path sheet id: ' + _pathSheetId);
 	print('shot sheet id: ' + _shotSheetId);
 
-	// Scaffold.of(context).showSnackBar(SnackBar(content: Text('Loaded ' + filenames.length.toString() + ' sheets: ' + filenames.toString())));
-} 
+	 Scaffold.of(context).showSnackBar(SnackBar(content: Text('Loaded ' + filenames.length.toString() + ' sheets: ' + filenames.toString()), duration: Duration(seconds: 5)));
+}
 
 Future<bool> _createSheetsForEvent (String eventName) async {
 	if (eventName.isEmpty) { return false; }
@@ -239,12 +239,12 @@ Future<bool> _createSheetsForEvent (String eventName) async {
 	Client client = await _getGoogleClientForCurrentUser();
 	DriveApi driveApi = DriveApi(client);
 	SheetsApi api = SheetsApi(client);
-	
+
 	// Create a folder for the event:
 	File eventFolder = await driveApi.files.create(
 		File()
 			..name = eventName
-			..parents = [_eventsParentFolderId] 
+			..parents = [_eventsParentFolderId]
 			..mimeType = 'application/vnd.google-apps.folder'
 	);
 	String eventFolderId = eventFolder.id;
@@ -253,7 +253,7 @@ Future<bool> _createSheetsForEvent (String eventName) async {
 		File()
 			..name = eventName + '-matches'
 			..parents = [eventFolderId]
-			..mimeType = 'application/vnd.google-apps.spreadsheet'  
+			..mimeType = 'application/vnd.google-apps.spreadsheet'
 	);
 	_matchSheetId = matchSheet.id;
 	ValueRange matchVR = ValueRange.fromJson({
@@ -265,7 +265,7 @@ Future<bool> _createSheetsForEvent (String eventName) async {
 		File()
 			..name = eventName + '-shots'
 			..parents = [eventFolderId]
-			..mimeType = 'application/vnd.google-apps.spreadsheet'  
+			..mimeType = 'application/vnd.google-apps.spreadsheet'
 	);
 	_shotSheetId = shotSheet.id;
 	ValueRange shotVR = ValueRange.fromJson({
@@ -277,7 +277,7 @@ Future<bool> _createSheetsForEvent (String eventName) async {
 		File()
 			..name = eventName + '-paths'
 			..parents = [eventFolderId]
-			..mimeType = 'application/vnd.google-apps.spreadsheet'  
+			..mimeType = 'application/vnd.google-apps.spreadsheet'
 	);
 	_pathSheetId = pathSheet.id;
 	ValueRange pathVR = ValueRange.fromJson({
@@ -324,7 +324,7 @@ class _ScanModeState extends State<ScanMode> {
 				List<int> stringBytesDecoded = base64.decode(qrResult);
 				List<int> gzipBytesDecoded = new GZipDecoder().decodeBytes(stringBytesDecoded);
 				String decodedqr = new Utf8Codec().decode(gzipBytesDecoded);
-				
+
 				Map<String,dynamic> json = jsonDecode(decodedqr);
 				int id = json['id'];
 				scannedData[id] = json;
@@ -354,7 +354,7 @@ class _ScanModeState extends State<ScanMode> {
 		print('Scan mode complete. Scanned ' + data.length.toString() + ' unique matches');
 	}
 
-	_buildEventLoadPrompt (BuildContext context) async {
+	_buildEventLoadPrompt (BuildContext altContext) async {
 		Client client = await _getGoogleClientForCurrentUser();
 		DriveApi api = DriveApi(client);
 
@@ -383,7 +383,7 @@ class _ScanModeState extends State<ScanMode> {
 										return ListTile(
 											title: Text(eventSheets[index].name),
 											onTap: () async {
-												await _loadSheetsForEvent(eventSheets[index].id, context);
+												await _loadSheetsForEvent(eventSheets[index].id, altContext);
 												_currentEventName = eventSheets[index].name;
 												_sharedPreferences.then((sharedPref) {
 													sharedPref.setString('lastEventName', _currentEventName);
@@ -394,7 +394,7 @@ class _ScanModeState extends State<ScanMode> {
 									}
 								)
 						));
-				});	
+				});
 			});
 	}
 

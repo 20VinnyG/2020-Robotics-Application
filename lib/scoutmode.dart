@@ -39,14 +39,6 @@ class _ScoutModeState extends State<ScoutMode> {
 	bool state = true;
 
 	final formKey = GlobalKey<FormState>();
-	List<int> teleopshotsx = <int>[];
-	List<int> teleopshotsy = <int>[];
-	List<int> autoshotsx = <int>[];
-	List<int> autoshotsy = <int>[];
-	List<int> autoshotsmade = <int>[];
-	List<int> teleopshotsmade = <int>[];
-	List<int> autoshotstype = <int>[];
-	List<int> teleopshotstype = <int>[];
 
 	String _clockText = "00:00";
 	Timer _clockUpdateTimer;
@@ -262,19 +254,19 @@ class _ScoutModeState extends State<ScoutMode> {
 															RaisedButton(
 																child: Text("Auton"),
 																onPressed: () {
-																	Navigator.push(context, new MaterialPageRoute(builder: (context) => AutonPath(matchData: widget.matchData, onTap: () => _startClock())));
+																	Navigator.push(context, new MaterialPageRoute(builder: (context) => AutonPath(matchData: widget.matchData)));
 																},
 															),
 															VerticalDivider(width: 5.0),
 															RaisedButton(
 																child: Text("Teleop"),
 																onPressed: () {
-																	Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: widget.matchData, onTap: () => _startClock())));
+																	Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: widget.matchData)));
 																},
 															)
 														],
 														mainAxisAlignment: MainAxisAlignment.center
-													),	
+													),
 													Divider(
 														height: 30.0,
 														indent: 5.0,
@@ -486,7 +478,7 @@ class _ScoutModeState extends State<ScoutMode> {
 														indent: 5.0,
 														color: Colors.black,
 													),
-													
+
 													Container(
 															padding: const EdgeInsets.symmetric(
 																	vertical: 16.0, horizontal: 16.0),
@@ -525,8 +517,6 @@ class _ScoutModeState extends State<ScoutMode> {
 		int matchNumber = widget.matchData.matchNumber == '' ? 0 : int.parse(widget.matchData.matchNumber);
 
 		_generateId(teamNumber, matchNumber);
-		_extractshootingshootingpoints(); // TODO: 
-		_condensePoints(); // TODO:
 
 		if (formKey.currentState.validate()) {
 			formKey.currentState.save();
@@ -547,18 +537,6 @@ class _ScoutModeState extends State<ScoutMode> {
 		}
 	}
 
-	_condensePoints() {
-		List<Offset> points = widget.matchData.autopathpoints;
-		widget.matchData.autopathx = [];
-		widget.matchData.autopathy = [];
-		for (int i = 0; i < points.length; i += 5) {
-			widget.matchData.autopathx.add(((points[i].dx/MediaQuery.of(context).size.width)*686).round());
-			widget.matchData.autopathy.add(((points[i].dy/MediaQuery.of(context).size.height)*1316).round());
-		}
-		print(widget.matchData.autopathx);
-		print(widget.matchData.autopathy);
-	}
-
 	int _getTeam() {
 		String scheduledTeam;
 		String alphaPos;
@@ -575,25 +553,9 @@ class _ScoutModeState extends State<ScoutMode> {
 		return int.parse(scheduledTeam);
 	}
 
-	_generateId(int teamNumber, int matchNumber) {
+	void _generateId(int teamNumber, int matchNumber) {
 		int id = teamNumber * 10000 + matchNumber;
 		widget.matchData.id = id;
-	}
-
-	_extractshootingshootingpoints() {
-		for(int i=0; i < widget.matchData.autoshots.length; i++) {
-			autoshotsx.add(((widget.matchData.autoshots[i].pos.dx/MediaQuery.of(context).size.width)*686).round());
-			autoshotsy.add(((widget.matchData.autoshots[i].pos.dy/MediaQuery.of(context).size.height)*1316).round());
-			autoshotsmade.add(widget.matchData.autoshots[i].shotsMade);
-			autoshotstype.add(widget.matchData.autoshots[i].shotType ? 1 : 0);
-		}
-		for(int i=0; i < widget.matchData.teleopshots.length; i++) {
-			teleopshotsx.add(((widget.matchData.teleopshots[i].pos.dx/MediaQuery.of(context).size.width)*686).round());
-			teleopshotsy.add(((widget.matchData.teleopshots[i].pos.dy/MediaQuery.of(context).size.height)*1316).round());
-			teleopshotsmade.add(widget.matchData.teleopshots[i].shotsMade);
-			teleopshotstype.add(widget.matchData.teleopshots[i].shotType ? 1 : 0);
-		}
-		
 	}
 
 	Future<bool> _confirmationPrompt (BuildContext context, String prompt) async {

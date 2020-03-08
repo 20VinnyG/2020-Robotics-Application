@@ -7,12 +7,11 @@ import 'teleop.dart';
 
 class AutonPath extends StatefulWidget {
 	final MatchData matchData;
-	final VoidCallback onTap;
 
 	@override
 	AutonPathState createState() => AutonPathState();
 
-	AutonPath({this.matchData, this.onTap});
+	AutonPath({this.matchData});
 }
 
 class AutonPathState extends State<AutonPath> {
@@ -47,12 +46,13 @@ class AutonPathState extends State<AutonPath> {
 							},
 							onPanEnd: (DragEndDetails details) async {
 								Size size = MediaQuery.of(context).size;
+								Offset scaledLastPosition = _lastPosition.scale(100.0/size.width, 100.0/size.height);
 
-								widget.matchData.autopathpointscondensed.add(_lastPosition.scale(100.0/size.width, 100.0/size.height));
+								widget.matchData.autopathpointscondensed.add(scaledLastPosition);
 								_prevDistantPoint = _lastPosition;
-								
+
 								Shot newShot = new Shot();
-								newShot.pos = points[points.length - 1];
+								newShot.pos = scaledLastPosition;
 								await showDialog(
 									context: context,
 									builder: (context) {
@@ -65,7 +65,7 @@ class AutonPathState extends State<AutonPath> {
 													mainAxisSize: MainAxisSize.min,
 												)
 											);
-									});	
+									});
 							});
 							setState(() {});
 						},
@@ -91,7 +91,7 @@ class AutonPathState extends State<AutonPath> {
 								child: Icon(Icons.check),
 								label: "Completed Path",
 								onTap: () {
-									Navigator.push(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: widget.matchData, onTap: widget.onTap)));
+									Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => Teleop(matchData: widget.matchData)));
 								}),
 					],
 				));
@@ -175,9 +175,9 @@ class AutoPath extends CustomPainter {
 			..color = Colors.red
 			..strokeCap = StrokeCap.round
 			..strokeWidth = 5.0; // 2
-		
+
 		print('points: ' + points.length.toString() + ' -- condensed: ' + pointsCondensed.length.toString());
-		
+
 		for (int i = 1; i < points.length - 1; i++) {
 			canvas.drawLine(points[i-1], points[i], paint);
 		}
@@ -187,17 +187,17 @@ class AutoPath extends CustomPainter {
 		}
 
 		for (int i = 0; i < shotList.length; i++) {
-			Offset shotPos = shotList[i].pos;
+			Offset shotPos = shotList[i].pos.scale(size.width/100.0, size.height/100.0);
 			int shotsMade = shotList[i].shotsMade;
 
 			canvas.drawCircle(shotPos, _circleRadius, Paint()..color = Colors.yellow);
-			
+
 			TextPainter tp = TextPainter(
 				text: TextSpan(text: '$shotsMade', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25)),
 				textAlign: TextAlign.center,
 				textDirection: TextDirection.ltr,
 			)..layout(maxWidth: size.width);
-			
+
 			tp.paint(canvas, Offset(shotPos.dx - _halfRadius, shotPos.dy - _halfRadius));
 		}
 	}

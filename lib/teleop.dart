@@ -6,12 +6,11 @@ import "package:scoutmobile2020/types/shot.dart";
 class Teleop extends StatefulWidget {
 	// final List<Shot> teleopshotsList;
 	final MatchData matchData;
-	VoidCallback onTap;
 
 	@override
 	_TeleopState createState() => _TeleopState();
 
-	Teleop({this.matchData, this.onTap});
+	Teleop({this.matchData});
 }
 
 bool val = true;
@@ -21,7 +20,8 @@ class _TeleopState extends State<Teleop> {
 	void onTapDown(BuildContext context, TapDownDetails details) {
 		final RenderBox box = context.findRenderObject();
 		final Offset localOffset = box.globalToLocal(details.globalPosition);
-		screenPos = localOffset;
+		Size size = MediaQuery.of(context).size;
+		screenPos = localOffset.scale(100.0/size.width, 100.0/size.height);
 	}
 
 	@override
@@ -37,7 +37,7 @@ class _TeleopState extends State<Teleop> {
 											fit: BoxFit.fill)),
 						),
 						new CustomPaint(
-							painter: new MyPainter(shotList: widget.matchData.teleopshots),
+							painter: new MyPainter(shotList: widget.matchData.teleopshots, context: context),
 							size: Size.infinite,
 						),
 					],
@@ -63,9 +63,7 @@ class _TeleopState extends State<Teleop> {
 				child: Icon(Icons.timer),
 				onPressed: () {
 					setState(() {
-						widget.onTap();
-						// Navigator.pop(context);
-						// Navigator.pop(context);
+						 Navigator.pop(context);
 					});
 				},
 			),
@@ -203,13 +201,16 @@ class MyPainter extends CustomPainter {
 	final double _halfRadius = 10.0;
 
 	List<Shot> shotList;
+	BuildContext context;
 
-	MyPainter({this.shotList});
+	MyPainter({this.shotList, this.context});
 
 	@override
 	void paint(Canvas canvas, Size size) {
+		Size screenSize = MediaQuery.of(context).size;
+
 		for (int i = 0; i < shotList.length; i++) {
-			Offset shotPos = shotList[i].pos;
+			Offset shotPos = shotList[i].pos.scale(screenSize.width/100.0, screenSize.height/100.0);
 			int shotsMade = shotList[i].shotsMade;
 
 			canvas.drawCircle(shotPos, _circleRadius, Paint()..color = Colors.yellow);
