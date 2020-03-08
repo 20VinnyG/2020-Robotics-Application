@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:scoutmobile2020/autonpath.dart';
-import 'package:scoutmobile2020/bluealliance.dart';
+import 'package:scoutmobile2020/service/bluealliance.dart';
 import 'package:scoutmobile2020/teleop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:scoutmobile2020/types/schedule.dart';
@@ -38,10 +38,17 @@ class ScoutMode extends StatefulWidget {
 class _ScoutModeState extends State<ScoutMode> {
 	final _teamnumbercontroller = TextEditingController();
 	final formKey = GlobalKey<FormState>();
+	Schedule schedule;
 
 	String climbPartnercount = 'Climbed with 0';
 	Color climbColor = Colors.grey;
 	int climbCount = 0;
+
+	@override
+	void initState () {
+		super.initState();
+		schedule = widget.schedule;
+	}
 
 	@override
 	Widget build(BuildContext context) {
@@ -71,8 +78,9 @@ class _ScoutModeState extends State<ScoutMode> {
 																vertical: 16.0, horizontal: 16.0),
 																child: RaisedButton(
 																	child: Text("Import Schedule"),
-																	onPressed: () {
-																		Navigator.push(context, new MaterialPageRoute(builder: (context) => Bluealliance()));
+																	onPressed: () async {
+																		schedule = await Bluealliance.promptForSchedule(context) ?? schedule;
+																		_getTeam(int.tryParse(widget.matchData.matchNumber) ?? 0, widget.matchData.position);
 																	},
 															)),
 													Divider(
@@ -503,10 +511,10 @@ class _ScoutModeState extends State<ScoutMode> {
 	}
 
 	void _getTeam (int matchNumber, int position) {
-		if (widget.schedule == null) { return; }
+		if (schedule == null) { return; }
 
 		setState(() {
-			int teamNumber = widget.schedule[matchNumber][position];
+			int teamNumber = schedule[matchNumber][position];
 			if (teamNumber <= 0) {
 				_teamnumbercontroller.text = '';
 				widget.matchData.teamNumber = '';
