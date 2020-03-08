@@ -7,7 +7,7 @@ import 'teleop.dart';
 
 class AutonPath extends StatefulWidget {
 	final MatchData matchData;
-	VoidCallback onTap;
+	final VoidCallback onTap;
 
 	@override
 	AutonPathState createState() => AutonPathState();
@@ -24,7 +24,7 @@ class AutonPathState extends State<AutonPath> {
 	Widget build(BuildContext context) {
 		List<Offset> points = widget.matchData.autopathpoints;
 
-		return new Scaffold(
+		Scaffold scaffold = new Scaffold(
 				body: new Stack(children: <Widget>[
 					Container(
 						decoration: new BoxDecoration(
@@ -34,18 +34,21 @@ class AutonPathState extends State<AutonPath> {
 					),
 					new GestureDetector(
 							onPanUpdate: (DragUpdateDetails details) {
+                Size size = MediaQuery.of(context).size;
 								setState(() {
 									RenderBox object = context.findRenderObject();
 									_lastPosition = object.globalToLocal(details.globalPosition);
 									points.add(_lastPosition);
 									if (_prevDistantPoint == null || (_lastPosition - _prevDistantPoint).distance >= 25.0) {
-										widget.matchData.autopathpointscondensed.add(_lastPosition);
+										widget.matchData.autopathpointscondensed.add(_lastPosition.scale(100.0/size.width, 100.0/size.height));
 										_prevDistantPoint = _lastPosition;
 									}
 								});
 							},
 							onPanEnd: (DragEndDetails details) async {
-								widget.matchData.autopathpointscondensed.add(_lastPosition);
+                Size size = MediaQuery.of(context).size;
+
+								widget.matchData.autopathpointscondensed.add(_lastPosition.scale(100.0/size.width, 100.0/size.height));
 								_prevDistantPoint = _lastPosition;
 								
 								Shot newShot = new Shot();
@@ -67,7 +70,7 @@ class AutonPathState extends State<AutonPath> {
 							setState(() {});
 						},
 							child: new CustomPaint(
-								painter: new AutoPath(points: widget.matchData.autopathpoints, pointsCondensed: widget.matchData.autopathpointscondensed, shotList: widget.matchData.autoshots),
+								painter: new AutoPath(points: widget.matchData.autopathpoints, pointsCondensed: widget.matchData.autopathpointscondensed, shotList: widget.matchData.autoshots, context: context),
 								size: Size.infinite,
 							)),
 				]),
@@ -92,6 +95,8 @@ class AutonPathState extends State<AutonPath> {
 								}),
 					],
 				));
+
+        return scaffold;
 	}
 
 		List<Widget> _buildShotInfoEntryLayout (Shot newShot, Function setState) {
@@ -150,11 +155,17 @@ class AutoPath extends CustomPainter {
 	List<Offset> points;
 	List<Offset> pointsCondensed;
 	List<Shot> shotList;
+  Offset scaleFactor;
+  BuildContext context;
 
-	AutoPath({this.points, this.pointsCondensed, this.shotList});
+	AutoPath({this.points, this.pointsCondensed, this.shotList, this.scaleFactor, this.context});
 
 	@override
 	void paint(Canvas canvas, Size size) {
+    Size size = MediaQuery.of(context).size;
+
+    // print('size: ' + size.toString());
+
 		Paint paint = new Paint()
 			..color = Colors.blue
 			..strokeCap = StrokeCap.round
@@ -172,7 +183,7 @@ class AutoPath extends CustomPainter {
 		}
 
 		for (int i = 1; i < pointsCondensed.length - 1; i++) {
-			canvas.drawLine(pointsCondensed[i-1], pointsCondensed[i], condensedPaint);
+			canvas.drawLine(pointsCondensed[i-1].scale(size.width/100.0, size.height/100.0), pointsCondensed[i].scale(size.width/100.0, size.height/100.0), condensedPaint);
 		}
 
 		for (int i = 0; i < shotList.length; i++) {
