@@ -4,7 +4,6 @@ import 'package:scoutmobile2020/types/match.dart';
 import "package:scoutmobile2020/types/shot.dart";
 
 class Teleop extends StatefulWidget {
-	// final List<Shot> teleopshotsList;
 	final MatchData matchData;
 
 	@override

@@ -1,5 +1,4 @@
 {
 	"editor.detectIndentation": false,
-	"editor.insertSpaces": false,
-	"editor.comments.insertSpace": false
+	"editor.insertSpaces": false
 }

@@ -17,7 +17,6 @@ final Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstan
 
 List<dynamic> data = [];
 
-String sheetName;
 String result = '';
 
 String _currentEventName = '';
@@ -66,7 +65,7 @@ final Map<String,String> pathSheetMap = {
 	'Auton Path Y': ''
 };
 
-void _appendMatch (SheetsApi api) async {
+Future _appendMatch (SheetsApi api) async {
 	print('data length: ' + data.length.toString());
 
 	List<dynamic> payload = [];
@@ -93,12 +92,10 @@ void _appendMatch (SheetsApi api) async {
 	print('payload: ' + payload.toString());
 
 	ValueRange vr = ValueRange.fromJson({ 'values': payload });
-	await api.spreadsheets.values.append(vr, _matchSheetId, 'A:P', valueInputOption: 'USER_ENTERED');
-
-	print('Done appending match data');
+	return api.spreadsheets.values.append(vr, _matchSheetId, 'A:P', valueInputOption: 'USER_ENTERED');
 }
 
-void _appendPath (SheetsApi api) async {
+Future _appendPath (SheetsApi api) async {
 	List<dynamic> payload = [];
 
 	for (int i = 0; i < data.length; i++) {
@@ -120,12 +117,10 @@ void _appendPath (SheetsApi api) async {
 	}
 
 	ValueRange vr = ValueRange.fromJson({ 'values': payload 	});
-	await api.spreadsheets.values.append(vr, _pathSheetId, 'A:F', valueInputOption: 'USER_ENTERED');
-
-	print('Done appending path data');
+	return api.spreadsheets.values.append(vr, _pathSheetId, 'A:F', valueInputOption: 'USER_ENTERED');
 }
 
-void _appendShots (SheetsApi api) async {
+Future _appendShots (SheetsApi api) async {
 	List<dynamic> payload = [];
 
 	for (int i = 0; i < data.length; i++) {
@@ -167,20 +162,67 @@ void _appendShots (SheetsApi api) async {
 	}
 
 	ValueRange vr = ValueRange.fromJson({ 'values': payload });
-	await api.spreadsheets.values.append(vr, _shotSheetId, 'A:H', valueInputOption: 'USER_ENTERED');
-
-	print('Done appending shot data');
+	return api.spreadsheets.values.append(vr, _shotSheetId, 'A:H', valueInputOption: 'USER_ENTERED');
 }
 
-void _appendAll () async {
+void _appendAll (BuildContext context) async {
 	Client client = await _getGoogleClientForCurrentUser();
 	SheetsApi api = SheetsApi(client);
 
-	_appendMatch(api);
-	_appendPath(api);
-	_appendShots(api);
+	print('name: ' + _currentEventName + '; match: ' + _matchSheetId + '; shot: ' + _shotSheetId + '; path: ' + _pathSheetId);
+	if (_currentEventName.isEmpty || _matchSheetId.isEmpty || _shotSheetId.isEmpty || _pathSheetId.isEmpty) {
+		await _buildEventLoadPrompt(context);
+	}
+
+	List<Widget> statusBoxWidgets = [];
+
+	try {
+		await _appendMatch(api);
+		statusBoxWidgets.add(Text('Success writing match data\n\n', textAlign: TextAlign.left));
+	} catch (err) {
+		statusBoxWidgets.add(Text('Failure writing match data\n', textAlign: TextAlign.left, style: TextStyle(color: Colors.red)));
+		statusBoxWidgets.add(Text(err.toString() + '\n\n', textAlign: TextAlign.left));
+	}
+
+	try {
+		await _appendPath(api);
+		statusBoxWidgets.add(Text('Success writing path data\n\n', textAlign: TextAlign.left));
+	} catch (err) {
+		statusBoxWidgets.add(Text('Failure writing path data\n', textAlign: TextAlign.left, style: TextStyle(color: Colors.red)));
+		statusBoxWidgets.add(Text(err.toString() + '\n\n', textAlign: TextAlign.left));
+	}
+
+	try {
+		await _appendShots(api);
+		statusBoxWidgets.add(Text('Success writing shot data\n\n', textAlign: TextAlign.left));
+	} catch (err) {
+		statusBoxWidgets.add(Text('Failure writing shot data\n', textAlign: TextAlign.left, style: TextStyle(color: Colors.red)));
+		statusBoxWidgets.add(Text(err.toString() + '\n\n', textAlign: TextAlign.left));
+	}
+
+	statusBoxWidgets.add(
+		RaisedButton(
+			child: Text('Close'),
+			onPressed: () { Navigator.pop(context); }
+		)
+	);
 
 	client.close();
+
+	showDialog(
+			context: context,
+			builder: (context) {
+				return Builder(builder: (context) {
+					return AlertDialog(
+						title: Text('Status for event: $_currentEventName'),
+						content: Column(
+							children: statusBoxWidgets,
+							mainAxisSize: MainAxisSize.min,
+							mainAxisAlignment: MainAxisAlignment.start,
+						)
+				);
+			});
+		});
 }
 
 Future<Client> _getGoogleClientForCurrentUser () async {
@@ -230,7 +272,7 @@ Future _loadSheetsForEvent (String eventDriveFolderId, BuildContext context) asy
 	print('path sheet id: ' + _pathSheetId);
 	print('shot sheet id: ' + _shotSheetId);
 
-	 Scaffold.of(context).showSnackBar(SnackBar(content: Text('Loaded ' + filenames.length.toString() + ' sheets: ' + filenames.toString()), duration: Duration(seconds: 5)));
+	 Scaffold.of(context).showSnackBar(SnackBar(content: Text('Loaded ' + filenames.length.toString() + ' sheets: ' + filenames.toString()), duration: Duration(seconds: 3)));
 }
 
 Future<bool> _createSheetsForEvent (String eventName) async {
@@ -290,6 +332,48 @@ Future<bool> _createSheetsForEvent (String eventName) async {
 	print('Done setup for: ' + eventName);
 
 	return true;
+}
+
+Future _buildEventLoadPrompt (BuildContext altContext) async {
+	Client client = await _getGoogleClientForCurrentUser();
+	DriveApi api = DriveApi(client);
+
+	FileList eventFolders = await api.files.list(q: '\'$_eventsParentFolderId\' in parents');
+
+	client.close();
+
+	List<_SheetNameId> eventSheets = [];
+
+	eventFolders.files.forEach((file) {
+		print('name: ' + file.name + ' -- id: ' + file.id);
+		eventSheets.add(_SheetNameId(name: file.name, id: file.id));
+	});
+
+	return showDialog(
+			context: altContext,
+			builder: (context) {
+				return StatefulBuilder(builder: (context, setState) {
+					return AlertDialog(
+						title: Text("Select an event"),
+						content: Container(
+							width: double.maxFinite,
+							child: ListView.builder(
+								itemCount: eventSheets.length,
+								itemBuilder: (context, index) {
+									return ListTile(
+										title: Text(eventSheets[index].name),
+										onTap: () async {
+											await _loadSheetsForEvent(eventSheets[index].id, altContext);
+											_currentEventName = eventSheets[index].name;
+											_sharedPreferences.then((sharedPref) { sharedPref.setString('lastEventName', _currentEventName); });
+											Navigator.pop(context);
+										}
+									);
+								}
+							)
+					));
+			});
+		});
 }
 
 class ScanMode extends StatefulWidget {
@@ -354,50 +438,6 @@ class _ScanModeState extends State<ScanMode> {
 		print('Scan mode complete. Scanned ' + data.length.toString() + ' unique matches');
 	}
 
-	_buildEventLoadPrompt (BuildContext altContext) async {
-		Client client = await _getGoogleClientForCurrentUser();
-		DriveApi api = DriveApi(client);
-
-		FileList eventFolders = await api.files.list(q: '\'$_eventsParentFolderId\' in parents');
-
-		client.close();
-
-		List<_SheetNameId> eventSheets = [];
-
-		eventFolders.files.forEach((file) {
-			print('name: ' + file.name + ' -- id: ' + file.id);
-			eventSheets.add(_SheetNameId(name: file.name, id: file.id));
-		});
-
-		return showDialog(
-				context: context,
-				builder: (context) {
-					return StatefulBuilder(builder: (context, setState) {
-						return AlertDialog(
-							title: Text("Select an event"),
-							content: Container(
-								width: double.maxFinite,
-								child: ListView.builder(
-									itemCount: eventSheets.length,
-									itemBuilder: (context, index) {
-										return ListTile(
-											title: Text(eventSheets[index].name),
-											onTap: () async {
-												await _loadSheetsForEvent(eventSheets[index].id, altContext);
-												_currentEventName = eventSheets[index].name;
-												_sharedPreferences.then((sharedPref) {
-													sharedPref.setString('lastEventName', _currentEventName);
-												});
-												Navigator.pop(context);
-											}
-										);
-									}
-								)
-						));
-				});
-			});
-	}
-
 	@override
 	Widget build (BuildContext context) {
 		String eventName = '';
@@ -429,7 +469,7 @@ class _ScanModeState extends State<ScanMode> {
 								child: Text("Create event"),
 								onPressed: () async {
 									bool success = await _createSheetsForEvent(eventName);
-									Scaffold.of(context).showSnackBar(SnackBar(content: Text(success ? 'Created event ' + eventName : 'Couldn\'t create event ' + eventName), duration: Duration(seconds: 5)));
+									Scaffold.of(context).showSnackBar(SnackBar(content: Text(success ? 'Created event ' + eventName : 'Couldn\'t create event ' + eventName), duration: Duration(seconds: 3)));
 									eventName = '';
 									FocusScopeNode currentFocus = FocusScope.of(context);
 									if (!currentFocus.hasPrimaryFocus) { currentFocus.unfocus(); }
@@ -448,9 +488,9 @@ class _ScanModeState extends State<ScanMode> {
 								onPressed: () {
 									FocusScopeNode currentFocus = FocusScope.of(context);
 									if (!currentFocus.hasPrimaryFocus) { currentFocus.unfocus(); }
-									_appendAll();
+									_appendAll(context);
 								},
-							)
+							),
 						],
 					)
 				),
