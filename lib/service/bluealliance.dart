@@ -4,10 +4,13 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 
 import 'package:scoutmobile2020/types/schedule.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+final Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
 
 class Bluealliance {
 
-	static Future<Schedule> promptForSchedule (BuildContext scaffoldContext) async {
+	static Future promptForSchedule (BuildContext scaffoldContext) async {
 		String eventCode = await _promptForEventId(scaffoldContext);
 
 		if (eventCode != null && eventCode.isNotEmpty) {
@@ -18,15 +21,14 @@ class Bluealliance {
 
 			if (matchResponse.statusCode == 200) {
 				dynamic json = jsonDecode(matchResponse.body);
-				Schedule schedule = (json.isNotEmpty) ? Schedule.fromJson(json) : null;
+				Schedule schedule = (json != null && json.isNotEmpty) ? Schedule.importFromJson(json, eventCode) : null;
+				if (schedule != null) { (await _sharedPreferences).setString('schedule', jsonEncode(schedule.toJson())); }
 				Scaffold.of(scaffoldContext).showSnackBar(SnackBar(content: Text(schedule != null ? 'Loaded Schedule' : 'Failed to parse schedule'), duration: Duration(seconds: 3)));
-				return schedule;
+
 			} else {
 				Scaffold.of(scaffoldContext).showSnackBar(SnackBar(content: Text('Failed to load schedule ($eventCode) -- HTTP: ' + matchResponse.statusCode.toString()), duration: Duration(seconds: 3)));
 			}
 		}
-
-		return null;
 	}
 
 	static Future<String> _promptForEventId (BuildContext context) async {

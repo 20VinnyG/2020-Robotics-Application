@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:scoutmobile2020/service/bluealliance.dart';
 import 'package:scoutmobile2020/scan.dart';
 import 'package:scoutmobile2020/types/schedule.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'scoutmode.dart';
+
+final Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
 
 class Homepage extends StatefulWidget {
 	@override
@@ -28,7 +33,7 @@ class _HomepageState extends State<Homepage> {
 								RaisedButton(
 									child: Text('Scout Mode'),
 									color: Colors.yellow,
-									onPressed: () { Navigator.push( context, new MaterialPageRoute(builder: (context) => ScoutMode(schedule: schedule))); }
+									onPressed: () { Navigator.push( context, new MaterialPageRoute(builder: (context) => ScoutMode())); }
 								),
 								RaisedButton(
 									child: Text('Scan Mode'),
@@ -39,8 +44,12 @@ class _HomepageState extends State<Homepage> {
 									child: Text('Import Match Schedule'),
 									color: Colors.yellow,
 									onPressed: () async {
-											schedule = await Bluealliance.promptForSchedule(scaffoldContext) ?? schedule;
-									}),
+										schedule = await Bluealliance.promptForSchedule(scaffoldContext) ?? schedule;
+										if (schedule != null) {
+											(await _sharedPreferences).setString('schedule', jsonEncode(schedule.toJson()));
+										}
+									}
+                )
 							],
 						),
 					),
