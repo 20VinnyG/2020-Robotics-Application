@@ -3,22 +3,22 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:scoutmobile2020/autonpath.dart';
-import 'package:scoutmobile2020/service/bluealliance.dart';
+import 'package:scoutmobile2020/service/qr.dart';
 import 'package:scoutmobile2020/teleop.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:scoutmobile2020/types/schedule.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:scoutmobile2020/types/match.dart';
-import 'package:archive/archive.dart';
+
+final Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
 
 class ScoutMode extends StatefulWidget {
-	final Schedule schedule;
 	final MatchData lastMatchData;
 
 	@override
 	_ScoutModeState createState() => _ScoutModeState();
 
-	ScoutMode({this.lastMatchData, this.schedule});
+	ScoutMode({this.lastMatchData});
 }
 
 class _ScoutModeState extends State<ScoutMode> {
@@ -36,7 +36,14 @@ class _ScoutModeState extends State<ScoutMode> {
 	void initState () {
 		super.initState();
 
-		schedule = widget.schedule;
+		_sharedPreferences.then((sp) {
+			String scheduleStr = sp.getString('schedule');
+			if (scheduleStr.isNotEmpty) {
+				try { setState(() { schedule = Schedule.fromJson(jsonDecode(scheduleStr)); }); }
+				catch (error) { print(error); }
+			}
+		});
+
 		matchData = new MatchData();
 
 		if (widget.lastMatchData != null) {
@@ -71,21 +78,12 @@ class _ScoutModeState extends State<ScoutMode> {
 											key: formKey,
 											child: ListView(
 												children: [
-													Container(
-															padding: const EdgeInsets.symmetric(
-																vertical: 16.0, horizontal: 16.0),
-																child: RaisedButton(
-																	child: Text("Import Schedule"),
-																	onPressed: () async {
-																		schedule = await Bluealliance.promptForSchedule(context) ?? schedule;
-																		_getTeam(int.tryParse(matchData.matchNumber) ?? 0, matchData.position);
-																	},
-															)),
-													Divider(
-														height: 30.0,
-														indent: 5.0,
-														color: Colors.black,
+													Text(
+														schedule != null ? "Loaded schedule for: ${schedule.eventName}" : 'No schedule loaded',
+														style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+														textAlign: TextAlign.center,
 													),
+													Container(height: 10),
 													Text("Prematch"),
 													TextFormField(
 														initialValue: matchData.initials,
@@ -465,7 +463,7 @@ class _ScoutModeState extends State<ScoutMode> {
 																onPressed:() async {
 																	bool shouldClear = await _confirmationPrompt(context, 'Are you sure you want to clear?');
 																	if (shouldClear) {
-																		Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => ScoutMode(lastMatchData: matchData, schedule: schedule)));
+																		Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => ScoutMode(lastMatchData: matchData)));
 																	}
 																}
 													)),
@@ -503,18 +501,7 @@ class _ScoutModeState extends State<ScoutMode> {
 			formKey.currentState.save();
 
 			var payload = matchData.toJson();
-			print(jsonEncode(payload));
-			List<int> stringBytes = utf8.encode(json.encode(payload));
-			List<int> gzipBytes = new GZipEncoder().encode(stringBytes);
-			String compressedString = base64.encode(gzipBytes);
-			showDialog (
-					context: context,
-					builder: (context) {
-						return Dialog(
-								child: QrImage(
-							data: compressedString,
-						));
-					});
+			QrTools.buildCompressedQrCode(context, jsonEncode(payload));
 		}
 	}
 
