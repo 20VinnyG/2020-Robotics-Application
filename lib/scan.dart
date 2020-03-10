@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:archive/archive.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +8,7 @@ import 'package:googleapis/sheets/v4.dart';
 import 'package:googleapis_auth/auth.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
+import 'package:scoutmobile2020/service/qr.dart';
 import 'package:scoutmobile2020/types/match.dart';
 import 'package:scoutmobile2020/types/shot.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -404,12 +404,8 @@ class _ScanModeState extends State<ScanMode> {
 
 		try {
 			for (;;) {
-				String qrResult = await BarcodeScanner.scan();
-				List<int> stringBytesDecoded = base64.decode(qrResult);
-				List<int> gzipBytesDecoded = new GZipDecoder().decodeBytes(stringBytesDecoded);
-				String decodedqr = new Utf8Codec().decode(gzipBytesDecoded);
-
-				Map<String,dynamic> json = jsonDecode(decodedqr);
+				String qrData = await QrTools.readCompressedQrCode();
+				Map<String,dynamic> json = jsonDecode(qrData);
 				int id = json['id'];
 				scannedData[id] = json;
 			}

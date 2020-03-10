@@ -3,13 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:scoutmobile2020/autonpath.dart';
+import 'package:scoutmobile2020/service/qr.dart';
 import 'package:scoutmobile2020/teleop.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:scoutmobile2020/types/schedule.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:scoutmobile2020/types/match.dart';
-import 'package:archive/archive.dart';
 
 final Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
 
@@ -504,18 +503,7 @@ class _ScoutModeState extends State<ScoutMode> {
 			formKey.currentState.save();
 
 			var payload = matchData.toJson();
-			print(jsonEncode(payload));
-			List<int> stringBytes = utf8.encode(json.encode(payload));
-			List<int> gzipBytes = new GZipEncoder().encode(stringBytes);
-			String compressedString = base64.encode(gzipBytes);
-			showDialog (
-					context: context,
-					builder: (context) {
-						return Dialog(
-								child: QrImage(
-							data: compressedString,
-						));
-					});
+			QrTools.buildCompressedQrCode(context, jsonEncode(payload));
 		}
 	}
 
