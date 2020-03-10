@@ -38,9 +38,7 @@ class _ScoutModeState extends State<ScoutMode> {
 
 		_sharedPreferences.then((sp) {
 			String scheduleStr = sp.getString('schedule');
-			print('schedule in scout init: ' + scheduleStr);
 			if (scheduleStr.isNotEmpty) {
-				print('process schedule');
 				try { setState(() { schedule = Schedule.fromJson(jsonDecode(scheduleStr)); }); }
 				catch (error) { print(error); }
 			}

@@ -24,7 +24,6 @@ class Bluealliance {
 				Schedule schedule = (json != null && json.isNotEmpty) ? Schedule.importFromJson(json, eventCode) : null;
 				if (schedule != null) { (await _sharedPreferences).setString('schedule', jsonEncode(schedule.toJson())); }
 				Scaffold.of(scaffoldContext).showSnackBar(SnackBar(content: Text(schedule != null ? 'Loaded Schedule' : 'Failed to parse schedule'), duration: Duration(seconds: 3)));
-
 			} else {
 				Scaffold.of(scaffoldContext).showSnackBar(SnackBar(content: Text('Failed to load schedule ($eventCode) -- HTTP: ' + matchResponse.statusCode.toString()), duration: Duration(seconds: 3)));
 			}
