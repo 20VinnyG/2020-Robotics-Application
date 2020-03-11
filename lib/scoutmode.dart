@@ -36,6 +36,8 @@ class _ScoutModeState extends State<ScoutMode> {
 	void initState () {
 		super.initState();
 
+		matchData = new MatchData();
+
 		_sharedPreferences.then((sp) {
 			String scheduleStr = sp.getString('schedule');
 			if (scheduleStr.isNotEmpty) {
@@ -43,8 +45,6 @@ class _ScoutModeState extends State<ScoutMode> {
 				catch (error) { print(error); }
 			}
 		});
-
-		matchData = new MatchData();
 
 		if (widget.lastMatchData != null) {
 			matchData.initials = widget.lastMatchData.initials;
