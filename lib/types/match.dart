@@ -24,7 +24,7 @@ class MatchData {
 	Spin spins = new Spin();
 
 	//Endgame
-	double climbtime=0;
+	double climbtime = 0;
 	int numberClimbedWith = 0;
 	int park = 3; // TODO: Convert to int 1-3 before QR
 	bool levelability = false;
@@ -33,7 +33,7 @@ class MatchData {
 
 	//Postgame
 	double generalSuccess =	0;
-	double defensiveSuccess =0;
+	double defensiveSuccess = 0;
 	double accuracy = 0;
 	bool floorpickup = true;
 	bool fouls = false;
@@ -84,11 +84,11 @@ class MatchData {
 	Map<String,dynamic> toJson () {
 
 		double gs = (generalSuccess * 2).roundToDouble() / 2;
-		if (gs <= 1e-10) { generalSuccess = null; }
+		if (gs <= 1e-10) { gs = null; }
 		double ds = (defensiveSuccess * 2).roundToDouble() / 2;
-		if (ds <= 1e-10) { defensiveSuccess = null; }
+		if (ds <= 1e-10) { ds = null; }
 		double ac = (accuracy * 2).roundToDouble() / 2;
-		if (ac <= 1e-10) { accuracy = null; }
+		if (ac <= 1e-10) { ac = null; }
 
 		Map<String,dynamic> map = {
 			'in': initials,
